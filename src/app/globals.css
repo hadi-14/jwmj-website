@@ -2,25 +2,45 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #2b2b2b;
+  --primary-blue: #038DCD;
+  --primary-green: #25D47F;
+  --primary-yellow: #F9C856;
+  --primary-silver: #D9D9D9;
+  --primary-white: #FFFFFF;
+  --primary-black: #171717;
+  --accent-navy: #024767;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary-blue: var(--primary-blue);
+  --color-primary-green: var(--primary-green);
+  --color-primary-yellow: var(--primary-yellow);
+  --color-primary-silver: var(--primary-silver);
+  --color-primary-white: var(--primary-white);
+  --color-primary-black: var(--primary-black);
+  --color-accent-navy: var(--accent-navy);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes marquee {
+    0% { left: -200px; }
+    100% { left: 100%; }
 }
