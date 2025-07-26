@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Footer() {
     return (
-        <footer className="w-full fixed bottom-0 left-0 bg-primary-black text-white z-50">
+        <footer className="w-full relative bottom-0 left-0 bg-primary-black text-white z-50">
             <div className="max-w-7xl mx-auto px-6 py-12">
                 {/* Main Footer Content */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -38,8 +38,8 @@ export default function Footer() {
                                 </div>
                                 <div>
                                     <p className="text-gray-300">Phone 1</p>
-                                    <a href="tel:+919876543210" className="text-white hover:text-blue-400 transition-colors">
-                                        +91 98765 43210
+                                    <a href="tel:+922134893375" className="text-white hover:text-blue-400 transition-colors">
+                                        +92 21 34893375
                                     </a>
                                 </div>
                             </div>
@@ -52,8 +52,8 @@ export default function Footer() {
                                 </div>
                                 <div>
                                     <p className="text-gray-300">Phone 2</p>
-                                    <a href="tel:+919876543211" className="text-white hover:text-blue-400 transition-colors">
-                                        +91 98765 43211
+                                    <a href="tel:+923009253888" className="text-white hover:text-blue-400 transition-colors">
+                                        +92 300 9253888
                                     </a>
                                 </div>
                             </div>
@@ -70,7 +70,7 @@ export default function Footer() {
                             <div>
                                 <p className="text-gray-300">Email</p>
                                 <a href="mailto:info@jwmj.org" className="text-white hover:text-red-400 transition-colors">
-                                    info@jwmj.org
+                                    jamnagarwehvaria@gmail.com
                                 </a>
                             </div>
                         </div>
@@ -119,7 +119,7 @@ export default function Footer() {
                         <div className="grid grid-cols-2 gap-4">
 
                             {/* WhatsApp */}
-                            <a href="https://wa.me/919876543210"
+                            <a href="https://wa.me/923009253888"
                                 className="flex items-center gap-3 p-3 bg-gray-800 hover:bg-green-600 rounded-lg transition-all duration-300 group">
                                 <div className="bg-green-500 p-2 rounded-full group-hover:bg-white">
                                     <svg className="w-5 h-5 text-white group-hover:text-green-500" fill="currentColor" viewBox="0 0 24 24">
@@ -130,7 +130,7 @@ export default function Footer() {
                             </a>
 
                             {/* Facebook */}
-                            <a href="https://facebook.com/jwmj"
+                            <a href="https://www.facebook.com/JWMJYO/"
                                 className="flex items-center gap-3 p-3 bg-gray-800 hover:bg-blue-600 rounded-lg transition-all duration-300 group">
                                 <div className="bg-blue-500 p-2 rounded-full group-hover:bg-white">
                                     <svg className="w-5 h-5 text-white group-hover:text-blue-500" fill="currentColor" viewBox="0 0 24 24">
@@ -141,18 +141,18 @@ export default function Footer() {
                             </a>
 
                             {/* Instagram */}
-                            <a href="https://instagram.com/jwmj"
+                            <a href="https://www.instagram.com/jwmjyo/"
                                 className="flex items-center gap-3 p-3 bg-gray-800 hover:bg-pink-600 rounded-lg transition-all duration-300 group">
                                 <div className="bg-gradient-to-br from-purple-500 to-pink-500 p-2 rounded-full group-hover:bg-white">
                                     <svg className="w-5 h-5 text-white group-hover:text-pink-500" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.348-1.051-2.348-2.348 0-1.297 1.051-2.348 2.348-2.348 1.297 0 2.348 1.051 2.348 2.348 0 1.297-1.051 2.348-2.348 2.348zm7.718 0c-1.297 0-2.348-1.051-2.348-2.348 0-1.297 1.051-2.348 2.348-2.348 1.297 0 2.348 1.051 2.348 2.348 0 1.297-1.051 2.348-2.348 2.348z" />
+                                        <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5zm4.25 3.25a5.25 5.25 0 1 1 0 10.5 5.25 5.25 0 0 1 0-10.5zm0 1.5a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm5.13.62a1.13 1.13 0 1 1-2.26 0 1.13 1.13 0 0 1 2.26 0z" />
                                     </svg>
                                 </div>
                                 <span className="text-sm font-medium">Instagram</span>
                             </a>
 
                             {/* YouTube */}
-                            <a href="https://youtube.com/@jwmj"
+                            <a href="https://www.youtube.com/channel/UCBI_Uk_RXxfpL_u8hPKVC_g"
                                 className="flex items-center gap-3 p-3 bg-gray-800 hover:bg-red-600 rounded-lg transition-all duration-300 group">
                                 <div className="bg-red-500 p-2 rounded-full group-hover:bg-white">
                                     <svg className="w-5 h-5 text-white group-hover:text-red-500" fill="currentColor" viewBox="0 0 24 24">

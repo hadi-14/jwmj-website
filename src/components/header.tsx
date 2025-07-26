@@ -1,7 +1,16 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function Header() {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
     return (
         <header className="w-full">
             {/* Blue Ribbon */}
@@ -39,7 +48,8 @@ export default function Header() {
 
                 {/* Background Grey Box */}
                 <div className="w-full bg-primary-silver h-15 flex items-center justify-end z-40">
-                    <nav className="flex items-center mx-10">
+                    {/* Desktop Navigation */}
+                    <nav className="hidden lg:flex items-center mx-10">
                         <ul className="flex gap-6 text-primary-black/60 text-lg font-semibold">
                             <li><Link href="/#" className="hover:text-primary-blue">About US</Link></li>
                             <li><Link href="/#" className="hover:text-primary-blue">Announcements</Link></li>
@@ -49,7 +59,96 @@ export default function Header() {
                             <li><Link href="/#" className="hover:text-primary-blue">Contact</Link></li>
                         </ul>
                     </nav>
+
+                    {/* Mobile Menu Button */}
+                    <button
+                        className="lg:hidden flex flex-col items-center justify-center w-8 h-8 mx-6 z-50"
+                        onClick={toggleMenu}
+                        aria-label="Toggle menu"
+                    >
+                        <span
+                            className={`block w-6 h-0.5 bg-primary-black/60 transition-all duration-300 ${
+                                isMenuOpen ? 'rotate-45 translate-y-1.5' : ''
+                            }`}
+                        ></span>
+                        <span
+                            className={`block w-6 h-0.5 bg-primary-black/60 transition-all duration-300 my-1 ${
+                                isMenuOpen ? 'opacity-0' : ''
+                            }`}
+                        ></span>
+                        <span
+                            className={`block w-6 h-0.5 bg-primary-black/60 transition-all duration-300 ${
+                                isMenuOpen ? '-rotate-45 -translate-y-1.5' : ''
+                            }`}
+                        ></span>
+                    </button>
                 </div>
+            </div>
+
+            {/* Mobile Navigation Menu */}
+            <div
+                className={`lg:hidden absolute left-1/2 w-1/2 bg-primary-silver shadow-lg shadow-primary-black z-30 transition-all duration-300 ease-in-out ${
+                    isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
+                }`}
+            >
+                <nav className="py-4">
+                    <ul className="flex flex-col text-primary-black/60 text-lg font-semibold">
+                        <li>
+                            <Link 
+                                href="/#" 
+                                className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                About US
+                            </Link>
+                        </li>
+                        <li>
+                            <Link 
+                                href="/#" 
+                                className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                Announcements
+                            </Link>
+                        </li>
+                        <li>
+                            <Link 
+                                href="/#" 
+                                className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                Events
+                            </Link>
+                        </li>
+                        <li>
+                            <Link 
+                                href="/#" 
+                                className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                Youth Programs
+                            </Link>
+                        </li>
+                        <li>
+                            <Link 
+                                href="/#" 
+                                className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                Support
+                            </Link>
+                        </li>
+                        <li>
+                            <Link 
+                                href="/#" 
+                                className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                Contact
+                            </Link>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </header>
     );

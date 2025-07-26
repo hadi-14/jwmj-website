@@ -13,6 +13,7 @@
 }
 
 @theme inline {
+  /* Base colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary-blue: var(--primary-blue);
@@ -23,6 +24,116 @@
   --color-primary-black: var(--primary-black);
   --color-accent-navy: var(--accent-navy);
 
+  /* Dynamic color variants using color-mix with white (lighter) and black (darker) */
+  /* Background variants */
+  --color-background-50: color-mix(in srgb, var(--background), white 45%);
+  --color-background-100: color-mix(in srgb, var(--background), white 40%);
+  --color-background-200: color-mix(in srgb, var(--background), white 30%);
+  --color-background-300: color-mix(in srgb, var(--background), white 20%);
+  --color-background-400: color-mix(in srgb, var(--background), white 10%);
+  --color-background-500: var(--background);
+  --color-background-600: color-mix(in srgb, var(--background), black 10%);
+  --color-background-700: color-mix(in srgb, var(--background), black 20%);
+  --color-background-800: color-mix(in srgb, var(--background), black 30%);
+  --color-background-900: color-mix(in srgb, var(--background), black 40%);
+
+  /* Foreground variants */
+  --color-foreground-50: color-mix(in srgb, var(--foreground), white 45%);
+  --color-foreground-100: color-mix(in srgb, var(--foreground), white 40%);
+  --color-foreground-200: color-mix(in srgb, var(--foreground), white 30%);
+  --color-foreground-300: color-mix(in srgb, var(--foreground), white 20%);
+  --color-foreground-400: color-mix(in srgb, var(--foreground), white 10%);
+  --color-foreground-500: var(--foreground);
+  --color-foreground-600: color-mix(in srgb, var(--foreground), black 10%);
+  --color-foreground-700: color-mix(in srgb, var(--foreground), black 20%);
+  --color-foreground-800: color-mix(in srgb, var(--foreground), black 30%);
+  --color-foreground-900: color-mix(in srgb, var(--foreground), black 40%);
+
+  /* Primary Blue variants */
+  --color-primary-blue-50: color-mix(in srgb, var(--primary-blue), white 45%);
+  --color-primary-blue-100: color-mix(in srgb, var(--primary-blue), white 40%);
+  --color-primary-blue-200: color-mix(in srgb, var(--primary-blue), white 30%);
+  --color-primary-blue-300: color-mix(in srgb, var(--primary-blue), white 20%);
+  --color-primary-blue-400: color-mix(in srgb, var(--primary-blue), white 10%);
+  --color-primary-blue-500: var(--primary-blue);
+  --color-primary-blue-600: color-mix(in srgb, var(--primary-blue), black 10%);
+  --color-primary-blue-700: color-mix(in srgb, var(--primary-blue), black 20%);
+  --color-primary-blue-800: color-mix(in srgb, var(--primary-blue), black 30%);
+  --color-primary-blue-900: color-mix(in srgb, var(--primary-blue), black 40%);
+
+  /* Primary Green variants */
+  --color-primary-green-50: color-mix(in srgb, var(--primary-green), white 45%);
+  --color-primary-green-100: color-mix(in srgb, var(--primary-green), white 40%);
+  --color-primary-green-200: color-mix(in srgb, var(--primary-green), white 30%);
+  --color-primary-green-300: color-mix(in srgb, var(--primary-green), white 20%);
+  --color-primary-green-400: color-mix(in srgb, var(--primary-green), white 10%);
+  --color-primary-green-500: var(--primary-green);
+  --color-primary-green-600: color-mix(in srgb, var(--primary-green), black 10%);
+  --color-primary-green-700: color-mix(in srgb, var(--primary-green), black 20%);
+  --color-primary-green-800: color-mix(in srgb, var(--primary-green), black 30%);
+  --color-primary-green-900: color-mix(in srgb, var(--primary-green), black 40%);
+
+  /* Primary Yellow variants */
+  --color-primary-yellow-50: color-mix(in srgb, var(--primary-yellow), white 45%);
+  --color-primary-yellow-100: color-mix(in srgb, var(--primary-yellow), white 40%);
+  --color-primary-yellow-200: color-mix(in srgb, var(--primary-yellow), white 30%);
+  --color-primary-yellow-300: color-mix(in srgb, var(--primary-yellow), white 20%);
+  --color-primary-yellow-400: color-mix(in srgb, var(--primary-yellow), white 10%);
+  --color-primary-yellow-500: var(--primary-yellow);
+  --color-primary-yellow-600: color-mix(in srgb, var(--primary-yellow), black 10%);
+  --color-primary-yellow-700: color-mix(in srgb, var(--primary-yellow), black 20%);
+  --color-primary-yellow-800: color-mix(in srgb, var(--primary-yellow), black 30%);
+  --color-primary-yellow-900: color-mix(in srgb, var(--primary-yellow), black 40%);
+
+  /* Primary Silver variants */
+  --color-primary-silver-50: color-mix(in srgb, var(--primary-silver), white 95%);
+  --color-primary-silver-100: color-mix(in srgb, var(--primary-silver), white 90%);
+  --color-primary-silver-200: color-mix(in srgb, var(--primary-silver), white 80%);
+  --color-primary-silver-300: color-mix(in srgb, var(--primary-silver), white 70%);
+  --color-primary-silver-400: color-mix(in srgb, var(--primary-silver), white 60%);
+  --color-primary-silver-500: var(--primary-silver);
+  --color-primary-silver-600: color-mix(in srgb, var(--primary-silver), black 10%);
+  --color-primary-silver-700: color-mix(in srgb, var(--primary-silver), black 20%);
+  --color-primary-silver-800: color-mix(in srgb, var(--primary-silver), black 30%);
+  --color-primary-silver-900: color-mix(in srgb, var(--primary-silver), black 40%);
+
+  /* Primary White variants */
+  --color-primary-white-50: color-mix(in srgb, var(--primary-white), white 95%);
+  --color-primary-white-100: color-mix(in srgb, var(--primary-white), white 90%);
+  --color-primary-white-200: color-mix(in srgb, var(--primary-white), white 80%);
+  --color-primary-white-300: color-mix(in srgb, var(--primary-white), white 70%);
+  --color-primary-white-400: color-mix(in srgb, var(--primary-white), white 60%);
+  --color-primary-white-500: var(--primary-white);
+  --color-primary-white-600: color-mix(in srgb, var(--primary-white), black 10%);
+  --color-primary-white-700: color-mix(in srgb, var(--primary-white), black 20%);
+  --color-primary-white-800: color-mix(in srgb, var(--primary-white), black 30%);
+  --color-primary-white-900: color-mix(in srgb, var(--primary-white), black 40%);
+
+  /* Primary Black variants */
+  --color-primary-black-50: color-mix(in srgb, var(--primary-black), white 95%);
+  --color-primary-black-100: color-mix(in srgb, var(--primary-black), white 90%);
+  --color-primary-black-200: color-mix(in srgb, var(--primary-black), white 80%);
+  --color-primary-black-300: color-mix(in srgb, var(--primary-black), white 70%);
+  --color-primary-black-400: color-mix(in srgb, var(--primary-black), white 60%);
+  --color-primary-black-500: var(--primary-black);
+  --color-primary-black-600: color-mix(in srgb, var(--primary-black), black 10%);
+  --color-primary-black-700: color-mix(in srgb, var(--primary-black), black 20%);
+  --color-primary-black-800: color-mix(in srgb, var(--primary-black), black 30%);
+  --color-primary-black-900: color-mix(in srgb, var(--primary-black), black 40%);
+
+  /* Accent Navy variants */
+  --color-accent-navy-50: color-mix(in srgb, var(--accent-navy), white 95%);
+  --color-accent-navy-100: color-mix(in srgb, var(--accent-navy), white 90%);
+  --color-accent-navy-200: color-mix(in srgb, var(--accent-navy), white 80%);
+  --color-accent-navy-300: color-mix(in srgb, var(--accent-navy), white 70%);
+  --color-accent-navy-400: color-mix(in srgb, var(--accent-navy), white 60%);
+  --color-accent-navy-500: var(--accent-navy);
+  --color-accent-navy-600: color-mix(in srgb, var(--accent-navy), black 10%);
+  --color-accent-navy-700: color-mix(in srgb, var(--accent-navy), black 20%);
+  --color-accent-navy-800: color-mix(in srgb, var(--accent-navy), black 30%);
+  --color-accent-navy-900: color-mix(in srgb, var(--accent-navy), black 40%);
+
+  /* Font families */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
