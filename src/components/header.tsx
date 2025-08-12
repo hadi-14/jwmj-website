@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -12,7 +11,7 @@ export default function Header() {
     };
 
     return (
-        <header className="w-full">
+        <header className="w-full top-0 left-0 z-50">
             {/* Blue Ribbon */}
             <div className="h-8 bg-gradient-to-r from-primary-blue to-accent-navy relative overflow-hidden justify-between">
                 {/* First animated text */}
@@ -38,7 +37,7 @@ export default function Header() {
                 </span>
             </div>
 
-            <div className="w-full relative flex items-center justify-between shadow-lg shadow-primary-black">
+            <div className="w-full relative flex items-center justify-between shadow-lg shadow-primary-black opacity-80">
                 {/* Circle */}
                 <div className="bg-primary-silver h-30 w-30 rounded-full absolute left-5 top-1 p-2 shadow-lg shadow-primary-black z-10">
                 </div>
@@ -51,7 +50,7 @@ export default function Header() {
                     {/* Desktop Navigation */}
                     <nav className="hidden lg:flex items-center mx-10">
                         <ul className="flex gap-6 text-primary-black/60 text-lg font-semibold">
-                            <li><Link href="/#" className="hover:text-primary-blue">About US</Link></li>
+                            <li><Link href="/about" className="hover:text-primary-blue">About US</Link></li>
                             <li><Link href="/#" className="hover:text-primary-blue">Announcements</Link></li>
                             <li><Link href="/#" className="hover:text-primary-blue">Events</Link></li>
                             <li><Link href="/#" className="hover:text-primary-blue">Youth Programs</Link></li>
@@ -67,19 +66,16 @@ export default function Header() {
                         aria-label="Toggle menu"
                     >
                         <span
-                            className={`block w-6 h-0.5 bg-primary-black/60 transition-all duration-300 ${
-                                isMenuOpen ? 'rotate-45 translate-y-1.5' : ''
-                            }`}
+                            className={`block w-6 h-0.5 bg-primary-black/60 transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-1.5' : ''
+                                }`}
                         ></span>
                         <span
-                            className={`block w-6 h-0.5 bg-primary-black/60 transition-all duration-300 my-1 ${
-                                isMenuOpen ? 'opacity-0' : ''
-                            }`}
+                            className={`block w-6 h-0.5 bg-primary-black/60 transition-all duration-300 my-1 ${isMenuOpen ? 'opacity-0' : ''
+                                }`}
                         ></span>
                         <span
-                            className={`block w-6 h-0.5 bg-primary-black/60 transition-all duration-300 ${
-                                isMenuOpen ? '-rotate-45 -translate-y-1.5' : ''
-                            }`}
+                            className={`block w-6 h-0.5 bg-primary-black/60 transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-1.5' : ''
+                                }`}
                         ></span>
                     </button>
                 </div>
@@ -87,15 +83,14 @@ export default function Header() {
 
             {/* Mobile Navigation Menu */}
             <div
-                className={`lg:hidden absolute left-1/2 w-1/2 bg-primary-silver shadow-lg shadow-primary-black z-30 transition-all duration-300 ease-in-out ${
-                    isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
-                }`}
+                className={`lg:hidden absolute left-1/2 w-1/2 bg-primary-silver shadow-lg shadow-primary-black z-30 transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-96 opacity-80 rounded-2xl mt-2 -ml-2' : 'max-h-0 opacity-0 overflow-hidden'
+                    }`}
             >
                 <nav className="py-4">
                     <ul className="flex flex-col text-primary-black/60 text-lg font-semibold">
                         <li>
-                            <Link 
-                                href="/#" 
+                            <Link
+                                href="/#"
                                 className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
@@ -103,8 +98,8 @@ export default function Header() {
                             </Link>
                         </li>
                         <li>
-                            <Link 
-                                href="/#" 
+                            <Link
+                                href="/#"
                                 className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
@@ -112,8 +107,8 @@ export default function Header() {
                             </Link>
                         </li>
                         <li>
-                            <Link 
-                                href="/#" 
+                            <Link
+                                href="/#"
                                 className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
@@ -121,8 +116,8 @@ export default function Header() {
                             </Link>
                         </li>
                         <li>
-                            <Link 
-                                href="/#" 
+                            <Link
+                                href="/#"
                                 className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
@@ -130,8 +125,8 @@ export default function Header() {
                             </Link>
                         </li>
                         <li>
-                            <Link 
-                                href="/#" 
+                            <Link
+                                href="/#"
                                 className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
@@ -139,8 +134,8 @@ export default function Header() {
                             </Link>
                         </li>
                         <li>
-                            <Link 
-                                href="/#" 
+                            <Link
+                                href="/#"
                                 className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >

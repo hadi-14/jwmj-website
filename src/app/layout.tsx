@@ -27,9 +27,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground relative`}
       >
-        <Header />
+        <div className="absolute top-0 left-0 w-full z-50">
+          <Header />
+        </div>
+        {/* Children and Footer start from 0 */}
         {children}
         <Footer />
       </body>
