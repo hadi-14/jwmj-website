@@ -152,6 +152,59 @@ body {
 }
 
 @keyframes marquee {
-    0% { left: -200px; }
-    100% { left: 100%; }
+  0% {
+    left: -200px;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
+.bg-jwmj-50 {
+  background: radial-gradient(circle at 21% 70%, rgba(249, 217, 143, 0.05) 0%, rgba(113, 189, 224, 0.05) 100%);
+}
+
+.bg-jwmj-100 {
+  background: radial-gradient(circle at 21% 70%, rgba(249, 217, 143, 0.1) 0%, rgba(113, 189, 224, 0.1) 100%);
+}
+
+.bg-jwmj-150 {
+  background: radial-gradient(circle at 21% 70%, rgba(249, 217, 143, 0.15) 0%, rgba(113, 189, 224, 0.15) 100%);
+}
+
+.bg-jwmj-200 {
+  background: radial-gradient(circle at 21% 70%, rgba(249, 217, 143, 0.2) 0%, rgba(113, 189, 224, 0.2) 100%);
+}
+
+.bg-jwmj-300 {
+  background: radial-gradient(circle at 21% 70%, rgba(249, 217, 143, 0.3) 0%, rgba(113, 189, 224, 0.3) 100%);
+}
+
+.bg-jwmj-400 {
+  background: radial-gradient(circle at 21% 70%, rgba(249, 217, 143, 0.4) 0%, rgba(113, 189, 224, 0.4) 100%);
+}
+
+.bg-jwmj, .bg-jwmj-500 {
+  background: radial-gradient(circle at 21% 70%, rgba(249, 217, 143, 0.5) 0%, rgba(113, 189, 224, 0.5) 100%);
+}
+
+.bg-jwmj-600 {
+  background: radial-gradient(circle at 21% 70%, rgba(249, 217, 143, 0.6) 0%, rgba(113, 189, 224, 0.6) 100%);
+}
+
+.bg-jwmj-700 {
+  background: radial-gradient(circle at 21% 70%, rgba(249, 217, 143, 0.7) 0%, rgba(113, 189, 224, 0.7) 100%);
+}
+
+.bg-jwmj-800 {
+  background: radial-gradient(circle at 21% 70%, rgba(249, 217, 143, 0.8) 0%, rgba(113, 189, 224, 0.8) 100%);
+}
+
+.bg-jwmj-900 {
+  background: radial-gradient(circle at 21% 70%, rgba(249, 217, 143, 0.9) 0%, rgba(113, 189, 224, 0.9) 100%);
+}
+
+.bg-jwmj-950 {
+  background: radial-gradient(circle at 21% 70%, rgba(249, 217, 143, 0.95) 0%, rgba(113, 189, 224, 0.95) 100%);
 }
