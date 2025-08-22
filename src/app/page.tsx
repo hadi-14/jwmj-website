@@ -26,7 +26,7 @@ export default function Home() {
   // const recentUpdates = [];
 
   return (
-    <main className="w-full z-5">
+    <main className="w-full z-5 -mt-24">
 
       {/* Header Section */}
       <div>

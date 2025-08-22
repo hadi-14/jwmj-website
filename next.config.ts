@@ -1,7 +1,18 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "placehold.co",
+        port: "",
+        pathname: "/**",
+      },
+    ],
+    // ⚠️ only enable if you really trust the source
+    // dangerouslyAllowSVG: true,
+  },
 };
 
 export default nextConfig;
