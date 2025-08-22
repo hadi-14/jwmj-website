@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function EventsPage() {
     return (
-        <main className="w-full min-h-screen bg-gradient-to-br from-[#f9f6ff] via-[#f4faff] to-[#fefaf5] pb-20">
+        <main className="w-full min-h-screen pb-20">
             {/* Hero Section */}
             <section className="max-w-6xl mx-auto mt-10 mb-12 rounded-2xl border border-slate-200 shadow-lg p-8 flex flex-col md:flex-row items-center gap-10 bg-gradient-to-tr from-[#fffde7] to-[#e0f7fa]">
                 <div className="flex-1 flex flex-col justify-center">

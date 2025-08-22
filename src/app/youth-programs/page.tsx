@@ -2,14 +2,14 @@ export default function AboutPage() {
   return (
     <main className="w-full min-h-screen bg-gradient-to-br from-[#f4faff] via-[#fdfaf5] to-[#fefaf5] pb-20">
       {/* Header Section */}
-      <section className="max-w-5xl mx-auto mt-10 mb-12 relative">
+      <section className="max-w-7xl mx-auto mt-10 mb-12 relative">
         <div className="flex items-center rounded-3xl border border-slate-300 shadow-sm bg-gradient-to-r from-[#fef9e7] to-[#e6f7fb] px-10 py-6 relative">
           {/* Translucent Pill Overlap */}
-          <div className="absolute -left-6 top-1/2 -translate-y-1/2 bg-sky-400/70 px-10 py-4 rounded-3xl font-extrabold text-yellow-300 text-3xl shadow-md">
+          <div className="absolute -left-6 top-1/2 -translate-y-1/2 bg-sky-400/70 px-10 py-4 rounded-3xl font-extrabold text-yellow-300 text-3xl shadow-md border border-slate-30">
             JWMYO
           </div>
           {/* Full Name */}
-          <h1 className="ml-28 text-xl md:text-2xl font-bold text-sky-600">
+          <h1 className="ml-28 text-xl md:text-2xl font-bold text-sky-600 pl-10">
             Jamnagar Wehvaria Memon Youth Organization
           </h1>
         </div>

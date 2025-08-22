@@ -57,13 +57,13 @@ const advisors = [
 ];
 
 // Flip Card Component
-const FlipCard = ({ member, isPresident = false }: FlipCardProps) => {
+const FlipCard = ({ member, isPresident = false, yellow = false }: FlipCardProps & { yellow?: boolean }) => {
   return (
     <div className="group w-full h-64 [perspective:1000px]">
       <div className="relative w-full h-full duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
         {/* Front of card */}
-        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg border border-gray-200 p-4 flex flex-col justify-center items-center text-center">
-          <div className="w-24 h-24 rounded-lg overflow-hidden border-4 border-gray-200 mb-3 shadow-md">
+        <div className={"absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl shadow-lg border p-4 flex flex-col justify-center items-center text-center bg-gradient-to-br from-white to-gray-50 border-gray-200"}>
+          <div className="w-24 h-24 rounded-lg overflow-hidden border-4 mb-3 shadow-md border-gray-200">
             <Image
               src="https://placehold.co/96x96/e0e0e0/666?text=Photo"
               alt={member.name}
@@ -75,10 +75,10 @@ const FlipCard = ({ member, isPresident = false }: FlipCardProps) => {
           <h3 className="font-bold text-gray-800 text-base leading-tight mb-1">
             {member.name}
           </h3>
-          <p className={`text-sm font-medium ${isPresident ? 'text-[#038DCD]' : 'text-gray-600'} mb-2`}>
+          <p className={`text-sm font-medium ${isPresident ? (yellow ? 'text-yellow-700' : 'text-[#038DCD]') : 'text-gray-600'} mb-2`}>
             {member.designation}
           </p>
-          <div className="mt-2 text-xs text-gray-400 flex items-center gap-1">
+          <div className="mt-2 text-xs flex items-center gap-1 text-gray-400">
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
             </svg>
@@ -87,20 +87,9 @@ const FlipCard = ({ member, isPresident = false }: FlipCardProps) => {
         </div>
 
         {/* Back of card */}
-        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] bg-gradient-to-br from-[#038DCD] to-blue-700 rounded-xl shadow-lg p-4 flex flex-col justify-center items-center text-center text-white">
-          <div className="w-20 h-20 rounded-lg overflow-hidden border-3 border-white/30 mb-4">
-            <Image
-              src="https://placehold.co/80x80/ffffff/038DCD?text=Photo"
-              alt={member.name}
-              width={80}
-              height={80}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          
+        <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl shadow-lg p-4 flex flex-col justify-center items-center text-center text-white ${yellow ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' : 'bg-gradient-to-br from-[#038DCD] to-blue-700'}`}>
           <h4 className="font-bold text-lg mb-2 text-white">{member.name}</h4>
           <p className="text-blue-100 text-sm mb-4">{member.designation}</p>
-          
           {/* Phone Number Display */}
           <div className="bg-white/20 px-4 py-3 rounded-lg mb-3 w-full max-w-[200px]">
             <div className="flex items-center justify-center gap-2 mb-2">
@@ -111,32 +100,72 @@ const FlipCard = ({ member, isPresident = false }: FlipCardProps) => {
             </div>
             <p className="text-white font-mono text-lg">{member.contact}</p>
           </div>
-          
           {/* Action Buttons */}
           <div className="space-y-2 w-full max-w-[200px]">
-            <a 
-              href={`tel:${member.contact}`} 
-              className="bg-white/30 hover:bg-white/40 transition-colors px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 w-full text-white border border-white/20"
-            >
-              📞 Call Now
-            </a>
-            
-            <a 
-              href={`https://wa.me/92${member.contact.substring(1)}`} 
+            <a
+              href={`https://wa.me/92${member.contact.substring(1)}`}
               className="bg-green-500 hover:bg-green-600 transition-colors px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 w-full text-white"
             >
               💬 WhatsApp
             </a>
           </div>
-          
-          <div className="text-xs text-blue-100 mt-3 opacity-80">
-            {isPresident ? "JWMJ President 2024-2026" : "Committee Member"}
+          <div className={`text-xs mt-3 opacity-80 ${yellow ? 'text-yellow-100' : 'text-blue-100'}`}>
+            {isPresident ? (yellow ? "JWMYO President 2024-2026" : "JWMJ President 2024-2026") : "Committee Member"}
           </div>
         </div>
       </div>
     </div>
   );
-};
+}
+
+// JWMYO Data
+const jwmyoOfficeBearers: Member[] = [
+  { name: "Uzair Munawar", designation: "President", contact: "0321-2918197" },
+  { name: "Muhammad Umer Durvesh", designation: "Senior Vice President", contact: "0300-2010940" },
+  { name: "Mohammad Arif Patel", designation: "Vice President", contact: "0321-2256579" },
+  { name: "Saqib Yousuf Rangoonwala", designation: "General Secretary", contact: "0321-8247615" },
+  { name: "Qaiser Ahmed Rangoonwala", designation: "Senior Joint Secretary", contact: "0321-2391660" },
+  { name: "Shamoon Siddiq", designation: "Joint Secretary", contact: "0322-2281344" },
+  { name: "Abdul Samad Durvesh", designation: "Finance Secretary", contact: "0334-3931592" },
+  { name: "Arsalan Abdullah", designation: "Press Secretary", contact: "0300-2590194" },
+];
+
+const jwmyoManagingCommittee: Member[] = [
+  { name: "Sanan Ilyas", designation: "Member", contact: "0344-2560203" },
+  { name: "Muhammad Hassan Wehvaria", designation: "Member", contact: "0331-3660330" },
+  { name: "Adnan Amin", designation: "Member", contact: "0323-3236828" },
+  { name: "Muhammad Owais Dinga", designation: "Member", contact: "0307-0203484" },
+  { name: "Imran Hussain", designation: "Member", contact: "0333-0394690" },
+  { name: "Muhammad Anas Rangoonwala", designation: "Member", contact: "0317-1186611" },
+  { name: "Muhammad Hammad Rangoonwala", designation: "Member", contact: "0309-8886403" },
+  { name: "Muhammad Faiq Imran", designation: "Member", contact: "0323-2850941" },
+  { name: "Muhammad Ahmed Patel", designation: "Member", contact: "0303-2701674" },
+  { name: "Shayan Saleem", designation: "Member", contact: "0307-2884984" },
+  { name: "Usama Kamdar", designation: "Member", contact: "0312-2464924" },
+  { name: "Rabi Ibrahim", designation: "Member", contact: "0324-2112122" },
+  { name: "Hammad Ibrahim", designation: "Member", contact: "0324-2111998" },
+  { name: "Umair Amin Nakhuda", designation: "Member", contact: "0315-2053998" },
+  { name: "Muhammad Memon", designation: "Member", contact: "0322-2100279" },
+  { name: "Anfal Dadabhai", designation: "Member", contact: "0332-2170332" },
+  { name: "Abubakar Nakhuda", designation: "Member", contact: "0336-2307281" },
+  { name: "Uzair Yaqoob", designation: "Member", contact: "0343-2558633" },
+  { name: "Safwan Abdul Samad", designation: "Member", contact: "0334-2105667" },
+  { name: "Raza Imran Bharambia", designation: "Member", contact: "0325-8986899" },
+  { name: "Emaaz Durvesh", designation: "Member", contact: "0307-0035584" },
+  { name: "Ahmed Abdul Sami", designation: "Member", contact: "0302-1251625" },
+  { name: "Ahnaf Durvesh", designation: "Member", contact: "0304-1159066" },
+  { name: "Hasin Munawar", designation: "Member", contact: "0317-2151401" },
+  { name: "Fayyaz Faisal", designation: "Member", contact: "0343-2560292" },
+];
+
+const jwmyoAdvisors: Member[] = [
+  { name: "Abdul Samad Dochki", designation: "Advisor", contact: "0333-3024651" },
+  { name: "Haris Rangoonwala", designation: "Advisor", contact: "0321-8226754" },
+  { name: "Tahir Rangoonwala", designation: "Advisor", contact: "0321-8833332" },
+  { name: "Abdul Samad Jamal", designation: "Advisor", contact: "0300-2662701" },
+  { name: "Urwah Zubair", designation: "Advisor", contact: "0321-2610204" },
+  { name: "Uzair Hussain", designation: "Advisor", contact: "0320-2559784" },
+];
 
 export default function AboutPage() {
   const president = officeBearers[0]; // First office bearer is the president
@@ -199,9 +228,9 @@ export default function AboutPage() {
         <div className="flex flex-wrap justify-center gap-6">
           {officeBearers.map((member, index) => (
             <div key={index} className="w-full sm:w-72 md:w-64 lg:w-72">
-              <FlipCard 
-                member={member} 
-                isPresident={member.designation === "President"} 
+              <FlipCard
+                member={member}
+                isPresident={member.designation === "President"}
               />
             </div>
           ))}
@@ -227,6 +256,41 @@ export default function AboutPage() {
           {advisors.map((member, index) => (
             <div key={index} className="w-full sm:w-72 md:w-64 lg:w-72">
               <FlipCard member={member} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* JWMYO Section */}
+      <section className="max-w-7xl w-full mb-12">
+        <h2 className="text-yellow-600 font-bold text-4xl mb-8 text-center">JWMYO</h2>
+
+        {/* JWMYO Office Bearers */}
+        <h3 className="text-yellow-600 font-bold text-2xl mb-6 text-center">Office Bearers</h3>
+        <div className="flex flex-wrap justify-center gap-6 mb-10">
+          {jwmyoOfficeBearers.map((member, index) => (
+            <div key={index} className="w-full sm:w-72 md:w-64 lg:w-72">
+              <FlipCard member={member} isPresident={member.designation === "President"} yellow />
+            </div>
+          ))}
+        </div>
+
+        {/* JWMYO Managing Committee */}
+        <h3 className="text-yellow-600 font-bold text-2xl mb-6 text-center">Members Managing Committee</h3>
+        <div className="flex flex-wrap justify-center gap-6 mb-10">
+          {jwmyoManagingCommittee.map((member, index) => (
+            <div key={index} className="w-full sm:w-72 md:w-64 lg:w-72">
+              <FlipCard member={member} yellow />
+            </div>
+          ))}
+        </div>
+
+        {/* JWMYO Advisors */}
+        <h3 className="text-yellow-600 font-bold text-2xl mb-6 text-center">Advisors</h3>
+        <div className="flex flex-wrap justify-center gap-6">
+          {jwmyoAdvisors.map((member, index) => (
+            <div key={index} className="w-full sm:w-72 md:w-64 lg:w-72">
+              <FlipCard member={member} yellow />
             </div>
           ))}
         </div>

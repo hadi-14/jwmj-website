@@ -58,44 +58,42 @@ export default function AboutPage() {
       </section>
 
         {/* Aims & Objectives */}
-  <section id="about" className="max-w-7xl px-4 py-16 place-items-center">
+  <section id="about" className="max-w-7xl px-4 py-16 place-items-center ">
     <h2 className="text-2xl md:text-4xl font-semibold mb-12">
       Aims & Objectives
     </h2>
-    <div className="grid md:grid-cols-4 gap-8 text-center w-full">
-      <div className="p-6 rounded-2xl border border-gray-400 bg-jwmj flex items-center justify-center">
+    <div className="text-center w-full flex flex-row flex-wrap gap-6 justify-center">
+      <div className="p-6 rounded-2xl border-1 border-gray-400 bg-jwmj flex items-center justify-centerw-64 md:w-72">
         <p className="text-sky-600 text-lg">
           Promote unity, brotherhood, and friendship among Jamat members, working for their betterment and uplift.
         </p>
       </div>
-      <div className="p-6 rounded-2xl border-gray-400 border-1 bg-jwmj flex items-center justify-center">
+      <div className="p-6 rounded-2xl border-1 border-gray-400 bg-jwmj flex items-center justify-center w-64 md:w-72">
         <p className="text-sky-600 text-lg">
           Extend all possible help and cooperation to Jamat members, striving to improve their educational and religious conditions. Arrange proper measures for providing coffin and burial facilities.
         </p>
       </div>
-      <div className="p-6 rounded-2xl border-gray-400 border-1 bg-jwmj flex items-center justify-center">
+      <div className="p-6 rounded-2xl border-1 border-gray-400 bg-jwmj flex items-center justify-center w-64 md:w-72">
         <p className="text-sky-600 text-lg">
           Raise funds through subscriptions, donations, contributions, grants, aids, loans, and advances (in cash, cheque, or other forms) to be utilized in the best interest of Jamat.
         </p>
       </div>
-      <div className="p-6 rounded-2xl border-gray-400 border-1 bg-jwmj flex items-center justify-center">
+      <div className="p-6 rounded-2xl border-1 border-gray-400 bg-jwmj flex items-center justify-center w-64 md:w-72">
         <p className="text-sky-600 text-lg">
           Establish and run Jamat Khana, decoration services, or other measures to strengthen the social and economic condition of Jamat. Acquire, purchase, or exchange movable and immovable properties for association use, and maintain, repair, renovate, demolish, or construct them for offices, coaching classes, cutting classes, libraries, and more.
         </p>
       </div>
-    </div>
-    <div className="grid md:grid-cols-3 gap-8 text-center w-5/6 mt-20">
-      <div className="p-6 rounded-2xl border-gray-400 border-1 bg-jwmj flex items-center justify-center">
+      <div className="p-6 rounded-2xl border-1 border-gray-400 bg-jwmj flex items-center justify-center w-64 md:w-72">
         <p className="text-sky-600 text-lg">
           Amalgamate Madrassas, schools, boarding houses, libraries, reading rooms, industrial homes, meeting rooms, function halls, educational/instructional/vocational training centres, dispensaries, hospitals, maternity homes, child welfare centres, sanatoriums, orphanages, Musafir Khanas, and similar institutions whenever feasible within community means.
         </p>
       </div>
-      <div className="p-6 rounded-2xl border-gray-400 border-1 bg-jwmj flex items-center justify-center">
+      <div className="p-6 rounded-2xl border-1 border-gray-400 bg-jwmj flex items-center justify-center w-64 md:w-72">
         <p className="text-sky-600 text-lg">
           Maintain close contact with the entire Memon community of Pakistan, extending cooperation and assistance for social uplift and unity. Cooperate or affiliate with other Memon institutions or organizations having similar aims and objectives.
         </p>
       </div>
-      <div className="p-6 rounded-2xl border-gray-400 border-1 bg-jwmj flex items-center justify-center">
+      <div className="p-6 rounded-2xl border-1 border-gray-400 bg-jwmj flex items-center justify-center w-64 md:w-72">
         <p className="text-sky-600 text-lg">
           Abstain from participating in the politics of the country.
         </p>

@@ -51,11 +51,11 @@ export default function Header() {
                     <nav className="hidden lg:flex items-center mx-10">
                         <ul className="flex gap-6 text-primary-black/60 text-lg font-semibold">
                             <li><Link href="/about" className="hover:text-primary-blue">About US</Link></li>
-                            <li><Link href="/#" className="hover:text-primary-blue">Announcements</Link></li>
-                            <li><Link href="/#" className="hover:text-primary-blue">Events</Link></li>
+                            <li><Link href="/about-jwmyo" className="hover:text-primary-blue">About JWMYO</Link></li>
                             <li><Link href="/#" className="hover:text-primary-blue">Youth Programs</Link></li>
-                            <li><Link href="/#" className="hover:text-primary-blue">Support</Link></li>
-                            <li><Link href="/#" className="hover:text-primary-blue">Contact</Link></li>
+                            <li><Link href="/events" className="hover:text-primary-blue">Events</Link></li>
+                            <li><Link href="/presidency" className="hover:text-primary-blue">Presidency</Link></li>
+                            <li><Link href="/support" className="hover:text-primary-blue">Support & Contact</Link></li>
                         </ul>
                     </nav>
 
@@ -90,7 +90,7 @@ export default function Header() {
                     <ul className="flex flex-col text-primary-black/60 text-lg font-semibold">
                         <li>
                             <Link
-                                href="/#"
+                                href="/about"
                                 className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
@@ -99,25 +99,16 @@ export default function Header() {
                         </li>
                         <li>
                             <Link
-                                href="/#"
+                                href="/about-jwmyo"
                                 className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
-                                Announcements
+                                About JWMYO
                             </Link>
                         </li>
                         <li>
                             <Link
-                                href="/#"
-                                className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                Events
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                href="/#"
+                                href="/youth-programs"
                                 className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
@@ -126,20 +117,29 @@ export default function Header() {
                         </li>
                         <li>
                             <Link
-                                href="/#"
+                                href="/events"
                                 className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
-                                Support
+                                Events
                             </Link>
                         </li>
                         <li>
                             <Link
-                                href="/#"
+                                href="/presidency"
                                 className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
-                                Contact
+                                Presidency
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
+                                href="/support"
+                                className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                Support & Contact
                             </Link>
                         </li>
                     </ul>
