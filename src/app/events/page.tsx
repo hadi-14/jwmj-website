@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from 'next/image';
 import EventsHighlights from "@/components/eventsHighlights";
+import { formatDate } from "@/utils/general";
 
 // Dummy event data with placeholder images
 const categories = [
@@ -11,121 +12,34 @@ const categories = [
   "Islamic Gatherings",
 ];
 
-export const dummyEvents = [
-  {
-    id: 1,
-    title: "Family Picnic 2025",
-    desc: "A fun-filled day for families with games, food, and activities.",
-    date: "2025-08-22",
-    category: "Family Events",
-    img: "https://placehold.co/400x300/87CEEB/FFFFFF/jpg?text=Family+Picnic",
-  },
-  {
-    id: 2,
-    title: "Quran Class Graduation",
-    desc: "Celebrating our students' achievements in Quran studies.",
-    date: "2025-08-15",
-    category: "Jamat Teachings",
-    img: "https://placehold.co/400x300/98FB98/FFFFFF/jpg?text=Quran+Class",
-  },
-  {
-    id: 3,
-    title: "Bachat Bazar Summer",
-    desc: "A community market for affordable shopping.",
-    date: "2025-07-30",
-    category: "Bachat Bazar",
-    img: "https://placehold.co/400x300/FFB347/FFFFFF/jpg?text=Summer+Bazar",
-  },
-  {
-    id: 4,
-    title: "Eid Gathering",
-    desc: "Celebrate Eid with prayers and community lunch.",
-    date: "2025-07-20",
-    category: "Islamic Gatherings",
-    img: "https://placehold.co/400x300/DDA0DD/FFFFFF/jpg?text=Eid+Gathering",
-  },
-  {
-    id: 5,
-    title: "Family Movie Night",
-    desc: "Watch a family-friendly movie under the stars.",
-    date: "2025-06-18",
-    category: "Family Events",
-    img: "https://placehold.co/400x300/87CEEB/FFFFFF/jpg?text=Movie+Night",
-  },
-  {
-    id: 6,
-    title: "Ramadan Workshop",
-    desc: "Learn about the significance of Ramadan.",
-    date: "2025-06-10",
-    category: "Jamat Teachings",
-    img: "https://placehold.co/400x300/98FB98/FFFFFF/jpg?text=Ramadan+Workshop",
-  },
-  {
-    id: 7,
-    title: "Bachat Bazar Spring",
-    desc: "Spring edition of our popular community market.",
-    date: "2025-05-25",
-    category: "Bachat Bazar",
-    img: "https://placehold.co/400x300/FFB347/FFFFFF/jpg?text=Spring+Bazar",
-  },
-  {
-    id: 8,
-    title: "Friday Halaqa",
-    desc: "Weekly gathering for spiritual discussion.",
-    date: "2025-05-10",
-    category: "Islamic Gatherings",
-    img: "https://placehold.co/400x300/DDA0DD/FFFFFF/jpg?text=Friday+Halaqa",
-  },
-  {
-    id: 9,
-    title: "Family Sports Day",
-    desc: "Sports competitions for all ages.",
-    date: "2025-04-15",
-    category: "Family Events",
-    img: "https://placehold.co/400x300/87CEEB/FFFFFF/jpg?text=Sports+Day",
-  },
-  {
-    id: 10,
-    title: "Islamic Art Workshop",
-    desc: "Explore Islamic art and calligraphy.",
-    date: "2025-03-28",
-    category: "Islamic Gatherings",
-    img: "https://placehold.co/400x300/DDA0DD/FFFFFF/jpg?text=Art+Workshop",
-  },
-  {
-    id: 11,
-    title: "Bachat Bazar Winter",
-    desc: "Winter deals and community fun.",
-    date: "2025-02-12",
-    category: "Bachat Bazar",
-    img: "https://placehold.co/400x300/FFB347/FFFFFF/jpg?text=Winter+Bazar",
-  },
-  {
-    id: 12,
-    title: "Jamat Youth Seminar",
-    desc: "Empowering youth with knowledge and skills.",
-    date: "2025-01-20",
-    category: "Jamat Teachings",
-    img: "https://placehold.co/400x300/98FB98/FFFFFF/jpg?text=Youth+Seminar",
-  },
-];
-
-export const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr);
-  return {
-    day: date.getDate(),
-    month: date.toLocaleDateString(undefined, { month: 'short' }),
-    year: date.getFullYear()
-  };
-};
-
 export default function EventsPage() {
   const [activeTab, setActiveTab] = useState(categories[0]);
   const [sortOrder, setSortOrder] = useState<'new' | 'old'>('new');
   const [visibleCards, setVisibleCards] = useState(new Set());
+  const [Events, setEvents] = useState<{
+    id: number;
+    title: string;
+    desc: string;
+    date: string;
+    category: string;
+    img: string;
+  }[]>([]);
+
+  const getEvents = async () => {
+    const res = await fetch("/api/events", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await res.json();
+    setEvents(data);
+  };
+
+  useEffect(() => {
+    getEvents();
+  }, []);
 
   // Sort only for categorized events
-  const sortedEvents = [...dummyEvents].sort((a, b) =>
+  const sortedEvents = [...Events].sort((a, b) =>
     sortOrder === 'new'
       ? new Date(b.date).getTime() - new Date(a.date).getTime()
       : new Date(a.date).getTime() - new Date(b.date).getTime()

@@ -1,13 +1,34 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-
-import { dummyEvents, formatDate } from '@/app/events/page';
+import { formatDate } from '@/utils/general';
 
 export default function EventsHighlights() {
     const sliderRef = useRef<HTMLDivElement>(null);
+      const [Events, setEvents] = useState<{
+        id: number;
+        title: string;
+        desc: string;
+        date: string;
+        category: string;
+        img: string;
+      }[]>([]);
+    
+      const getEvents = async () => {
+        const res = await fetch("/api/events", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+        const data = await res.json();
+        setEvents(data);
+      };
+    
+      useEffect(() => {
+        getEvents();
+      }, []);
+    
 
     // Latest 8 events for slider (always newest)
-    const latestEvents = [...dummyEvents]
+    const latestEvents = [...Events]
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         .slice(0, 8);
 
