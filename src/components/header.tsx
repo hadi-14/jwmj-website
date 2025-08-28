@@ -52,7 +52,7 @@ export default function Header() {
                         <ul className="flex gap-6 text-primary-black/60 text-lg font-semibold">
                             <li><Link href="/about" className="hover:text-primary-blue">About US</Link></li>
                             <li><Link href="/about-jwmyo" className="hover:text-primary-blue">About JWMYO</Link></li>
-                            <li><Link href="/#" className="hover:text-primary-blue">Youth Programs</Link></li>
+                            {/* <li><Link href="/#" className="hover:text-primary-blue">Youth Programs</Link></li> */}
                             <li><Link href="/events" className="hover:text-primary-blue">Events</Link></li>
                             <li><Link href="/presidency" className="hover:text-primary-blue">Presidency</Link></li>
                             <li><Link href="/support" className="hover:text-primary-blue">Support & Contact</Link></li>
@@ -106,7 +106,7 @@ export default function Header() {
                                 About JWMYO
                             </Link>
                         </li>
-                        <li>
+                        {/* <li>
                             <Link
                                 href="/youth-programs"
                                 className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
@@ -114,7 +114,7 @@ export default function Header() {
                             >
                                 Youth Programs
                             </Link>
-                        </li>
+                        </li> */}
                         <li>
                             <Link
                                 href="/events"

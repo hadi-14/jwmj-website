@@ -1,27 +1,18 @@
+'use client';
+
+import EventsHighlights from "@/components/eventsHighlights";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
   const services = [
-    { name: "HEALTHCARE", href: "/healthcare" },
-    { name: "EDUCATION", href: "/education" },
-    { name: "MICROFINANCE", href: "/microfinance" },
-    { name: "HELPING HAND", href: "/helping-hand" },
-    { name: "24/7 EMERGENCY SUPPORT", href: "/emergency-support" },
-    { name: "HOME BUYING SUPPORT", href: "/home-buying" }
+    { name: "HEALTHCARE", href: "/#" },
+    { name: "EDUCATION", href: "/#" },
+    { name: "MICROFINANCE", href: "/#" },
+    { name: "HELPING HAND", href: "/#" },
+    { name: "24/7 EMERGENCY SUPPORT", href: "/#" },
+    { name: "HOME BUYING SUPPORT", href: "/#" }
   ];
-
-  const presidencyMembers = [
-    { name: "Ahmed Hassan", role: "President", image: "/president.jpg" },
-    { name: "Fatima Ali", role: "Vice President", image: "/vice-president.jpg" },
-    { name: "Omar Malik", role: "General Secretary", image: "/secretary.jpg" },
-    { name: "Zara Khan", role: "Treasurer", image: "/treasurer.jpg" }
-  ];
-
-  // Assign president, generalSecretary, and others for the management team section
-  const president = presidencyMembers.find(m => m.role === "President");
-  const generalSecretary = presidencyMembers.find(m => m.role === "General Secretary");
-  const others = presidencyMembers.filter(m => m.role !== "President" && m.role !== "General Secretary");
 
   // const recentUpdates = [];
 
@@ -171,158 +162,234 @@ export default function Home() {
       </div>
 
 
-      {/* Desktop Sections Below Hero */}
-      <div className="top-[90vh] w-full px-12 py-16 bg-gray-50">
-
-        {/* About Overview & Annual Report - Desktop */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-
-          {/* About Overview */}
-          <section className="bg-white rounded-4xl shadow-md p-8 border border-[#038DCD]/10">
-            <h2 className="text-[#038DCD] font-bold text-2xl mb-6">About Overview</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              Jamnagar Wehvaria Memon Jamat has been serving our community for over five decades,
-              providing essential services and fostering unity among our members. Our commitment
-              to excellence in healthcare, education, and social welfare has made us a cornerstone
-              of the community.
-            </p>
-            <p className="text-gray-700 leading-relaxed mb-6">
-              Our mission is to create a supportive environment where every member can thrive
-              through comprehensive healthcare services, quality education support, financial assistance,
-              and 24/7 emergency support systems.
-            </p>
-            <Link href="/about" className="inline-flex items-center text-[#038DCD] font-semibold hover:underline">
-              Read More About Us →
-            </Link>
-          </section>
-
-          {/* Annual Report */}
-          <section className="bg-white rounded-4xl shadow-md p-8 border border-[#038DCD]/10">
-            <h2 className="text-[#038DCD] font-bold text-2xl mb-6">Annual Report 2024</h2>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center p-4 bg-[#038DCD]/5 rounded-lg">
-                <span className="font-semibold">Families Served</span>
-                <span className="text-[#038DCD] font-bold text-xl">2,450</span>
-              </div>
-              <div className="flex justify-between items-center p-4 bg-[#038DCD]/5 rounded-lg">
-                <span className="font-semibold">Healthcare Services</span>
-                <span className="text-[#038DCD] font-bold text-xl">15,200</span>
-              </div>
-              <div className="flex justify-between items-center p-4 bg-[#038DCD]/5 rounded-lg">
-                <span className="font-semibold">Educational Support</span>
-                <span className="text-[#038DCD] font-bold text-xl">850</span>
-              </div>
-            </div>
-            <Link href="/annual-report" className="inline-flex items-center mt-6 text-[#038DCD] font-semibold hover:underline">
-              View Full Report →
-            </Link>
-          </section>
-
-        </div>
+      <div className="top-[90vh] w-full py-16 bg-gray-50">
 
         {/* Faculty Members (Presidency) - Desktop */}
-        <section className="bg-gradient-to-br from-[#fdfaf5] via-[#f4faff] to-[#fefaf5] p-8 rounded-3xl border border-gray-200 shadow-lg">
-          {/* Title */}
-          <h2 className="text-center text-[#038DCD] font-bold text-2xl mb-8">
-            MANAGEMENT TEAM
-          </h2>
+        <section className="bg-jwmj p-8 max-w-7xl rounded-3xl border border-gray-200 shadow-lg mx-auto">
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+          <div className="flex flex-row gap-6 items-center">
 
             {/* President */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between items-center h-64">
-              {president && president.image ? (
-                <Image
-                  src={president.image}
-                  alt={president.name}
-                  width={100}
-                  height={100}
-                  className="rounded-full object-cover mb-4"
-                />
-              ) : null}
+            <div className="bg-white/30 rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between items-center h-80 w-1/4">
+
+              <Image
+                src="https://placehold.co/150x150/jpg?text=President"
+                alt="President"
+                width={150}
+                height={150}
+                className="object-cover mb-4"
+              />
               <p className="text-lg font-bold text-gray-800 text-center">
-                President <br />{president ? president.name : "Name"}
+                President <br />Muhammad Yousuf Rangoonwala
               </p>
             </div>
 
-            {/* Middle Section - Other Team */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 h-64 flex items-center justify-center text-gray-500">
-              {others && others.length > 0 ? (
-                <div className="grid grid-cols-2 gap-4 w-full text-center">
-                  {others.map((member) => (
-                    <div
-                      key={member.name}
-                      className="p-3 bg-gradient-to-br from-[#f4faff] to-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all"
-                    >
-                      {member.image && (
-                        <Image
-                          src={member.image}
-                          alt={member.name}
-                          width={60}
-                          height={60}
-                          className="rounded-full object-cover mx-auto mb-2"
-                        />
-                      )}
-                      <p className="font-semibold text-sm">{member.name}</p>
-                      <p className="text-xs text-[#038DCD]">{member.role}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                "Other leadership members"
-              )}
+            <div className="w-1/2">
+              {/* Title */}
+              <h2 className="text-center text-[#038DCD] font-bold text-2xl mb-8">
+                MANAGEMENT TEAM
+              </h2>
+              {/* Middle Section - Other Team */}
+              <div className="bg-white/30 rounded-2xl p-6 shadow-sm border border-gray-100 h-64 flex items-center justify-center text-gray-500">
+              </div>
             </div>
 
             {/* General Secretary */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between items-center h-64">
-              {generalSecretary && generalSecretary.image ? (
-                <Image
-                  src={generalSecretary.image}
-                  alt={generalSecretary.name}
-                  width={100}
-                  height={100}
-                  className="rounded-full object-cover mb-4"
-                />
-              ) : null}
+            <div className="bg-white/30 rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between items-center h-80 w-1/4">
+              <Image
+                src="https://placehold.co/150x150/jpg?text=Gen+Sec"
+                alt="General Secretary"
+                width={150}
+                height={150}
+                className="object-cover mb-4"
+              />
               <p className="text-lg font-bold text-gray-800 text-center">
-                General Secretary <br />{generalSecretary ? generalSecretary.name : "Name"}
+                General Secretary <br />Muhammad Imran Wehvaria
               </p>
             </div>
 
           </div>
         </section>
 
-        {/* Patron Zakat & Donations */}
-        <section className="bg-white rounded-4xl shadow-md p-8 border border-[#038DCD]/10">
-          <h2 className="text-[#038DCD] font-bold text-2xl mb-6">Patron Zakat & Donations</h2>
-          <p className="text-gray-700 leading-relaxed mb-6">
-            Your contributions make a significant difference in our community. Through Zakat
-            and generous donations, we&apos;ve been able to expand our services and reach more
-            families in need.
-          </p>
-          <div className="space-y-4 mb-6">
-            <div className="bg-[#038DCD]/5 p-4 rounded-lg">
-              <h4 className="font-semibold mb-2">Zakat Collection 2024</h4>
-              <p className="text-sm text-gray-600">Distributed to 180 eligible families</p>
+        {/* Faculty Members (Presidency) JWMYO - Desktop */}
+        <section className="mt-10 mb-10 bg-jwmj p-8 rounded-3xl border border-gray-200 shadow-lg mx-auto max-w-7xl">
+
+          <div className="flex flex-row  gap-6 items-center">
+
+            {/* President */}
+            <div className="bg-primary-yellow/30 rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between items-center h-80 w-1/4">
+
+              <Image
+                src="https://placehold.co/150x150/jpg?text=President"
+                alt="President"
+                width={150}
+                height={150}
+                className="object-cover mb-4"
+              />
+              <p className="text-lg font-bold text-gray-800 text-center">
+                President <br />Uzair Munawar
+              </p>
             </div>
-            <div className="bg-[#038DCD]/5 p-4 rounded-lg">
-              <h4 className="font-semibold mb-2">Emergency Fund</h4>
-              <p className="text-sm text-gray-600">Available for urgent community needs</p>
+
+            <div className="w-1/2">
+              {/* Title */}
+              <h2 className="text-center text-[#F9C856] font-bold text-2xl mb-8">
+                JWMYO MANAGEMENT TEAM
+              </h2>
+              {/* Middle Section - Other Team */}
+              <div className="bg-primary-yellow/30 rounded-2xl p-6 shadow-sm border border-gray-100 h-64 flex items-center justify-center text-gray-500">
+              </div>
             </div>
-            <div className="bg-[#038DCD]/5 p-4 rounded-lg">
-              <h4 className="font-semibold mb-2">Development Projects</h4>
-              <p className="text-sm text-gray-600">Infrastructure and facility improvements</p>
+
+            {/* General Secretary */}
+            <div className="bg-primary-yellow/30 rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between items-center h-80 w-1/4">
+              <Image
+                src="https://placehold.co/150x150/jpg?text=Gen+Sec"
+                alt="General Secretary"
+                width={150}
+                height={150}
+                className="object-cover mb-4"
+              />
+              <p className="text-lg font-bold text-gray-800 text-center">
+                General Secretary <br />Saqib Yousuf Rangoonwala
+              </p>
             </div>
+
           </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/zakat" className="flex-1 bg-[#038DCD] text-white text-center py-3 px-4 rounded-lg font-semibold hover:bg-[#038DCD]/90 transition">
-              Pay Zakat
-            </Link>
-            <Link href="/donations" className="flex-1 border-2 border-[#038DCD] text-[#038DCD] text-center py-3 px-4 rounded-lg font-semibold hover:bg-[#038DCD]/5 transition">
-              Donate Now
-            </Link>
-          </div>
+
         </section>
+        {/* Centered Button Below JWMYO Section */}
+        <div className="flex justify-center mt-10 mb-10">
+          <Link
+            href="/presidency"
+            className="px-8 py-3 rounded-full font-semibold text-lg bg-gray-200/70 text-gray-700 border-2 border-gray-400 shadow-md backdrop-blur-md transition hover:bg-gray-400 hover:text-white hover:border-gray-600 hover:scale-105 duration-200"
+            style={{ boxShadow: '0 2px 8px rgba(120,120,120,0.10)' }}
+          >
+            See all teams
+          </Link>
+        </div>
+
+
+        <div className="bg-gradient-to-b from-zinc-300/0 to-yellow-500/25 backdrop-blur-sm">
+          {/* Hero Section with Three Cards */}
+          <section className="relative px-3 py-4 md:px-6 lg:px-10">
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
+              {/* About Us Card */}
+              <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-6 min-h-[280px] flex flex-col">
+                <h2 className="text-sky-600 text-xl lg:text-2xl font-bold mb-4">About Us</h2>
+                <div className="text-black/60 text-xs lg:text-sm font-medium leading-relaxed flex-grow">
+                  Jamnagar Wehvaria Memon Jamat (JWMJ), established in 1949 in Karachi, is a non-profit community organization dedicated to fostering unity, brotherhood, and welfare among its members. Guided by its constitution, JWMJ actively supports education, healthcare, housing, employment, and social services while ensuring dignity and upliftment for all. Through various committees and initiatives, it continues to strengthen the community, provide essential facilities, and work for the collective progress of its members.
+                </div>
+                <Link href="/about" className="mt-4 self-center bg-sky-600/95 hover:bg-sky-700 text-black font-bold text-sm px-4 py-2 rounded-full border border-sky-700 transition-colors">
+                  See All
+                </Link>
+              </div>
+
+              {/* Aims & Objectives Card */}
+              <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-6 min-h-[280px] flex flex-col">
+                <h2 className="text-emerald-400 text-xl lg:text-2xl font-bold mb-4">Aims & Objectives</h2>
+                <div className="text-black/60 text-xs lg:text-sm font-medium leading-relaxed flex-grow">
+                  Jamnagar Wehvaria Memon Jamat, established in 1949 as a non-profit organization, aims to foster unity, brotherhood, and welfare among its members by supporting their educational, religious, social, and economic needs. The community raises funds through donations and contributions to provide essential services such as burial facilities, Jamat Khana, libraries, training centers, healthcare, and welfare institutions. It also works to strengthen social bonds, promote collective progress, and collaborate with other Memon organizations across Pakistan, while remaining strictly non-political.
+                </div>
+                <Link href="/about#aims" className="mt-4 self-center bg-emerald-400/75 hover:bg-emerald-500 text-black font-bold text-sm px-4 py-2 rounded-full border border-emerald-800 transition-colors">
+                  See All
+                </Link>
+              </div>
+
+              {/* Vision Card */}
+              <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-6 min-h-[280px] flex flex-col">
+                <h2 className="text-amber-300 text-xl lg:text-2xl font-bold mb-4">Vision</h2>
+                <div className="text-black/60 text-xs lg:text-sm font-medium leading-relaxed flex-grow">
+                  The vision of Jamat is to holistically support its members by promoting education, reducing unemployment through training, providing interest-free business loans, ensuring healthcare with Islamic Takaful, offering 24/7 emergency services, facilitating Hajj/Umrah for the needy, assisting in housing, expanding and transparently distributing zakat and welfare funds, empowering sub-committees, granting voting rights to overseas members, maintaining updated member data with digital tools, updating the constitution, seeking guidance from senior members, and ensuring transparency through annual financial and performance reports.
+                </div>
+                <Link href="/about#vision" className="mt-4 self-center bg-amber-300/60 hover:bg-amber-400 text-black font-bold text-sm px-4 py-2 rounded-full border border-orange-400 transition-colors">
+                  See All
+                </Link>
+              </div>
+            </div>
+          </section>
+
+          {/* President's Message Section */}
+          <section className="px-3 py-6 md:px-6 lg:px-10">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex flex-col md:flex-row gap-6 items-start">
+                {/* President's Image Placeholder */}
+                <div className="flex-1">
+                  <div className="relative">
+                    <div className="rounded-xl border-2 border-neutral-950 aspect-square mx-auto lg:mx-0 bg-gray-100 flex items-center justify-center">
+                      <div className="text-center text-black text-sm font-bold">
+                        Floating Image here<br />
+                        (No box, No border)
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* President's Message Content */}
+                <div className="flex-1 md:flex-2">
+                  <h2 className="text-neutral-900 text-2xl lg:text-3xl font-bold mb-4">President&apos;s Message</h2>
+                  <div className="text-black text-sm lg:text-base leading-relaxed mb-6">
+                    As the President of Jamnagar Wehvaria Memon Jamat, I am very thankful to Almighty Allah for giving me and my team the opportunity to serve the members of Jamat. Alhamdulillah our team is the first team of Jamat which has been selected to serve Jamat through elections with the help and cooperation of the members of Jamat and I and my entire team are very grateful to all the members of Jamat for this cooperation and belief.
+                    Our first priority in serving the members of the Jamat is to educate the children and youth of the Jamat and at the same time make them skilled and aware according to the present times so that our future generations can benefit from it. Along with education, we are trying to provide maximum employment opportunities to our members so that unemployment can be eliminated from Jamat and in this regard, work has been started to provide interest free business loans to the members on easy installments. Efforts are also being made to improve the medical treatment, monthly helps, housing, marriage and other matters of the members of Jamat.
+                    The current team will soon issue a health card for all the members of Jamat which will be used by members at any time as per their need. At the same time, for the first time in the Jamat, a 24/7 Committee has been formed to serve the members through which the members of the Jamat can contact the representatives of committee in case of any sudden trouble and inform them about their medical, burial or any legal issue and InShaAllah every effort will be made by the committee to resolve the grievances of the members as soon as possible.
+                    In the end, we will try our best to promote the atmosphere of brotherhood and fraternity in the congregation. Poverty should be eradicated from the Jamat and all members should be made independent and we need full support and cooperation of our members for this noble cause.
+
+                  </div>
+                  <Link href="/presidency" className="bg-stone-300/75 hover:bg-stone-400 text-black font-bold text-xl px-12 py-6 rounded-full border border-neutral-500 transition-colors">
+                    Full Message
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* About JWMYO and History Section - Compact Version */}
+          <section className="relative px-4 py-8 md:px-8 lg:px-12">
+            <div className="relative z-10 max-w-7xl mx-auto">
+              <div className="bg-stone-300/25 rounded-2xl border border-blue-900 p-6 lg:p-10">
+                {/* About JWMYO */}
+                <div>
+                  <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
+                    <h2 className="text-sky-600 text-2xl lg:text-3xl font-bold">About JWMYO</h2>
+                    <div className="text-sky-600 text-3xl lg:text-5xl font-black -mt-3">→</div>
+                  </div>
+                  <p className="text-black text-base lg:text-lg leading-relaxed mt-2">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ac pulvinar ipsum.
+                    Quisque finibus rhoncus lectus eget sollicitudin. Cras in maximus nibh. Fusce
+                    bibendum lorem neque, at congue magna eleifend sed.
+                  </p>
+                </div>
+
+                <div className="bg-blue-900 max-w-6xl -mx-6 lg:-mx-10 my-8 h-[1px]"></div>
+
+                {/* History */}
+                <div>
+                  <h2 className="text-neutral-900 text-2xl lg:text-3xl font-bold mb-4">History</h2>
+                  <p className="text-black text-base lg:text-lg leading-relaxed">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ac pulvinar ipsum.
+                    Quisque finibus rhoncus lectus eget sollicitudin. Cras in maximus nibh. Fusce
+                    bibendum lorem neque, at congue magna eleifend sed.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div className="relative w-full max-w-7xl mx-auto py-8">
+
+          <EventsHighlights />
+
+          {/* See All Button */}
+          <div className="flex justify-center mt-2 lg:mt-4">
+            <button className="w-32 sm:w-36 lg:w-40 h-10 sm:h-12 lg:h-14 opacity-60 bg-stone-300/75 rounded-[25px] sm:rounded-[30px] border border-neutral-500 hover:opacity-80 transition-opacity duration-200">
+              <span className="text-black text-sm sm:text-base lg:text-lg font-bold font-inter">
+                See All
+              </span>
+            </button>
+          </div>
+        </div>
+
 
       </div>
     </main >

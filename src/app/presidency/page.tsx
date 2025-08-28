@@ -6,6 +6,7 @@ interface Member {
   name: string;
   designation: string;
   contact: string;
+  photo?: string;
 }
 
 interface FlipCardProps {
@@ -41,7 +42,7 @@ const managingCommittee = [
   { name: "Haji Muhammad Ibrahim", designation: "Member", contact: "0321-8226608" },
   { name: "Maqsood Ahmed Dochki", designation: "Member", contact: "0300-8204877" },
   { name: "Khurram Abdul Rasheed Bangi", designation: "Member", contact: "0321-9251917" },
-  { name: "Abdul Samad Jamal", designation: "Member", contact: "0300-2662701" },
+  { name: "Abdul Samad Jamal", designation: "Member", contact: "0300-2662701", photo: "/Presidency/Abdul Samad Jamal.jpg" },
   { name: "Uzair Munawar", designation: "Member", contact: "0321-2918197" },
   { name: "Saqib Yousuf Rangoonwala", designation: "Member", contact: "0321-8247615" }
 ];
@@ -65,11 +66,11 @@ const FlipCard = ({ member, isPresident = false, yellow = false }: FlipCardProps
         <div className={"absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl shadow-lg border p-4 flex flex-col justify-center items-center text-center bg-gradient-to-br from-white to-gray-50 border-gray-200"}>
           <div className="w-24 h-24 rounded-lg overflow-hidden border-4 mb-3 shadow-md border-gray-200">
             <Image
-              src="https://placehold.co/96x96/e0e0e0/666?text=Photo"
+              src={member.photo || "https://placehold.co/96x96/e0e0e0/666?text=Photo"}
               alt={member.name}
               width={96}
               height={96}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-top"
             />
           </div>
           <h3 className="font-bold text-gray-800 text-base leading-tight mb-1">
@@ -162,7 +163,7 @@ const jwmyoAdvisors: Member[] = [
   { name: "Abdul Samad Dochki", designation: "Advisor", contact: "0333-3024651" },
   { name: "Haris Rangoonwala", designation: "Advisor", contact: "0321-8226754" },
   { name: "Tahir Rangoonwala", designation: "Advisor", contact: "0321-8833332" },
-  { name: "Abdul Samad Jamal", designation: "Advisor", contact: "0300-2662701" },
+  { name: "Abdul Samad Jamal", designation: "Advisor", contact: "0300-2662701", photo: "/Presidency/Abdul Samad Jamal.jpg" },
   { name: "Urwah Zubair", designation: "Advisor", contact: "0321-2610204" },
   { name: "Uzair Hussain", designation: "Advisor", contact: "0320-2559784" },
 ];

@@ -11,9 +11,7 @@ export default function AboutPage() {
             JWMYO
           </div>
           {/* Full Name */}
-          <h1 className="ml-28 text-xl md:text-2xl font-bold text-sky-600 pl-10">
-            Jamnagar Wehvaria Memon Youth Organization
-          </h1>
+          
         </div>
       </section>
 

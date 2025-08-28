@@ -58,7 +58,7 @@ export default function AboutPage() {
       </section>
 
         {/* Aims & Objectives */}
-  <section id="about" className="max-w-7xl px-4 py-16 place-items-center ">
+  <section id="aims" className="max-w-7xl px-4 py-16 place-items-center ">
     <h2 className="text-2xl md:text-4xl font-semibold mb-12">
       Aims & Objectives
     </h2>
@@ -105,7 +105,7 @@ export default function AboutPage() {
       <br />
 
       {/* Vision */}
-      <section className="max-w-7xl p-8 rounded-2xl border-gray-400 border-1 bg-jwmj">
+      <section id="vision" className="max-w-7xl p-8 rounded-2xl border-gray-400 border-1 bg-jwmj">
         <div className="flex items-center gap-6">
           <Image
             src="/mission.png"
