@@ -196,23 +196,23 @@ export default function Home() {
                   alt="Group Photo"
                   width={500}
                   height={200}
-                  className="object-contain rounded-2xl transition-transform duration-300 ease-in-out hover:scale-105"
+                  className="object-contain rounded-2xl transition-transform duration-300 ease-in-out hover:scale-105 rounded-xl"
                 />
               </div>
 
             </div>
 
-            {/* General Secretary */}
+            {/* Honorary General Secretary */}
             <div className="bg-white/30 rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between items-center h-80 w-1/4">
               <Image
                 src="/Presidency/JWMJ/4.png"
-                alt="General Secretary"
+                alt="Honorary General Secretary"
                 width={200}
                 height={200}
-                className="object-cover mb-4 transition-transform duration-300 ease-in-out hover:scale-105"
+                className="object-cover mb-4 transition-transform duration-300 ease-in-out hover:scale-105 rounded-xl"
               />
               <p className="text-lg font-bold text-gray-800 text-center">
-                General Secretary <br />Muhammad Imran Wehvaria
+                Honorary General Secretary <br />Muhammad Imran Wehvaria
               </p>
             </div>
 
@@ -251,7 +251,7 @@ export default function Home() {
                   alt="Group Photo"
                   width={500}
                   height={200}
-                  className="object-contain rounded-2xl transition-transform duration-300 ease-in-out hover:scale-105"
+                  className="object-contain rounded-2xl transition-transform duration-300 ease-in-out hover:scale-105 rounded-xl"
                 />
               </div>
             </div>
@@ -263,7 +263,7 @@ export default function Home() {
                 alt="General Secretary"
                 width={200}
                 height={200}
-                className="object-cover mb-4 transition-transform duration-300 ease-in-out hover:scale-105"
+                className="object-cover mb-4 transition-transform duration-300 ease-in-out hover:scale-105 rounded-xl"
               />
               <p className="text-lg font-bold text-gray-800 text-center">
                 General Secretary <br />Saqib Yousuf Rangoonwala
