@@ -11,6 +11,7 @@ export default function EventsHighlights() {
         date: string;
         category: string;
         img: string;
+        fb?: string;
       }[]>([]);
     
       const getEvents = async () => {
@@ -96,6 +97,7 @@ export default function EventsHighlights() {
                     {latestEvents.map((event, index) => (
                         <div
                             key={event.id}
+                            onClick={() => event.fb && window.open(event.fb, '_blank')}
                             className="group event-slider-card flex-shrink-0 w-72 bg-white/40 rounded-2xl shadow-md border border-gray-100 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-3 transition-all duration-500 relative"
                             style={{
                                 animationDelay: `${index * 100}ms`,

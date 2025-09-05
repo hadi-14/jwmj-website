@@ -173,11 +173,11 @@ export default function Home() {
             <div className="bg-white/30 rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between items-center h-80 w-1/4">
 
               <Image
-                src="https://placehold.co/150x150/jpg?text=President"
+                src="/Presidency/JWMJ/1.png"
                 alt="President"
-                width={150}
-                height={150}
-                className="object-cover mb-4"
+                width={200}
+                height={200}
+                className="object-cover mb-4 transition-transform duration-300 ease-in-out hover:scale-105"
               />
               <p className="text-lg font-bold text-gray-800 text-center">
                 President <br />Muhammad Yousuf Rangoonwala
@@ -190,18 +190,26 @@ export default function Home() {
                 MANAGEMENT TEAM
               </h2>
               {/* Middle Section - Other Team */}
-              <div className="bg-white/30 rounded-2xl p-6 shadow-sm border border-gray-100 h-64 flex items-center justify-center text-gray-500">
+              <div className="bg-white/30 rounded-2xl p-6 shadow-sm border border-gray-100 h-64 flex items-center justify-center">
+                <Image
+                  src="/Presidency/JWMJ group.jpg"
+                  alt="Group Photo"
+                  width={500}
+                  height={200}
+                  className="object-contain rounded-2xl transition-transform duration-300 ease-in-out hover:scale-105"
+                />
               </div>
+
             </div>
 
             {/* General Secretary */}
             <div className="bg-white/30 rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between items-center h-80 w-1/4">
               <Image
-                src="https://placehold.co/150x150/jpg?text=Gen+Sec"
+                src="/Presidency/JWMJ/4.png"
                 alt="General Secretary"
-                width={150}
-                height={150}
-                className="object-cover mb-4"
+                width={200}
+                height={200}
+                className="object-cover mb-4 transition-transform duration-300 ease-in-out hover:scale-105"
               />
               <p className="text-lg font-bold text-gray-800 text-center">
                 General Secretary <br />Muhammad Imran Wehvaria
@@ -220,11 +228,11 @@ export default function Home() {
             <div className="bg-primary-yellow/30 rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between items-center h-80 w-1/4">
 
               <Image
-                src="https://placehold.co/150x150/jpg?text=President"
+                src="/Presidency/JWMYO/1.png"
                 alt="President"
-                width={150}
-                height={150}
-                className="object-cover mb-4"
+                width={200}
+                height={200}
+                className="object-cover mb-4 transition-transform duration-300 ease-in-out hover:scale-105"
               />
               <p className="text-lg font-bold text-gray-800 text-center">
                 President <br />Uzair Munawar
@@ -237,18 +245,25 @@ export default function Home() {
                 JWMYO MANAGEMENT TEAM
               </h2>
               {/* Middle Section - Other Team */}
-              <div className="bg-primary-yellow/30 rounded-2xl p-6 shadow-sm border border-gray-100 h-64 flex items-center justify-center text-gray-500">
+              <div className="bg-primary-yellow/30 rounded-2xl p-6 shadow-sm border border-gray-100 h-64 flex items-center justify-center text-gray-500 flex items-center justify-center">
+                <Image
+                  src="/Presidency/JWMYO group.jpg"
+                  alt="Group Photo"
+                  width={500}
+                  height={200}
+                  className="object-contain rounded-2xl transition-transform duration-300 ease-in-out hover:scale-105"
+                />
               </div>
             </div>
 
             {/* General Secretary */}
             <div className="bg-primary-yellow/30 rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between items-center h-80 w-1/4">
               <Image
-                src="https://placehold.co/150x150/jpg?text=Gen+Sec"
+                src="/Presidency/JWMYO/4.png"
                 alt="General Secretary"
-                width={150}
-                height={150}
-                className="object-cover mb-4"
+                width={200}
+                height={200}
+                className="object-cover mb-4 transition-transform duration-300 ease-in-out hover:scale-105"
               />
               <p className="text-lg font-bold text-gray-800 text-center">
                 General Secretary <br />Saqib Yousuf Rangoonwala
@@ -316,12 +331,14 @@ export default function Home() {
                 {/* President's Image Placeholder */}
                 <div className="flex-1">
                   <div className="relative">
-                    <div className="rounded-xl border-2 border-neutral-950 aspect-square mx-auto lg:mx-0 bg-gray-100 flex items-center justify-center">
-                      <div className="text-center text-black text-sm font-bold">
-                        Floating Image here<br />
-                        (No box, No border)
-                      </div>
-                    </div>
+                    <Image
+                      src="/Presidency/JWMJ/1.png"
+                      alt="President"
+                      width={400}
+                      height={400}
+                      className="object-cover mb-4 rounded-2xl"
+                    />
+
                   </div>
                 </div>
 
@@ -347,30 +364,24 @@ export default function Home() {
           <section className="relative px-4 py-8 md:px-8 lg:px-12">
             <div className="relative z-10 max-w-7xl mx-auto">
               <div className="bg-stone-300/25 rounded-2xl border border-blue-900 p-6 lg:p-10">
-                {/* About JWMYO */}
-                <div>
+                <Link href="/about-jwmyo" className="block cursor-pointer hover:bg-blue-900/10 rounded-2xl transition duration-200">
+                  {/* About JWMYO */}
                   <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
                     <h2 className="text-sky-600 text-2xl lg:text-3xl font-bold">About JWMYO</h2>
                     <div className="text-sky-600 text-3xl lg:text-5xl font-black -mt-3">→</div>
                   </div>
                   <p className="text-black text-base lg:text-lg leading-relaxed mt-2">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ac pulvinar ipsum.
-                    Quisque finibus rhoncus lectus eget sollicitudin. Cras in maximus nibh. Fusce
-                    bibendum lorem neque, at congue magna eleifend sed.
+                    The primary aims of JWMYO are the development of youth with strong religious belief and positive approach towards the modern world, organization of a healthcare system to arrange blood donation camps and free of cost medical camps for the members of community to facilitate a healthy lifestyle. Providing the educational opportunities to the students in the community with an intention to promote and encourage the positive approach towards higher and professional qualifications in order to achieve better jobs and work opportunities in the market. 
                   </p>
-                </div>
-
-                <div className="bg-blue-900 max-w-6xl -mx-6 lg:-mx-10 my-8 h-[1px]"></div>
-
-                {/* History */}
-                <div>
-                  <h2 className="text-neutral-900 text-2xl lg:text-3xl font-bold mb-4">History</h2>
-                  <p className="text-black text-base lg:text-lg leading-relaxed">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ac pulvinar ipsum.
-                    Quisque finibus rhoncus lectus eget sollicitudin. Cras in maximus nibh. Fusce
-                    bibendum lorem neque, at congue magna eleifend sed.
-                  </p>
-                </div>
+                  <div className="bg-blue-900 max-w-6xl -mx-6 lg:-mx-10 my-8 h-[1px]"></div>
+                  {/* History */}
+                  <div>
+                    <h2 className="text-neutral-900 text-2xl lg:text-3xl font-bold mb-4">History</h2>
+                    <p className="text-black text-base lg:text-lg leading-relaxed">
+                      The Jamnagar Wehvaria Memon Youth Organization is one of the esteemed social organization of the Memon communities serving since 1982 under the patronage of Jamnagar Wehvaria Memon Jamat.The strong foundation of Jamnagar Wehvaria Memon Youth Organization was laid by Mr. A.K Jamal, Mr. Abdul Nasir Rangoonwala, Mr Muhammad Saleem Durvesh, and Mr Muhammad Yousuf Rangoonwala under of leadership of then President of the Jamnagar Wehvaria Memon Jamat, Mr.Ahmed Abdul Ghaffar Rangoonwala.
+                    </p>
+                  </div>
+                </Link>
               </div>
             </div>
           </section>

@@ -16,45 +16,45 @@ interface FlipCardProps {
 
 // Data structure for office bearers
 const officeBearers = [
-  { name: "Muhammad Yousuf Rangoonwala", designation: "President", contact: "0300-8223534" },
-  { name: "Jawad Ahmed Farooq", designation: "Senior Vice President", contact: "0321-9215667" },
-  { name: "Muhammad Asif Muhammad Ali", designation: "Vice President", contact: "0321-2027353" },
-  { name: "Muhammad Imran Wehvaria", designation: "Honorary General Secretary", contact: "0321-9255899" },
-  { name: "Mufti Muhammad Bilal Durvesh", designation: "Senior Joint Secretary", contact: "0321-2892532" },
-  { name: "Shabbir Abdul Wahid", designation: "Joint Secretary", contact: "0322-2377366" },
-  { name: "Shahzad Kamdar", designation: "Finance Secretary", contact: "0322-8667279" }
+  { name: "Muhammad Yousuf Rangoonwala", designation: "President", contact: "0300-8223534", photo: "/Presidency/JWMJ/1.png" },
+  { name: "Jawad Ahmed Farooq", designation: "Senior Vice President", contact: "0321-9215667", photo: "/Presidency/JWMJ/2.jpg" },
+  { name: "Muhammad Asif Muhammad Ali", designation: "Vice President", contact: "0321-2027353", photo: "/Presidency/JWMJ/3.png" },
+  { name: "Muhammad Imran Wehvaria", designation: "Honorary General Secretary", contact: "0321-9255899", photo: "/Presidency/JWMJ/4.png" },
+  { name: "Mufti Muhammad Bilal Durvesh", designation: "Senior Joint Secretary", contact: "0321-2892532", photo: "/Presidency/JWMJ/5.jpg" },
+  { name: "Shabbir Abdul Wahid", designation: "Joint Secretary", contact: "0322-2377366", photo: "/Presidency/JWMJ/6.jpg" },
+  { name: "Shahzad Kamdar", designation: "Finance Secretary", contact: "0322-8667279", photo: "/Presidency/JWMJ/7.jpg" }
 ];
 
 // Data structure for managing committee members
 const managingCommittee = [
-  { name: "Haji Ghulam Muhammad", designation: "Member", contact: "0320-9229221" },
-  { name: "Abdul Majeed Rangoonwala", designation: "Member", contact: "0321-8203850" },
-  { name: "Muhammad Saeed Mulla", designation: "Member", contact: "0321-8220996" },
-  { name: "Muhammad Shahid Abdul Rasheed", designation: "Member", contact: "0321-3863533" },
-  { name: "Muhammad Imran Patel", designation: "Member", contact: "0321-9274868" },
-  { name: "Abdul Sami Ahmed Surmawala", designation: "Member", contact: "0321-9246168" },
-  { name: "Abdul Samad Dochki", designation: "Member", contact: "0333-3024651" },
-  { name: "Adnan Muhammad Yaqoob", designation: "Member", contact: "0321-2193920" },
-  { name: "Muhammad Imran Suleman", designation: "Member", contact: "0321-3787616" },
-  { name: "Obaidullah Durvesh", designation: "Member", contact: "0321-9235725" },
-  { name: "Salman Muhammad Saleem", designation: "Member", contact: "0321-8263000" },
-  { name: "Muhammad Ubaid Rehmani", designation: "Member", contact: "0322-2188688" },
-  { name: "Haji Muhammad Ibrahim", designation: "Member", contact: "0321-8226608" },
-  { name: "Maqsood Ahmed Dochki", designation: "Member", contact: "0300-8204877" },
-  { name: "Khurram Abdul Rasheed Bangi", designation: "Member", contact: "0321-9251917" },
-  { name: "Abdul Samad Jamal", designation: "Member", contact: "0300-2662701", photo: "/Presidency/Abdul Samad Jamal.jpg" },
-  { name: "Uzair Munawar", designation: "Member", contact: "0321-2918197" },
-  { name: "Saqib Yousuf Rangoonwala", designation: "Member", contact: "0321-8247615" }
+  { name: "Haji Ghulam Muhammad", designation: "Member", contact: "0320-9229221", photo: "/Presidency/JWMJ/8.jpg" },
+  { name: "Abdul Majeed Rangoonwala", designation: "Member", contact: "0321-8203850", photo: "/Presidency/JWMJ/9.jpg" },
+  { name: "Muhammad Saeed Mulla", designation: "Member", contact: "0321-8220996", photo: "/Presidency/JWMJ/10.jpg" },
+  { name: "Muhammad Shahid Abdul Rasheed", designation: "Member", contact: "0321-3863533", photo: "/Presidency/JWMJ/11.jpeg" },
+  { name: "Muhammad Imran Patel", designation: "Member", contact: "0321-9274868", photo: "/Presidency/JWMJ/12.jpg" },
+  { name: "Abdul Sami Ahmed Surmawala", designation: "Member", contact: "0321-9246168", photo: "/Presidency/JWMJ/13.jpg" },
+  { name: "Abdul Samad Dochki", designation: "Member", contact: "0333-3024651", photo: "/Presidency/JWMJ/14.jpg" },
+  { name: "Adnan Muhammad Yaqoob", designation: "Member", contact: "0321-2193920", photo: "/Presidency/JWMJ/15.jpg" },
+  { name: "Muhammad Imran Suleman", designation: "Member", contact: "0321-3787616", photo: "/Presidency/JWMJ/16.jpeg" },
+  { name: "Obaidullah Durvesh", designation: "Member", contact: "0321-9235725", photo: "/Presidency/JWMJ/17.png" },
+  { name: "Salman Muhammad Saleem", designation: "Member", contact: "0321-8263000", photo: "/Presidency/JWMJ/18.jpg" },
+  { name: "Muhammad Ubaid Rehmani", designation: "Member", contact: "0322-2188688", photo: "/Presidency/JWMJ/19.jpeg" },
+  { name: "Haji Muhammad Ibrahim", designation: "Member", contact: "0321-8226608", photo: "/Presidency/JWMJ/20.jpg" },
+  { name: "Maqsood Ahmed Dochki", designation: "Member", contact: "0300-8204877", photo: "/Presidency/JWMJ/21.jpeg" },
+  { name: "Khurram Abdul Rasheed Bangi", designation: "Member", contact: "0321-9251917", photo: "/Presidency/JWMJ/22.jpg" },
+  { name: "Abdul Samad Jamal", designation: "Member", contact: "0300-2662701", photo: "/Presidency/JWMJ/23.jpeg" },
+  { name: "Uzair Munawar", designation: "Member", contact: "0321-2918197", photo: "/Presidency/JWMJ/24.jpeg" },
+  { name: "Saqib Yousuf Rangoonwala", designation: "Member", contact: "0321-8247615", photo: "/Presidency/JWMJ/25.jpg" }
 ];
 
 // Data structure for advisors
 const advisors = [
-  { name: "Abdul Nasir Rangoonwala", designation: "Advisor", contact: "0300-8277910" },
-  { name: "Muhammad Saleem Durvesh", designation: "Advisor", contact: "0321-8276693" },
-  { name: "Hafiz Muhammad Ilyas", designation: "Advisor", contact: "0300-9283144" },
-  { name: "Muhammad Asif Patel", designation: "Advisor", contact: "0300-8257225" },
-  { name: "Abdul Rahim Kamdar", designation: "Advisor", contact: "0321-8208878" },
-  { name: "Abdul Rauf Rangoonwala", designation: "Advisor", contact: "0300-8237805" }
+  { name: "Abdul Nasir Rangoonwala", designation: "Advisor", contact: "0300-8277910", photo: "/Presidency/JWMJ/26.jpg" },
+  { name: "Muhammad Saleem Durvesh", designation: "Advisor", contact: "0321-8276693", photo: "/Presidency/JWMJ/27.jpeg" },
+  { name: "Hafiz Muhammad Ilyas", designation: "Advisor", contact: "0300-9283144", photo: "/Presidency/JWMJ/28.jpg" },
+  { name: "Muhammad Asif Patel", designation: "Advisor", contact: "0300-8257225", photo: "/Presidency/JWMJ/29.jpg" },
+  { name: "Abdul Rahim Kamdar", designation: "Advisor", contact: "0321-8208878", photo: "/Presidency/JWMJ/30.jpeg" },
+  { name: "Abdul Rauf Rangoonwala", designation: "Advisor", contact: "0300-8237805", photo: "/Presidency/JWMJ/31.jpg" }
 ];
 
 // Flip Card Component
@@ -121,51 +121,51 @@ const FlipCard = ({ member, isPresident = false, yellow = false }: FlipCardProps
 
 // JWMYO Data
 const jwmyoOfficeBearers: Member[] = [
-  { name: "Uzair Munawar", designation: "President", contact: "0321-2918197" },
-  { name: "Muhammad Umer Durvesh", designation: "Senior Vice President", contact: "0300-2010940" },
-  { name: "Mohammad Arif Patel", designation: "Vice President", contact: "0321-2256579" },
-  { name: "Saqib Yousuf Rangoonwala", designation: "General Secretary", contact: "0321-8247615" },
-  { name: "Qaiser Ahmed Rangoonwala", designation: "Senior Joint Secretary", contact: "0321-2391660" },
-  { name: "Shamoon Siddiq", designation: "Joint Secretary", contact: "0322-2281344" },
-  { name: "Abdul Samad Durvesh", designation: "Finance Secretary", contact: "0334-3931592" },
-  { name: "Arsalan Abdullah", designation: "Press Secretary", contact: "0300-2590194" },
+  { name: "Uzair Munawar", designation: "President", contact: "0321-2918197", photo: "/Presidency/JWMYO/1.png" },
+  { name: "Muhammad Umer Durvesh", designation: "Senior Vice President", contact: "0300-2010940", photo: "/Presidency/JWMYO/2.png" },
+  { name: "Mohammad Arif Patel", designation: "Vice President", contact: "0321-2256579", photo: "/Presidency/JWMYO/3.png" },
+  { name: "Saqib Yousuf Rangoonwala", designation: "General Secretary", contact: "0321-8247615", photo: "/Presidency/JWMYO/4.png" },
+  { name: "Qaiser Ahmed Rangoonwala", designation: "Senior Joint Secretary", contact: "0321-2391660", photo: "/Presidency/JWMYO/5.jpg" },
+  { name: "Shamoon Siddiq", designation: "Joint Secretary", contact: "0322-2281344", photo: "/Presidency/JWMYO/6.jpeg" },
+  { name: "Abdul Samad Durvesh", designation: "Finance Secretary", contact: "0334-3931592", photo: "/Presidency/JWMYO/7.jpg" },
+  { name: "Arsalan Abdullah", designation: "Press Secretary", contact: "0300-2590194", photo: "/Presidency/JWMYO/8.jpeg" },
 ];
 
 const jwmyoManagingCommittee: Member[] = [
-  { name: "Sanan Ilyas", designation: "Member", contact: "0344-2560203" },
-  { name: "Muhammad Hassan Wehvaria", designation: "Member", contact: "0331-3660330" },
-  { name: "Adnan Amin", designation: "Member", contact: "0323-3236828" },
-  { name: "Muhammad Owais Dinga", designation: "Member", contact: "0307-0203484" },
-  { name: "Imran Hussain", designation: "Member", contact: "0333-0394690" },
-  { name: "Muhammad Anas Rangoonwala", designation: "Member", contact: "0317-1186611" },
-  { name: "Muhammad Hammad Rangoonwala", designation: "Member", contact: "0309-8886403" },
-  { name: "Muhammad Faiq Imran", designation: "Member", contact: "0323-2850941" },
-  { name: "Muhammad Ahmed Patel", designation: "Member", contact: "0303-2701674" },
-  { name: "Shayan Saleem", designation: "Member", contact: "0307-2884984" },
-  { name: "Usama Kamdar", designation: "Member", contact: "0312-2464924" },
-  { name: "Rabi Ibrahim", designation: "Member", contact: "0324-2112122" },
-  { name: "Hammad Ibrahim", designation: "Member", contact: "0324-2111998" },
-  { name: "Umair Amin Nakhuda", designation: "Member", contact: "0315-2053998" },
-  { name: "Muhammad Memon", designation: "Member", contact: "0322-2100279" },
-  { name: "Anfal Dadabhai", designation: "Member", contact: "0332-2170332" },
-  { name: "Abubakar Nakhuda", designation: "Member", contact: "0336-2307281" },
-  { name: "Uzair Yaqoob", designation: "Member", contact: "0343-2558633" },
-  { name: "Safwan Abdul Samad", designation: "Member", contact: "0334-2105667" },
-  { name: "Raza Imran Bharambia", designation: "Member", contact: "0325-8986899" },
-  { name: "Emaaz Durvesh", designation: "Member", contact: "0307-0035584" },
-  { name: "Ahmed Abdul Sami", designation: "Member", contact: "0302-1251625" },
-  { name: "Ahnaf Durvesh", designation: "Member", contact: "0304-1159066" },
-  { name: "Hasin Munawar", designation: "Member", contact: "0317-2151401" },
-  { name: "Fayyaz Faisal", designation: "Member", contact: "0343-2560292" },
+  { name: "Sanan Ilyas", designation: "Member", contact: "0344-2560203", photo: "/Presidency/JWMYO/9.jpeg" },
+  { name: "Muhammad Hassan Wehvaria", designation: "Member", contact: "0331-3660330", photo: "/Presidency/JWMYO/10.jpeg" },
+  { name: "Adnan Amin", designation: "Member", contact: "0323-3236828", photo: "/Presidency/JWMYO/11.jpeg" },
+  { name: "Muhammad Owais Dinga", designation: "Member", contact: "0307-0203484", photo: "/Presidency/JWMYO/12.jpg" },
+  { name: "Imran Hussain", designation: "Member", contact: "0333-0394690", photo: "/Presidency/JWMYO/13.jpg" },
+  { name: "Muhammad Anas Rangoonwala", designation: "Member", contact: "0317-1186611", photo: "/Presidency/JWMYO/14.jpg" },
+  { name: "Muhammad Hammad Rangoonwala", designation: "Member", contact: "0309-8886403", photo: "/Presidency/JWMYO/15.png" },
+  { name: "Muhammad Faiq Imran", designation: "Member", contact: "0323-2850941", photo: "/Presidency/JWMYO/16.jpeg" },
+  { name: "Muhammad Ahmed Patel", designation: "Member", contact: "0303-2701674", photo: "/Presidency/JWMYO/17.jpg" },
+  { name: "Shayan Saleem", designation: "Member", contact: "0307-2884984", photo: "/Presidency/JWMYO/18.jpg" },
+  { name: "Usama Kamdar", designation: "Member", contact: "0312-2464924", photo: "/Presidency/JWMYO/19.jpeg" },
+  { name: "Rabi Ibrahim", designation: "Member", contact: "0324-2112122", photo: "/Presidency/JWMYO/20.jpeg" },
+  { name: "Hammad Ibrahim", designation: "Member", contact: "0324-2111998", photo: "/Presidency/JWMYO/21.jpg" },
+  { name: "Umair Amin Nakhuda", designation: "Member", contact: "0315-2053998", photo: "/Presidency/JWMYO/22.jpg" },
+  { name: "Muhammad Memon", designation: "Member", contact: "0322-2100279", photo: "/Presidency/JWMYO/23.jpg" },
+  { name: "Anfal Dadabhai", designation: "Member", contact: "0332-2170332", photo: "/Presidency/JWMYO/24.jpg" },
+  { name: "Abubakar Nakhuda", designation: "Member", contact: "0336-2307281", photo: "/Presidency/JWMYO/25.jpg" },
+  { name: "Uzair Yaqoob", designation: "Member", contact: "0343-2558633", photo: "/Presidency/JWMYO/26.jpg" },
+  { name: "Safwan Abdul Samad", designation: "Member", contact: "0334-2105667", photo: "/Presidency/JWMYO/27.jpeg" },
+  { name: "Raza Imran Bharambia", designation: "Member", contact: "0325-8986899", photo: "/Presidency/JWMYO/28.jpeg" },
+  { name: "Emaaz Durvesh", designation: "Member", contact: "0307-0035584", photo: "/Presidency/JWMYO/29.jpeg" },
+  { name: "Ahmed Abdul Sami", designation: "Member", contact: "0302-1251625", photo: "/Presidency/JWMYO/30.jpg" },
+  { name: "Ahnaf Durvesh", designation: "Member", contact: "0304-1159066", photo: "/Presidency/JWMYO/31.jpg" },
+  { name: "Hasin Munawar", designation: "Member", contact: "0317-2151401", photo: "/Presidency/JWMYO/32.jpeg" },
+  { name: "Fayyaz Faisal", designation: "Member", contact: "0343-2560292", photo: "/Presidency/JWMYO/33.jpeg" },
 ];
 
 const jwmyoAdvisors: Member[] = [
-  { name: "Abdul Samad Dochki", designation: "Advisor", contact: "0333-3024651" },
-  { name: "Haris Rangoonwala", designation: "Advisor", contact: "0321-8226754" },
-  { name: "Tahir Rangoonwala", designation: "Advisor", contact: "0321-8833332" },
-  { name: "Abdul Samad Jamal", designation: "Advisor", contact: "0300-2662701", photo: "/Presidency/Abdul Samad Jamal.jpg" },
-  { name: "Urwah Zubair", designation: "Advisor", contact: "0321-2610204" },
-  { name: "Uzair Hussain", designation: "Advisor", contact: "0320-2559784" },
+  { name: "Abdul Samad Dochki", designation: "Advisor", contact: "0333-3024651", photo: "/Presidency/JWMYO/34.jpg" },
+  { name: "Haris Rangoonwala", designation: "Advisor", contact: "0321-8226754", photo: "/Presidency/JWMYO/35.jpg" },
+  { name: "Tahir Rangoonwala", designation: "Advisor", contact: "0321-8833332", photo: "/Presidency/JWMYO/36.jpg" },
+  { name: "Abdul Samad Jamal", designation: "Advisor", contact: "0300-2662701", photo: "/Presidency/JWMYO/37.jpeg" },
+  { name: "Urwah Zubair", designation: "Advisor", contact: "0321-2610204", photo: "/Presidency/JWMYO/38.jpg" },
+  { name: "Uzair Hussain", designation: "Advisor", contact: "0320-2559784", photo: "/Presidency/JWMYO/39.jpeg" },
 ];
 
 export default function AboutPage() {
@@ -188,9 +188,9 @@ export default function AboutPage() {
         </div>
 
         {/* Right Side Card */}
-        <div className="bg-neutral-50 opacity-40 border border-zinc-400 rounded-[40px] w-80 h-fit flex justify-center justify-self-center">
+        <div className="bg-white border border-zinc-400 rounded-[40px] w-80 h-fit flex justify-center justify-self-center">
           <Image
-            src="https://placehold.co/200x200/jpg"
+            src={president.photo || "https://placehold.co/200x200/e0e0e0/666?text=Photo"}
             alt="President"
             width={200}
             height={200}

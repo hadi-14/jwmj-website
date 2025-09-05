@@ -4,16 +4,9 @@ import Image from 'next/image';
 import EventsHighlights from "@/components/eventsHighlights";
 import { formatDate } from "@/utils/general";
 
-// Dummy event data with placeholder images
-const categories = [
-  "Family Events",
-  "Jamat Teachings",
-  "Bachat Bazar",
-  "Islamic Gatherings",
-];
-
 export default function EventsPage() {
-  const [activeTab, setActiveTab] = useState(categories[0]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'new' | 'old'>('new');
   const [visibleCards, setVisibleCards] = useState(new Set());
   const [Events, setEvents] = useState<{
@@ -23,6 +16,7 @@ export default function EventsPage() {
     date: string;
     category: string;
     img: string;
+    fb?: string;
   }[]>([]);
 
   const getEvents = async () => {
@@ -31,6 +25,9 @@ export default function EventsPage() {
       headers: { "Content-Type": "application/json" },
     });
     const data = await res.json();
+    const cats = Array.from(new Set(data.map((e: { category: string }) => e.category))) as string[];
+    setCategories(cats);
+    setActiveTab(cats[0]);
     setEvents(data);
   };
 
@@ -123,8 +120,6 @@ export default function EventsPage() {
 
         {/* Timeline */}
         <div className="relative">
-          {/* Timeline line */}
-          <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-sky-300 via-blue-400 to-sky-300 rounded-full transform -translate-x-1/2 shadow-sm"></div>
 
           {filteredCategoryEvents.length === 0 ? (
             <div className="text-center text-gray-500 py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
@@ -134,6 +129,8 @@ export default function EventsPage() {
             </div>
           ) : (
             <div className="space-y-4">
+              {/* Timeline line */}
+              <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-sky-300 via-blue-400 to-sky-300 rounded-full transform -translate-x-1/2 shadow-sm"></div>
               {filteredCategoryEvents.map((event, index) => {
                 const isEven = index % 2 === 0;
                 const isVisible = visibleCards.has(event.id.toString());
@@ -141,6 +138,7 @@ export default function EventsPage() {
                 return (
                   <div
                     key={event.id}
+                    onClick={() => event.fb && window.open(event.fb, '_blank')}
                     className={`timeline-card relative flex items-center ${isEven ? 'flex-row' : 'flex-row-reverse'
                       } group ${index > 0 ? '-mt-8' : ''}`}
                     data-id={event.id.toString()}
