@@ -1,10 +1,14 @@
 'use client';
 
+import { getBusinesses } from "@/actions/business";
 import EventsHighlights from "@/components/eventsHighlights";
+import { Business } from "@/types/business";
 import Image from "next/image";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 export default function Home() {
+  const [allCommunityBusinesses, setAllCommunityBusinesses] = useState<Business[]>([]);
   const services = [
     { name: "HEALTHCARE", href: "/#" },
     { name: "EDUCATION", href: "/#" },
@@ -14,7 +18,13 @@ export default function Home() {
     { name: "HOME BUYING SUPPORT", href: "/#" }
   ];
 
-  // const recentUpdates = [];
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getBusinesses();
+      setAllCommunityBusinesses(data);
+    };
+    fetchData();
+  }, []);
 
   return (
     <main className="w-full z-5 -mt-24">
@@ -324,6 +334,76 @@ export default function Home() {
             </div>
           </section>
 
+          {/* Our Community Businesses Section - Redesigned */}
+          <section className="relative px-3 py-8 md:px-6 lg:px-10">
+            <div className="max-w-7xl mx-auto">
+              {/* Section Background Card */}
+              <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-6 lg:p-8">
+
+                {/* Section Header */}
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-3">
+                    Our Community Businesses
+                  </h2>
+                  <p className="text-gray-600 text-sm lg:text-base max-w-2xl mx-auto">
+                    Supporting our community members by showcasing their businesses and services.
+                  </p>
+                </div>
+
+                {/* Business Logos Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                  {allCommunityBusinesses.slice(0, 5).map((business) => (
+                    <div
+                      key={business.id}
+                      className="group cursor-pointer"
+                    >
+                      <div className="bg-white/60 rounded-xl border border-gray-300 p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 hover:bg-white/80">
+                        {/* Business Logo */}
+                        <div className="flex items-center justify-center mb-3">
+                          <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-[#038DCD] to-[#F9C856] rounded-lg flex items-center justify-center">
+                            <span className="text-white font-bold text-sm lg:text-lg">
+                              {business.name.split(' ').map(word => word[0]).join('').slice(0, 2)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Business Name */}
+                        <div className="text-center">
+                          <h3 className="font-semibold text-sm lg:text-base text-gray-800 line-clamp-2 group-hover:text-[#038DCD] transition-colors">
+                            {business.name}
+                          </h3>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Bottom Section with CTA */}
+                <div className="bg-white/50 rounded-xl border border-gray-300 p-6 text-center">
+                  <h3 className="text-lg lg:text-xl font-bold text-gray-800 mb-3">
+                    Discover More Community Businesses
+                  </h3>
+                  <p className="text-gray-600 text-sm lg:text-base mb-4 max-w-xl mx-auto">
+                    Get special member discounts and support local entrepreneurs in our community.
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                    <Link
+                      href="/business"
+                      className="bg-[#038DCD] hover:bg-[#038DCD]/90 text-white font-semibold px-6 py-2 rounded-full transition-all duration-200 hover:scale-105 text-sm lg:text-base"
+                    >
+                      View All Businesses
+                    </Link>
+                    <button className="bg-white hover:bg-gray-50 text-[#038DCD] font-semibold px-6 py-2 rounded-full border-2 border-[#038DCD] transition-all duration-200 hover:scale-105 text-sm lg:text-base">
+                      List Your Business
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </section>
+
           {/* President's Message Section */}
           <section className="px-3 py-6 md:px-6 lg:px-10">
             <div className="max-w-7xl mx-auto">
@@ -371,7 +451,7 @@ export default function Home() {
                     <div className="text-sky-600 text-3xl lg:text-5xl font-black -mt-3">→</div>
                   </div>
                   <p className="text-black text-base lg:text-lg leading-relaxed mt-2">
-                    The primary aims of JWMYO are the development of youth with strong religious belief and positive approach towards the modern world, organization of a healthcare system to arrange blood donation camps and free of cost medical camps for the members of community to facilitate a healthy lifestyle. Providing the educational opportunities to the students in the community with an intention to promote and encourage the positive approach towards higher and professional qualifications in order to achieve better jobs and work opportunities in the market. 
+                    The primary aims of JWMYO are the development of youth with strong religious belief and positive approach towards the modern world, organization of a healthcare system to arrange blood donation camps and free of cost medical camps for the members of community to facilitate a healthy lifestyle. Providing the educational opportunities to the students in the community with an intention to promote and encourage the positive approach towards higher and professional qualifications in order to achieve better jobs and work opportunities in the market.
                   </p>
                   <div className="bg-blue-900 max-w-6xl -mx-6 lg:-mx-10 my-8 h-[1px]"></div>
                   {/* History */}

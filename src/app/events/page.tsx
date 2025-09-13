@@ -26,6 +26,7 @@ export default function EventsPage() {
     });
     const data = await res.json();
     const cats = Array.from(new Set(data.map((e: { category: string }) => e.category))) as string[];
+    console.log(data, cats);
     setCategories(cats);
     setActiveTab(cats[0]);
     setEvents(data);
