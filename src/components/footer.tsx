@@ -70,7 +70,7 @@ export default function Footer() {
                             <div>
                                 <p className="text-gray-300">Email</p>
                                 <a href="mailto:info@jwmj.org" className="text-white hover:text-red-400 transition-colors">
-                                    jamnagarwehvaria@gmail.com
+                                    info@jwmj.org
                                 </a>
                             </div>
                         </div>

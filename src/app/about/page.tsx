@@ -116,7 +116,7 @@ export default function AboutPage() {
             priority
           />
           <p className="text-gray-600 text-lg md:text-2xl">
-            Our vision is to provide each and every facility to the members of
+            Our mission is to provide each and every facility to the members of
             Jamat and fulfill every basic need of needy people of Jamat.
           </p>
         </div>

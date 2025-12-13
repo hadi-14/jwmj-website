@@ -55,7 +55,7 @@ export default function Header() {
                             {/* <li><Link href="/#" className="hover:text-primary-blue">Youth Programs</Link></li> */}
                             <li><Link href="/events" className="hover:text-primary-blue">Events</Link></li>
                             <li><Link href="/presidency" className="hover:text-primary-blue">Presidency</Link></li>
-                            <li><Link href="/support" className="hover:text-primary-blue">Support & Contact</Link></li>
+                            <li><Link href="/contact" className="hover:text-primary-blue">Support & Contact</Link></li>
                         </ul>
                     </nav>
 
@@ -135,7 +135,7 @@ export default function Header() {
                         </li>
                         <li>
                             <Link
-                                href="/support"
+                                href="/contact"
                                 className="block px-6 py-3 hover:text-primary-blue hover:bg-primary-black/5 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
