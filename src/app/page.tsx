@@ -2,7 +2,7 @@
 
 import { getBusinesses } from "@/actions/business";
 import EventsHighlights from "@/components/eventsHighlights";
-import { Business } from "@/types/business";
+import { Business } from "@/types/businessAds";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
