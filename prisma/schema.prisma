@@ -1,6 +1,11 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  engineType             = "client"
+  runtime                = "nodejs"
+  moduleFormat           = "esm"
+  generatedFileExtension = "ts"
+  importFileExtension    = "ts"
 }
 
 datasource db {
@@ -1050,4 +1055,236 @@ model testtable {
   testtime Bytes? @db.VarBinary(50)
 
   @@ignore
+}
+
+
+// Add these models to your existing schema.prisma file
+
+model ZakatApplication {
+  id                       String    @id @default(cuid())
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  
+  // Basic Information
+  applicantName            String    @db.NVarChar(200)
+  fatherOrHusbandName      String    @db.NVarChar(200)
+  identification           String    @db.NVarChar(100)
+  membershipNumber         String?   @db.NVarChar(50)
+  idCardNumber             String    @db.NVarChar(20)
+  dateOfBirth              DateTime  @db.Date
+  education                String    @db.NVarChar(100)
+  
+  // Contact Information
+  currentAddress           String    @db.NVarChar(500)
+  mobileNumber             String    @db.NVarChar(20)
+  applicationDate          DateTime  @db.Date
+  lastApplicationDate      DateTime? @db.Date
+  
+  // Professional Information
+  professionOrSkill        String    @db.NVarChar(200)
+  workingInstitution       String?   @db.NVarChar(200)
+  institutionContact       String?   @db.NVarChar(50)
+  institutionAddress       String?   @db.NVarChar(500)
+  
+  // Marital Status
+  maritalStatus            String    @db.VarChar(20)
+  
+  // Residential Details
+  residentialStatus        String    @db.VarChar(20)
+  
+  // Household Information
+  parentsLivingWithYou     Boolean
+  numberOfBrothers         Int?
+  numberOfChildren         Int?
+  totalFamilyMembers       Int?
+  totalEarningMembers      Int?
+  monthlyIncome            Decimal?  @db.Decimal(18, 2)
+  
+  // Assets Information
+  hasGold                  Boolean   @default(false)
+  goldDetails              String?   @db.NVarChar(300)
+  goldAmount               Decimal?  @db.Decimal(18, 2)
+  
+  hasSilver                Boolean   @default(false)
+  silverDetails            String?   @db.NVarChar(300)
+  silverAmount             Decimal?  @db.Decimal(18, 2)
+  
+  hasCash                  Boolean   @default(false)
+  cashDetails              String?   @db.NVarChar(300)
+  cashAmount               Decimal?  @db.Decimal(18, 2)
+  
+  hasPrizeBonds            Boolean   @default(false)
+  prizeBondsDetails        String?   @db.NVarChar(300)
+  prizeBondsAmount         Decimal?  @db.Decimal(18, 2)
+  
+  hasExcessItems           Boolean   @default(false)
+  excessItemsDetails       String?   @db.NVarChar(500)
+  
+  hasBusiness              Boolean   @default(false)
+  businessDetails          String?   @db.NVarChar(500)
+  businessCapital          Decimal?  @db.Decimal(18, 2)
+  
+  hasGivenLoan             Boolean   @default(false)
+  givenLoanDetails         String?   @db.NVarChar(300)
+  givenLoanAmount          Decimal?  @db.Decimal(18, 2)
+  loanForgivenAmount       Decimal?  @db.Decimal(18, 2)
+  
+  hasCommittee             Boolean   @default(false)
+  committeeDetails         String?   @db.NVarChar(300)
+  committeeAmountReceived  Decimal?  @db.Decimal(18, 2)
+  
+  hasTakenLoan             Boolean   @default(false)
+  takenLoanDetails         String?   @db.NVarChar(300)
+  takenLoanAmount          Decimal?  @db.Decimal(18, 2)
+  loanForgivenByCreditor   Boolean?
+  
+  hasInvestment            Boolean   @default(false)
+  investmentDetails        String?   @db.NVarChar(500)
+  
+  // Declaration
+  declarationAccepted      Boolean
+  
+  // Status fields
+  status                   String    @default("pending") @db.VarChar(20)
+  approvedAmount           Decimal?  @db.Decimal(18, 2)
+  remarks                  String?   @db.NVarChar(1000)
+  
+  @@index([membershipNumber])
+  @@index([idCardNumber])
+  @@index([status])
+  @@index([applicationDate])
+}
+
+model BusinessLoanApplication {
+  id                       String    @id @default(cuid())
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  
+  // Basic Information
+  applicantName            String    @db.NVarChar(200)
+  fatherOrHusbandName      String    @db.NVarChar(200)
+  identification           String    @db.NVarChar(100)
+  membershipNumber         String?   @db.NVarChar(50)
+  idCardNumber             String    @db.NVarChar(20)
+  dateOfBirth              DateTime  @db.Date
+  education                String    @db.NVarChar(100)
+  
+  // Contact Information
+  currentAddress           String    @db.NVarChar(500)
+  mobileNumber             String    @db.NVarChar(20)
+  applicationDate          DateTime  @db.Date
+  
+  // Professional Information
+  professionOrSkill        String    @db.NVarChar(200)
+  workingInstitution       String?   @db.NVarChar(200)
+  institutionContact       String?   @db.NVarChar(50)
+  institutionAddress       String?   @db.NVarChar(500)
+  
+  // Business Information
+  businessType             String    @db.NVarChar(200)
+  businessDescription      String    @db.NVarChar(1000)
+  loanAmount               Decimal   @db.Decimal(18, 2)
+  loanPurpose              String    @db.NVarChar(500)
+  expectedMonthlyProfit    Decimal?  @db.Decimal(18, 2)
+  repaymentPeriod          Int?
+  
+  // Guarantor Information
+  guarantor1Name           String    @db.NVarChar(200)
+  guarantor1CNIC           String    @db.NVarChar(20)
+  guarantor1Contact        String    @db.NVarChar(20)
+  guarantor1Relation       String    @db.NVarChar(100)
+  
+  guarantor2Name           String?   @db.NVarChar(200)
+  guarantor2CNIC           String?   @db.NVarChar(20)
+  guarantor2Contact        String?   @db.NVarChar(20)
+  guarantor2Relation       String?   @db.NVarChar(100)
+  
+  // Financial Information
+  monthlyIncome            Decimal?  @db.Decimal(18, 2)
+  monthlyExpenses          Decimal?  @db.Decimal(18, 2)
+  existingLoans            Decimal?  @db.Decimal(18, 2)
+  
+  // Status fields
+  status                   String    @default("pending") @db.VarChar(20)
+  approvedAmount           Decimal?  @db.Decimal(18, 2)
+  disbursedAmount          Decimal?  @db.Decimal(18, 2)
+  disbursementDate         DateTime? @db.Date
+  remarks                  String?   @db.NVarChar(1000)
+  
+  @@index([membershipNumber])
+  @@index([idCardNumber])
+  @@index([status])
+  @@index([applicationDate])
+}
+
+model WelfareApplication {
+  id                       String    @id @default(cuid())
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  
+  // Basic Information
+  applicantName            String    @db.NVarChar(200)
+  fatherOrHusbandName      String    @db.NVarChar(200)
+  identification           String    @db.NVarChar(100)
+  membershipNumber         String?   @db.NVarChar(50)
+  idCardNumber             String    @db.NVarChar(20)
+  dateOfBirth              DateTime  @db.Date
+  education                String    @db.NVarChar(100)
+  
+  // Contact Information
+  currentAddress           String    @db.NVarChar(500)
+  mobileNumber             String    @db.NVarChar(20)
+  applicationDate          DateTime  @db.Date
+  
+  // Professional Information
+  professionOrSkill        String    @db.NVarChar(200)
+  workingInstitution       String?   @db.NVarChar(200)
+  
+  // Marital Status
+  maritalStatus            String    @db.VarChar(20)
+  
+  // Household Information
+  numberOfChildren         Int?
+  totalFamilyMembers       Int?
+  totalEarningMembers      Int?
+  monthlyIncome            Decimal?  @db.Decimal(18, 2)
+  
+  // Assistance Required
+  assistanceType           String    @db.VarChar(50)
+  assistanceDescription    String    @db.NVarChar(1000)
+  estimatedAmount          Decimal   @db.Decimal(18, 2)
+  urgencyLevel             String    @db.VarChar(20)
+  
+  // Medical Information
+  patientName              String?   @db.NVarChar(200)
+  patientRelation          String?   @db.NVarChar(100)
+  medicalCondition         String?   @db.NVarChar(500)
+  hospitalName             String?   @db.NVarChar(200)
+  doctorName               String?   @db.NVarChar(200)
+  estimatedMedicalCost     Decimal?  @db.Decimal(18, 2)
+  
+  // Education Information
+  studentName              String?   @db.NVarChar(200)
+  studentRelation          String?   @db.NVarChar(100)
+  institutionName          String?   @db.NVarChar(200)
+  courseOrClass            String?   @db.NVarChar(200)
+  feeAmount                Decimal?  @db.Decimal(18, 2)
+  
+  // Supporting Documents
+  hasDocuments             Boolean   @default(false)
+  documentsList            String?   @db.NVarChar(500)
+  
+  // Status fields
+  status                   String    @default("pending") @db.VarChar(20)
+  approvedAmount           Decimal?  @db.Decimal(18, 2)
+  disbursedAmount          Decimal?  @db.Decimal(18, 2)
+  disbursementDate         DateTime? @db.Date
+  remarks                  String?   @db.NVarChar(1000)
+  
+  @@index([membershipNumber])
+  @@index([idCardNumber])
+  @@index([status])
+  @@index([assistanceType])
+  @@index([urgencyLevel])
+  @@index([applicationDate])
 }
