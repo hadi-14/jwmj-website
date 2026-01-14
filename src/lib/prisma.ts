@@ -1,45 +1,24 @@
-import "dotenv/config";
-import { PrismaMssql } from "@prisma/adapter-mssql";
-import { PrismaClient } from "../../generated/prisma/client";
+import { PrismaClient } from "@/generated/prisma/client";
+import { PrismaMssql } from '@prisma/adapter-mssql'
 
-// SQL Server connection configuration using integrated security
-const sqlConfig = {
-  server: process.env.DB_HOST || "localhost",
+const config = {
+  server: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 1433,
-  database: process.env.DB_NAME || "DBWehvaria_Membership",
-  authentication: {
-    type: "default",
-    options: {
-      userName: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-    },
-  },
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
   options: {
-    encrypt: true,
-    trustServerCertificate: process.env.NODE_ENV !== "production",
-    enableKeepAlive: true,
+    encrypt: true, // Use this if you're on Windows Azure
+    trustServerCertificate: true, // Use this if you're using self-signed certificates
   },
-};
+}
 
-// For integrated security (Windows authentication), use environment variable or direct connection
-const useIntegratedSecurity = !process.env.DB_USER || !process.env.DB_PASSWORD;
-
-const adapter = new PrismaMssql(
-  useIntegratedSecurity
-    ? { connectionString: process.env.DATABASE_URL }
-    : sqlConfig
-);
+const adapter = new PrismaMssql(config)
 
 declare global {
   var prisma: PrismaClient | undefined;
 }
 
-const prisma =
-  global.prisma ||
-  new PrismaClient({
-    adapter,
-  });
+export const prisma = global.prisma || new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== "production") global.prisma = prisma;
-
-export { prisma };
