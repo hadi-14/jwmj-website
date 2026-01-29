@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model Gender_L
- * The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+ * 
  */
 export type Gender_LModel = runtime.Types.Result.DefaultSelection<Prisma.$Gender_LPayload>
 

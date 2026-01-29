@@ -30,14 +30,12 @@ export type Member_QualificationAvgAggregateOutputType = {
   MQu_MemComputerID: runtime.Decimal | null
   MQu_MemWehvariaNo: runtime.Decimal | null
   MQu_QualificationCode: runtime.Decimal | null
-  id: number | null
 }
 
 export type Member_QualificationSumAggregateOutputType = {
   MQu_MemComputerID: runtime.Decimal | null
   MQu_MemWehvariaNo: runtime.Decimal | null
   MQu_QualificationCode: runtime.Decimal | null
-  id: bigint | null
 }
 
 export type Member_QualificationMinAggregateOutputType = {
@@ -45,7 +43,6 @@ export type Member_QualificationMinAggregateOutputType = {
   MQu_MemWehvariaNo: runtime.Decimal | null
   MQu_QualificationCode: runtime.Decimal | null
   MQu_StatusDate: Date | null
-  id: bigint | null
 }
 
 export type Member_QualificationMaxAggregateOutputType = {
@@ -53,7 +50,6 @@ export type Member_QualificationMaxAggregateOutputType = {
   MQu_MemWehvariaNo: runtime.Decimal | null
   MQu_QualificationCode: runtime.Decimal | null
   MQu_StatusDate: Date | null
-  id: bigint | null
 }
 
 export type Member_QualificationCountAggregateOutputType = {
@@ -61,7 +57,6 @@ export type Member_QualificationCountAggregateOutputType = {
   MQu_MemWehvariaNo: number
   MQu_QualificationCode: number
   MQu_StatusDate: number
-  id: number
   _all: number
 }
 
@@ -70,14 +65,12 @@ export type Member_QualificationAvgAggregateInputType = {
   MQu_MemComputerID?: true
   MQu_MemWehvariaNo?: true
   MQu_QualificationCode?: true
-  id?: true
 }
 
 export type Member_QualificationSumAggregateInputType = {
   MQu_MemComputerID?: true
   MQu_MemWehvariaNo?: true
   MQu_QualificationCode?: true
-  id?: true
 }
 
 export type Member_QualificationMinAggregateInputType = {
@@ -85,7 +78,6 @@ export type Member_QualificationMinAggregateInputType = {
   MQu_MemWehvariaNo?: true
   MQu_QualificationCode?: true
   MQu_StatusDate?: true
-  id?: true
 }
 
 export type Member_QualificationMaxAggregateInputType = {
@@ -93,7 +85,6 @@ export type Member_QualificationMaxAggregateInputType = {
   MQu_MemWehvariaNo?: true
   MQu_QualificationCode?: true
   MQu_StatusDate?: true
-  id?: true
 }
 
 export type Member_QualificationCountAggregateInputType = {
@@ -101,7 +92,6 @@ export type Member_QualificationCountAggregateInputType = {
   MQu_MemWehvariaNo?: true
   MQu_QualificationCode?: true
   MQu_StatusDate?: true
-  id?: true
   _all?: true
 }
 
@@ -196,7 +186,6 @@ export type Member_QualificationGroupByOutputType = {
   MQu_MemWehvariaNo: runtime.Decimal | null
   MQu_QualificationCode: runtime.Decimal
   MQu_StatusDate: Date
-  id: bigint
   _count: Member_QualificationCountAggregateOutputType | null
   _avg: Member_QualificationAvgAggregateOutputType | null
   _sum: Member_QualificationSumAggregateOutputType | null
@@ -227,7 +216,6 @@ export type Member_QualificationWhereInput = {
   MQu_MemWehvariaNo?: Prisma.DecimalNullableFilter<"Member_Qualification"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_QualificationCode?: Prisma.DecimalFilter<"Member_Qualification"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   MQu_StatusDate?: Prisma.DateTimeFilter<"Member_Qualification"> | Date | string
-  id?: Prisma.BigIntFilter<"Member_Qualification"> | bigint | number
   member?: Prisma.XOR<Prisma.Member_InformationScalarRelationFilter, Prisma.Member_InformationWhereInput>
   qualification?: Prisma.XOR<Prisma.Qualification_LNullableScalarRelationFilter, Prisma.Qualification_LWhereInput> | null
 }
@@ -237,13 +225,12 @@ export type Member_QualificationOrderByWithRelationInput = {
   MQu_MemWehvariaNo?: Prisma.SortOrderInput | Prisma.SortOrder
   MQu_QualificationCode?: Prisma.SortOrder
   MQu_StatusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
   member?: Prisma.Member_InformationOrderByWithRelationInput
   qualification?: Prisma.Qualification_LOrderByWithRelationInput
 }
 
 export type Member_QualificationWhereUniqueInput = Prisma.AtLeast<{
-  id?: bigint | number
+  MQu_MemComputerID_MQu_QualificationCode_MQu_StatusDate?: Prisma.Member_QualificationMQu_MemComputerIDMQu_QualificationCodeMQu_StatusDateCompoundUniqueInput
   AND?: Prisma.Member_QualificationWhereInput | Prisma.Member_QualificationWhereInput[]
   OR?: Prisma.Member_QualificationWhereInput[]
   NOT?: Prisma.Member_QualificationWhereInput | Prisma.Member_QualificationWhereInput[]
@@ -253,14 +240,13 @@ export type Member_QualificationWhereUniqueInput = Prisma.AtLeast<{
   MQu_StatusDate?: Prisma.DateTimeFilter<"Member_Qualification"> | Date | string
   member?: Prisma.XOR<Prisma.Member_InformationScalarRelationFilter, Prisma.Member_InformationWhereInput>
   qualification?: Prisma.XOR<Prisma.Qualification_LNullableScalarRelationFilter, Prisma.Qualification_LWhereInput> | null
-}, "id">
+}, "MQu_MemComputerID_MQu_QualificationCode_MQu_StatusDate">
 
 export type Member_QualificationOrderByWithAggregationInput = {
   MQu_MemComputerID?: Prisma.SortOrder
   MQu_MemWehvariaNo?: Prisma.SortOrderInput | Prisma.SortOrder
   MQu_QualificationCode?: Prisma.SortOrder
   MQu_StatusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
   _count?: Prisma.Member_QualificationCountOrderByAggregateInput
   _avg?: Prisma.Member_QualificationAvgOrderByAggregateInput
   _max?: Prisma.Member_QualificationMaxOrderByAggregateInput
@@ -276,13 +262,11 @@ export type Member_QualificationScalarWhereWithAggregatesInput = {
   MQu_MemWehvariaNo?: Prisma.DecimalNullableWithAggregatesFilter<"Member_Qualification"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_QualificationCode?: Prisma.DecimalWithAggregatesFilter<"Member_Qualification"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   MQu_StatusDate?: Prisma.DateTimeWithAggregatesFilter<"Member_Qualification"> | Date | string
-  id?: Prisma.BigIntWithAggregatesFilter<"Member_Qualification"> | bigint | number
 }
 
 export type Member_QualificationCreateInput = {
   MQu_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_StatusDate: Date | string
-  id?: bigint | number
   member: Prisma.Member_InformationCreateNestedOneWithoutQualificationsInput
   qualification?: Prisma.Qualification_LCreateNestedOneWithoutMemberQualificationsInput
 }
@@ -292,13 +276,11 @@ export type Member_QualificationUncheckedCreateInput = {
   MQu_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_QualificationCode: runtime.Decimal | runtime.DecimalJsLike | number | string
   MQu_StatusDate: Date | string
-  id?: bigint | number
 }
 
 export type Member_QualificationUpdateInput = {
   MQu_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   member?: Prisma.Member_InformationUpdateOneRequiredWithoutQualificationsNestedInput
   qualification?: Prisma.Qualification_LUpdateOneWithoutMemberQualificationsNestedInput
 }
@@ -308,7 +290,6 @@ export type Member_QualificationUncheckedUpdateInput = {
   MQu_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_QualificationCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MQu_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_QualificationCreateManyInput = {
@@ -321,7 +302,6 @@ export type Member_QualificationCreateManyInput = {
 export type Member_QualificationUpdateManyMutationInput = {
   MQu_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_QualificationUncheckedUpdateManyInput = {
@@ -329,7 +309,6 @@ export type Member_QualificationUncheckedUpdateManyInput = {
   MQu_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_QualificationCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MQu_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_QualificationListRelationFilter = {
@@ -342,19 +321,23 @@ export type Member_QualificationOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type Member_QualificationMQu_MemComputerIDMQu_QualificationCodeMQu_StatusDateCompoundUniqueInput = {
+  MQu_MemComputerID: runtime.Decimal | runtime.DecimalJsLike | number | string
+  MQu_QualificationCode: runtime.Decimal | runtime.DecimalJsLike | number | string
+  MQu_StatusDate: Date | string
+}
+
 export type Member_QualificationCountOrderByAggregateInput = {
   MQu_MemComputerID?: Prisma.SortOrder
   MQu_MemWehvariaNo?: Prisma.SortOrder
   MQu_QualificationCode?: Prisma.SortOrder
   MQu_StatusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_QualificationAvgOrderByAggregateInput = {
   MQu_MemComputerID?: Prisma.SortOrder
   MQu_MemWehvariaNo?: Prisma.SortOrder
   MQu_QualificationCode?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_QualificationMaxOrderByAggregateInput = {
@@ -362,7 +345,6 @@ export type Member_QualificationMaxOrderByAggregateInput = {
   MQu_MemWehvariaNo?: Prisma.SortOrder
   MQu_QualificationCode?: Prisma.SortOrder
   MQu_StatusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_QualificationMinOrderByAggregateInput = {
@@ -370,14 +352,12 @@ export type Member_QualificationMinOrderByAggregateInput = {
   MQu_MemWehvariaNo?: Prisma.SortOrder
   MQu_QualificationCode?: Prisma.SortOrder
   MQu_StatusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_QualificationSumOrderByAggregateInput = {
   MQu_MemComputerID?: Prisma.SortOrder
   MQu_MemWehvariaNo?: Prisma.SortOrder
   MQu_QualificationCode?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_QualificationCreateNestedManyWithoutQualificationInput = {
@@ -467,7 +447,6 @@ export type Member_QualificationUncheckedUpdateManyWithoutMemberNestedInput = {
 export type Member_QualificationCreateWithoutQualificationInput = {
   MQu_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_StatusDate: Date | string
-  id?: bigint | number
   member: Prisma.Member_InformationCreateNestedOneWithoutQualificationsInput
 }
 
@@ -475,7 +454,6 @@ export type Member_QualificationUncheckedCreateWithoutQualificationInput = {
   MQu_MemComputerID: runtime.Decimal | runtime.DecimalJsLike | number | string
   MQu_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_StatusDate: Date | string
-  id?: bigint | number
 }
 
 export type Member_QualificationCreateOrConnectWithoutQualificationInput = {
@@ -511,13 +489,11 @@ export type Member_QualificationScalarWhereInput = {
   MQu_MemWehvariaNo?: Prisma.DecimalNullableFilter<"Member_Qualification"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_QualificationCode?: Prisma.DecimalFilter<"Member_Qualification"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   MQu_StatusDate?: Prisma.DateTimeFilter<"Member_Qualification"> | Date | string
-  id?: Prisma.BigIntFilter<"Member_Qualification"> | bigint | number
 }
 
 export type Member_QualificationCreateWithoutMemberInput = {
   MQu_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_StatusDate: Date | string
-  id?: bigint | number
   qualification?: Prisma.Qualification_LCreateNestedOneWithoutMemberQualificationsInput
 }
 
@@ -525,7 +501,6 @@ export type Member_QualificationUncheckedCreateWithoutMemberInput = {
   MQu_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_QualificationCode: runtime.Decimal | runtime.DecimalJsLike | number | string
   MQu_StatusDate: Date | string
-  id?: bigint | number
 }
 
 export type Member_QualificationCreateOrConnectWithoutMemberInput = {
@@ -562,7 +537,6 @@ export type Member_QualificationCreateManyQualificationInput = {
 export type Member_QualificationUpdateWithoutQualificationInput = {
   MQu_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   member?: Prisma.Member_InformationUpdateOneRequiredWithoutQualificationsNestedInput
 }
 
@@ -570,14 +544,12 @@ export type Member_QualificationUncheckedUpdateWithoutQualificationInput = {
   MQu_MemComputerID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MQu_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_QualificationUncheckedUpdateManyWithoutQualificationInput = {
   MQu_MemComputerID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MQu_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_QualificationCreateManyMemberInput = {
@@ -589,7 +561,6 @@ export type Member_QualificationCreateManyMemberInput = {
 export type Member_QualificationUpdateWithoutMemberInput = {
   MQu_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   qualification?: Prisma.Qualification_LUpdateOneWithoutMemberQualificationsNestedInput
 }
 
@@ -597,14 +568,12 @@ export type Member_QualificationUncheckedUpdateWithoutMemberInput = {
   MQu_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_QualificationCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MQu_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_QualificationUncheckedUpdateManyWithoutMemberInput = {
   MQu_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MQu_QualificationCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MQu_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 
@@ -614,7 +583,6 @@ export type Member_QualificationSelect<ExtArgs extends runtime.Types.Extensions.
   MQu_MemWehvariaNo?: boolean
   MQu_QualificationCode?: boolean
   MQu_StatusDate?: boolean
-  id?: boolean
   member?: boolean | Prisma.Member_InformationDefaultArgs<ExtArgs>
   qualification?: boolean | Prisma.Member_Qualification$qualificationArgs<ExtArgs>
 }, ExtArgs["result"]["member_Qualification"]>
@@ -626,10 +594,9 @@ export type Member_QualificationSelectScalar = {
   MQu_MemWehvariaNo?: boolean
   MQu_QualificationCode?: boolean
   MQu_StatusDate?: boolean
-  id?: boolean
 }
 
-export type Member_QualificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"MQu_MemComputerID" | "MQu_MemWehvariaNo" | "MQu_QualificationCode" | "MQu_StatusDate" | "id", ExtArgs["result"]["member_Qualification"]>
+export type Member_QualificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"MQu_MemComputerID" | "MQu_MemWehvariaNo" | "MQu_QualificationCode" | "MQu_StatusDate", ExtArgs["result"]["member_Qualification"]>
 export type Member_QualificationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   member?: boolean | Prisma.Member_InformationDefaultArgs<ExtArgs>
   qualification?: boolean | Prisma.Member_Qualification$qualificationArgs<ExtArgs>
@@ -646,7 +613,6 @@ export type $Member_QualificationPayload<ExtArgs extends runtime.Types.Extension
     MQu_MemWehvariaNo: runtime.Decimal | null
     MQu_QualificationCode: runtime.Decimal
     MQu_StatusDate: Date
-    id: bigint
   }, ExtArgs["result"]["member_Qualification"]>
   composites: {}
 }
@@ -1022,7 +988,6 @@ export interface Member_QualificationFieldRefs {
   readonly MQu_MemWehvariaNo: Prisma.FieldRef<"Member_Qualification", 'Decimal'>
   readonly MQu_QualificationCode: Prisma.FieldRef<"Member_Qualification", 'Decimal'>
   readonly MQu_StatusDate: Prisma.FieldRef<"Member_Qualification", 'DateTime'>
-  readonly id: Prisma.FieldRef<"Member_Qualification", 'BigInt'>
 }
     
 

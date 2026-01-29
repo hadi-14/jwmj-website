@@ -27,6 +27,7 @@ export type AggregateAft_vouchers = {
 }
 
 export type Aft_vouchersAvgAggregateOutputType = {
+  tmp: runtime.Decimal | null
   vocdr: number | null
   voccr: number | null
   vocSRNO: number | null
@@ -36,10 +37,10 @@ export type Aft_vouchersAvgAggregateOutputType = {
   vocConvRate: number | null
   VocCurrencyDR: number | null
   VocCurrencyCR: number | null
-  tmp: runtime.Decimal | null
 }
 
 export type Aft_vouchersSumAggregateOutputType = {
+  tmp: runtime.Decimal | null
   vocdr: number | null
   voccr: number | null
   vocSRNO: number | null
@@ -49,10 +50,10 @@ export type Aft_vouchersSumAggregateOutputType = {
   vocConvRate: number | null
   VocCurrencyDR: number | null
   VocCurrencyCR: number | null
-  tmp: runtime.Decimal | null
 }
 
 export type Aft_vouchersMinAggregateOutputType = {
+  tmp: runtime.Decimal | null
   vocno: string | null
   vocdate: Date | null
   vochead: string | null
@@ -80,10 +81,10 @@ export type Aft_vouchersMinAggregateOutputType = {
   VocNICNo: string | null
   VocEmpName: string | null
   VocEmpCode: string | null
-  tmp: runtime.Decimal | null
 }
 
 export type Aft_vouchersMaxAggregateOutputType = {
+  tmp: runtime.Decimal | null
   vocno: string | null
   vocdate: Date | null
   vochead: string | null
@@ -111,10 +112,10 @@ export type Aft_vouchersMaxAggregateOutputType = {
   VocNICNo: string | null
   VocEmpName: string | null
   VocEmpCode: string | null
-  tmp: runtime.Decimal | null
 }
 
 export type Aft_vouchersCountAggregateOutputType = {
+  tmp: number
   vocno: number
   vocdate: number
   vochead: number
@@ -142,12 +143,12 @@ export type Aft_vouchersCountAggregateOutputType = {
   VocNICNo: number
   VocEmpName: number
   VocEmpCode: number
-  tmp: number
   _all: number
 }
 
 
 export type Aft_vouchersAvgAggregateInputType = {
+  tmp?: true
   vocdr?: true
   voccr?: true
   vocSRNO?: true
@@ -157,10 +158,10 @@ export type Aft_vouchersAvgAggregateInputType = {
   vocConvRate?: true
   VocCurrencyDR?: true
   VocCurrencyCR?: true
-  tmp?: true
 }
 
 export type Aft_vouchersSumAggregateInputType = {
+  tmp?: true
   vocdr?: true
   voccr?: true
   vocSRNO?: true
@@ -170,10 +171,10 @@ export type Aft_vouchersSumAggregateInputType = {
   vocConvRate?: true
   VocCurrencyDR?: true
   VocCurrencyCR?: true
-  tmp?: true
 }
 
 export type Aft_vouchersMinAggregateInputType = {
+  tmp?: true
   vocno?: true
   vocdate?: true
   vochead?: true
@@ -201,10 +202,10 @@ export type Aft_vouchersMinAggregateInputType = {
   VocNICNo?: true
   VocEmpName?: true
   VocEmpCode?: true
-  tmp?: true
 }
 
 export type Aft_vouchersMaxAggregateInputType = {
+  tmp?: true
   vocno?: true
   vocdate?: true
   vochead?: true
@@ -232,10 +233,10 @@ export type Aft_vouchersMaxAggregateInputType = {
   VocNICNo?: true
   VocEmpName?: true
   VocEmpCode?: true
-  tmp?: true
 }
 
 export type Aft_vouchersCountAggregateInputType = {
+  tmp?: true
   vocno?: true
   vocdate?: true
   vochead?: true
@@ -263,7 +264,6 @@ export type Aft_vouchersCountAggregateInputType = {
   VocNICNo?: true
   VocEmpName?: true
   VocEmpCode?: true
-  tmp?: true
   _all?: true
 }
 
@@ -354,6 +354,7 @@ export type aft_vouchersGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 }
 
 export type Aft_vouchersGroupByOutputType = {
+  tmp: runtime.Decimal
   vocno: string
   vocdate: Date
   vochead: string
@@ -381,7 +382,6 @@ export type Aft_vouchersGroupByOutputType = {
   VocNICNo: string | null
   VocEmpName: string | null
   VocEmpCode: string | null
-  tmp: runtime.Decimal
   _count: Aft_vouchersCountAggregateOutputType | null
   _avg: Aft_vouchersAvgAggregateOutputType | null
   _sum: Aft_vouchersSumAggregateOutputType | null
@@ -408,6 +408,7 @@ export type aft_vouchersWhereInput = {
   AND?: Prisma.aft_vouchersWhereInput | Prisma.aft_vouchersWhereInput[]
   OR?: Prisma.aft_vouchersWhereInput[]
   NOT?: Prisma.aft_vouchersWhereInput | Prisma.aft_vouchersWhereInput[]
+  tmp?: Prisma.DecimalFilter<"aft_vouchers"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   vocno?: Prisma.StringFilter<"aft_vouchers"> | string
   vocdate?: Prisma.DateTimeFilter<"aft_vouchers"> | Date | string
   vochead?: Prisma.StringFilter<"aft_vouchers"> | string
@@ -435,10 +436,10 @@ export type aft_vouchersWhereInput = {
   VocNICNo?: Prisma.StringNullableFilter<"aft_vouchers"> | string | null
   VocEmpName?: Prisma.StringNullableFilter<"aft_vouchers"> | string | null
   VocEmpCode?: Prisma.StringNullableFilter<"aft_vouchers"> | string | null
-  tmp?: Prisma.DecimalFilter<"aft_vouchers"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type aft_vouchersOrderByWithRelationInput = {
+  tmp?: Prisma.SortOrder
   vocno?: Prisma.SortOrder
   vocdate?: Prisma.SortOrder
   vochead?: Prisma.SortOrder
@@ -466,7 +467,6 @@ export type aft_vouchersOrderByWithRelationInput = {
   VocNICNo?: Prisma.SortOrderInput | Prisma.SortOrder
   VocEmpName?: Prisma.SortOrderInput | Prisma.SortOrder
   VocEmpCode?: Prisma.SortOrderInput | Prisma.SortOrder
-  tmp?: Prisma.SortOrder
 }
 
 export type aft_vouchersWhereUniqueInput = Prisma.AtLeast<{
@@ -504,6 +504,7 @@ export type aft_vouchersWhereUniqueInput = Prisma.AtLeast<{
 }, "tmp">
 
 export type aft_vouchersOrderByWithAggregationInput = {
+  tmp?: Prisma.SortOrder
   vocno?: Prisma.SortOrder
   vocdate?: Prisma.SortOrder
   vochead?: Prisma.SortOrder
@@ -531,7 +532,6 @@ export type aft_vouchersOrderByWithAggregationInput = {
   VocNICNo?: Prisma.SortOrderInput | Prisma.SortOrder
   VocEmpName?: Prisma.SortOrderInput | Prisma.SortOrder
   VocEmpCode?: Prisma.SortOrderInput | Prisma.SortOrder
-  tmp?: Prisma.SortOrder
   _count?: Prisma.aft_vouchersCountOrderByAggregateInput
   _avg?: Prisma.aft_vouchersAvgOrderByAggregateInput
   _max?: Prisma.aft_vouchersMaxOrderByAggregateInput
@@ -543,6 +543,7 @@ export type aft_vouchersScalarWhereWithAggregatesInput = {
   AND?: Prisma.aft_vouchersScalarWhereWithAggregatesInput | Prisma.aft_vouchersScalarWhereWithAggregatesInput[]
   OR?: Prisma.aft_vouchersScalarWhereWithAggregatesInput[]
   NOT?: Prisma.aft_vouchersScalarWhereWithAggregatesInput | Prisma.aft_vouchersScalarWhereWithAggregatesInput[]
+  tmp?: Prisma.DecimalWithAggregatesFilter<"aft_vouchers"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   vocno?: Prisma.StringWithAggregatesFilter<"aft_vouchers"> | string
   vocdate?: Prisma.DateTimeWithAggregatesFilter<"aft_vouchers"> | Date | string
   vochead?: Prisma.StringWithAggregatesFilter<"aft_vouchers"> | string
@@ -570,10 +571,10 @@ export type aft_vouchersScalarWhereWithAggregatesInput = {
   VocNICNo?: Prisma.StringNullableWithAggregatesFilter<"aft_vouchers"> | string | null
   VocEmpName?: Prisma.StringNullableWithAggregatesFilter<"aft_vouchers"> | string | null
   VocEmpCode?: Prisma.StringNullableWithAggregatesFilter<"aft_vouchers"> | string | null
-  tmp?: Prisma.DecimalWithAggregatesFilter<"aft_vouchers"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type aft_vouchersCreateInput = {
+  tmp: runtime.Decimal | runtime.DecimalJsLike | number | string
   vocno: string
   vocdate: Date | string
   vochead: string
@@ -601,10 +602,10 @@ export type aft_vouchersCreateInput = {
   VocNICNo?: string | null
   VocEmpName?: string | null
   VocEmpCode?: string | null
-  tmp: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type aft_vouchersUncheckedCreateInput = {
+  tmp: runtime.Decimal | runtime.DecimalJsLike | number | string
   vocno: string
   vocdate: Date | string
   vochead: string
@@ -632,10 +633,10 @@ export type aft_vouchersUncheckedCreateInput = {
   VocNICNo?: string | null
   VocEmpName?: string | null
   VocEmpCode?: string | null
-  tmp: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type aft_vouchersUpdateInput = {
+  tmp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   vocno?: Prisma.StringFieldUpdateOperationsInput | string
   vocdate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vochead?: Prisma.StringFieldUpdateOperationsInput | string
@@ -663,10 +664,10 @@ export type aft_vouchersUpdateInput = {
   VocNICNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   VocEmpName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   VocEmpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  tmp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type aft_vouchersUncheckedUpdateInput = {
+  tmp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   vocno?: Prisma.StringFieldUpdateOperationsInput | string
   vocdate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vochead?: Prisma.StringFieldUpdateOperationsInput | string
@@ -694,10 +695,10 @@ export type aft_vouchersUncheckedUpdateInput = {
   VocNICNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   VocEmpName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   VocEmpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  tmp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type aft_vouchersCreateManyInput = {
+  tmp: runtime.Decimal | runtime.DecimalJsLike | number | string
   vocno: string
   vocdate: Date | string
   vochead: string
@@ -725,10 +726,10 @@ export type aft_vouchersCreateManyInput = {
   VocNICNo?: string | null
   VocEmpName?: string | null
   VocEmpCode?: string | null
-  tmp: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type aft_vouchersUpdateManyMutationInput = {
+  tmp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   vocno?: Prisma.StringFieldUpdateOperationsInput | string
   vocdate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vochead?: Prisma.StringFieldUpdateOperationsInput | string
@@ -756,10 +757,10 @@ export type aft_vouchersUpdateManyMutationInput = {
   VocNICNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   VocEmpName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   VocEmpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  tmp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type aft_vouchersUncheckedUpdateManyInput = {
+  tmp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   vocno?: Prisma.StringFieldUpdateOperationsInput | string
   vocdate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vochead?: Prisma.StringFieldUpdateOperationsInput | string
@@ -787,10 +788,10 @@ export type aft_vouchersUncheckedUpdateManyInput = {
   VocNICNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   VocEmpName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   VocEmpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  tmp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type aft_vouchersCountOrderByAggregateInput = {
+  tmp?: Prisma.SortOrder
   vocno?: Prisma.SortOrder
   vocdate?: Prisma.SortOrder
   vochead?: Prisma.SortOrder
@@ -818,10 +819,10 @@ export type aft_vouchersCountOrderByAggregateInput = {
   VocNICNo?: Prisma.SortOrder
   VocEmpName?: Prisma.SortOrder
   VocEmpCode?: Prisma.SortOrder
-  tmp?: Prisma.SortOrder
 }
 
 export type aft_vouchersAvgOrderByAggregateInput = {
+  tmp?: Prisma.SortOrder
   vocdr?: Prisma.SortOrder
   voccr?: Prisma.SortOrder
   vocSRNO?: Prisma.SortOrder
@@ -831,10 +832,10 @@ export type aft_vouchersAvgOrderByAggregateInput = {
   vocConvRate?: Prisma.SortOrder
   VocCurrencyDR?: Prisma.SortOrder
   VocCurrencyCR?: Prisma.SortOrder
-  tmp?: Prisma.SortOrder
 }
 
 export type aft_vouchersMaxOrderByAggregateInput = {
+  tmp?: Prisma.SortOrder
   vocno?: Prisma.SortOrder
   vocdate?: Prisma.SortOrder
   vochead?: Prisma.SortOrder
@@ -862,10 +863,10 @@ export type aft_vouchersMaxOrderByAggregateInput = {
   VocNICNo?: Prisma.SortOrder
   VocEmpName?: Prisma.SortOrder
   VocEmpCode?: Prisma.SortOrder
-  tmp?: Prisma.SortOrder
 }
 
 export type aft_vouchersMinOrderByAggregateInput = {
+  tmp?: Prisma.SortOrder
   vocno?: Prisma.SortOrder
   vocdate?: Prisma.SortOrder
   vochead?: Prisma.SortOrder
@@ -893,10 +894,10 @@ export type aft_vouchersMinOrderByAggregateInput = {
   VocNICNo?: Prisma.SortOrder
   VocEmpName?: Prisma.SortOrder
   VocEmpCode?: Prisma.SortOrder
-  tmp?: Prisma.SortOrder
 }
 
 export type aft_vouchersSumOrderByAggregateInput = {
+  tmp?: Prisma.SortOrder
   vocdr?: Prisma.SortOrder
   voccr?: Prisma.SortOrder
   vocSRNO?: Prisma.SortOrder
@@ -906,7 +907,6 @@ export type aft_vouchersSumOrderByAggregateInput = {
   vocConvRate?: Prisma.SortOrder
   VocCurrencyDR?: Prisma.SortOrder
   VocCurrencyCR?: Prisma.SortOrder
-  tmp?: Prisma.SortOrder
 }
 
 export type NullableFloatFieldUpdateOperationsInput = {
@@ -920,6 +920,7 @@ export type NullableFloatFieldUpdateOperationsInput = {
 
 
 export type aft_vouchersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  tmp?: boolean
   vocno?: boolean
   vocdate?: boolean
   vochead?: boolean
@@ -947,12 +948,12 @@ export type aft_vouchersSelect<ExtArgs extends runtime.Types.Extensions.Internal
   VocNICNo?: boolean
   VocEmpName?: boolean
   VocEmpCode?: boolean
-  tmp?: boolean
 }, ExtArgs["result"]["aft_vouchers"]>
 
 
 
 export type aft_vouchersSelectScalar = {
+  tmp?: boolean
   vocno?: boolean
   vocdate?: boolean
   vochead?: boolean
@@ -980,15 +981,15 @@ export type aft_vouchersSelectScalar = {
   VocNICNo?: boolean
   VocEmpName?: boolean
   VocEmpCode?: boolean
-  tmp?: boolean
 }
 
-export type aft_vouchersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"vocno" | "vocdate" | "vochead" | "vocdr" | "voccr" | "vocagains" | "voccheque" | "vocdescription" | "vocSRNO" | "VocNumber" | "VocRefNo" | "VocITaxPer" | "VocChqDate" | "VocBranch" | "VocITaxRs" | "VocITaxHead" | "VocFinYear" | "vocPay" | "vocCurrency" | "vocConvRate" | "VocCurrencyDR" | "VocCurrencyCR" | "Vocdescription2" | "VocNTNNo" | "VocNICNo" | "VocEmpName" | "VocEmpCode" | "tmp", ExtArgs["result"]["aft_vouchers"]>
+export type aft_vouchersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"tmp" | "vocno" | "vocdate" | "vochead" | "vocdr" | "voccr" | "vocagains" | "voccheque" | "vocdescription" | "vocSRNO" | "VocNumber" | "VocRefNo" | "VocITaxPer" | "VocChqDate" | "VocBranch" | "VocITaxRs" | "VocITaxHead" | "VocFinYear" | "vocPay" | "vocCurrency" | "vocConvRate" | "VocCurrencyDR" | "VocCurrencyCR" | "Vocdescription2" | "VocNTNNo" | "VocNICNo" | "VocEmpName" | "VocEmpCode", ExtArgs["result"]["aft_vouchers"]>
 
 export type $aft_vouchersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "aft_vouchers"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    tmp: runtime.Decimal
     vocno: string
     vocdate: Date
     vochead: string
@@ -1016,7 +1017,6 @@ export type $aft_vouchersPayload<ExtArgs extends runtime.Types.Extensions.Intern
     VocNICNo: string | null
     VocEmpName: string | null
     VocEmpCode: string | null
-    tmp: runtime.Decimal
   }, ExtArgs["result"]["aft_vouchers"]>
   composites: {}
 }
@@ -1100,8 +1100,8 @@ export interface aft_vouchersDelegate<ExtArgs extends runtime.Types.Extensions.I
    * // Get first 10 Aft_vouchers
    * const aft_vouchers = await prisma.aft_vouchers.findMany({ take: 10 })
    * 
-   * // Only select the `vocno`
-   * const aft_vouchersWithVocnoOnly = await prisma.aft_vouchers.findMany({ select: { vocno: true } })
+   * // Only select the `tmp`
+   * const aft_vouchersWithTmpOnly = await prisma.aft_vouchers.findMany({ select: { tmp: true } })
    * 
    */
   findMany<T extends aft_vouchersFindManyArgs>(args?: Prisma.SelectSubset<T, aft_vouchersFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$aft_vouchersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -1386,6 +1386,7 @@ export interface Prisma__aft_vouchersClient<T, Null = never, ExtArgs extends run
  * Fields of the aft_vouchers model
  */
 export interface aft_vouchersFieldRefs {
+  readonly tmp: Prisma.FieldRef<"aft_vouchers", 'Decimal'>
   readonly vocno: Prisma.FieldRef<"aft_vouchers", 'String'>
   readonly vocdate: Prisma.FieldRef<"aft_vouchers", 'DateTime'>
   readonly vochead: Prisma.FieldRef<"aft_vouchers", 'String'>
@@ -1413,7 +1414,6 @@ export interface aft_vouchersFieldRefs {
   readonly VocNICNo: Prisma.FieldRef<"aft_vouchers", 'String'>
   readonly VocEmpName: Prisma.FieldRef<"aft_vouchers", 'String'>
   readonly VocEmpCode: Prisma.FieldRef<"aft_vouchers", 'String'>
-  readonly tmp: Prisma.FieldRef<"aft_vouchers", 'Decimal'>
 }
     
 

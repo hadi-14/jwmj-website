@@ -87,6 +87,7 @@ export const ModelName = {
   Annual_Fee_Receive_M: 'Annual_Fee_Receive_M',
   Annual_Fee_Receive_D: 'Annual_Fee_Receive_D',
   abc: 'abc',
+  abc_tmp: 'abc_tmp',
   aft_vouchers: 'aft_vouchers',
   Donation_Application: 'Donation_Application',
   Donation_Status: 'Donation_Status',
@@ -97,14 +98,28 @@ export const ModelName = {
   tmp_annualfee_summary: 'tmp_annualfee_summary',
   tmp_auto_Desc: 'tmp_auto_Desc',
   tmp_deathcert_List: 'tmp_deathcert_List',
+  tmp_linked_mem: 'tmp_linked_mem',
+  tmp_member_linked: 'tmp_member_linked',
+  tmp_member_notgenerated: 'tmp_member_notgenerated',
+  Tmp_MemberShip_Form: 'Tmp_MemberShip_Form',
+  Tmp_MemberShip_Form_DOJ: 'Tmp_MemberShip_Form_DOJ',
+  TmpAllMemberList: 'TmpAllMemberList',
+  tmpbalfee: 'tmpbalfee',
+  tmpfatherdetails: 'tmpfatherdetails',
+  tmpMotherdetails: 'tmpMotherdetails',
+  tmpstatusChild: 'tmpstatusChild',
+  tmpstatusheadoffamily: 'tmpstatusheadoffamily',
+  tmpstatusSpouse: 'tmpstatusSpouse',
   Rpt_MemberCard: 'Rpt_MemberCard',
   rptfeeslip: 'rptfeeslip',
+  sysdiagrams: 'sysdiagrams',
   Form: 'Form',
   FormField: 'FormField',
   FormSubmission: 'FormSubmission',
   FormFieldValue: 'FormFieldValue',
   FormAuditLog: 'FormAuditLog',
-  User: 'User'
+  User: 'User',
+  VerificationCode: 'VerificationCode'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -441,8 +456,7 @@ export const Member_MaritalStatusScalarFieldEnum = {
   MMr_MemComputerID: 'MMr_MemComputerID',
   MMr_MemWehvariaNo: 'MMr_MemWehvariaNo',
   MMr_MaritalCode: 'MMr_MaritalCode',
-  MMr_StatusDate: 'MMr_StatusDate',
-  id: 'id'
+  MMr_StatusDate: 'MMr_StatusDate'
 } as const
 
 export type Member_MaritalStatusScalarFieldEnum = (typeof Member_MaritalStatusScalarFieldEnum)[keyof typeof Member_MaritalStatusScalarFieldEnum]
@@ -452,8 +466,7 @@ export const Member_OccupationScalarFieldEnum = {
   MOc_MemComputerID: 'MOc_MemComputerID',
   MOc_MemWehvariaNo: 'MOc_MemWehvariaNo',
   MOc_OccupationCode: 'MOc_OccupationCode',
-  MOc_statusDate: 'MOc_statusDate',
-  id: 'id'
+  MOc_statusDate: 'MOc_statusDate'
 } as const
 
 export type Member_OccupationScalarFieldEnum = (typeof Member_OccupationScalarFieldEnum)[keyof typeof Member_OccupationScalarFieldEnum]
@@ -463,8 +476,7 @@ export const Member_QualificationScalarFieldEnum = {
   MQu_MemComputerID: 'MQu_MemComputerID',
   MQu_MemWehvariaNo: 'MQu_MemWehvariaNo',
   MQu_QualificationCode: 'MQu_QualificationCode',
-  MQu_StatusDate: 'MQu_StatusDate',
-  id: 'id'
+  MQu_StatusDate: 'MQu_StatusDate'
 } as const
 
 export type Member_QualificationScalarFieldEnum = (typeof Member_QualificationScalarFieldEnum)[keyof typeof Member_QualificationScalarFieldEnum]
@@ -475,8 +487,7 @@ export const Member_StatusScalarFieldEnum = {
   Mst_WehvariaNo: 'Mst_WehvariaNo',
   Mst_StatusCode: 'Mst_StatusCode',
   Mst_CreationDate: 'Mst_CreationDate',
-  Mst_DeactiveDate: 'Mst_DeactiveDate',
-  id: 'id'
+  Mst_DeactiveDate: 'Mst_DeactiveDate'
 } as const
 
 export type Member_StatusScalarFieldEnum = (typeof Member_StatusScalarFieldEnum)[keyof typeof Member_StatusScalarFieldEnum]
@@ -494,8 +505,7 @@ export type Member_CellNumberScalarFieldEnum = (typeof Member_CellNumberScalarFi
 export const Member_EmailidScalarFieldEnum = {
   MEM_MemComputerID: 'MEM_MemComputerID',
   MEM_MemWehvariaNo: 'MEM_MemWehvariaNo',
-  MEM_Emailid: 'MEM_Emailid',
-  id: 'id'
+  MEM_Emailid: 'MEM_Emailid'
 } as const
 
 export type Member_EmailidScalarFieldEnum = (typeof Member_EmailidScalarFieldEnum)[keyof typeof Member_EmailidScalarFieldEnum]
@@ -599,7 +609,17 @@ export const AbcScalarFieldEnum = {
 export type AbcScalarFieldEnum = (typeof AbcScalarFieldEnum)[keyof typeof AbcScalarFieldEnum]
 
 
+export const Abc_tmpScalarFieldEnum = {
+  ARM_VoucherNo: 'ARM_VoucherNo',
+  ARM_MemberID: 'ARM_MemberID',
+  MemMembershipNo: 'MemMembershipNo'
+} as const
+
+export type Abc_tmpScalarFieldEnum = (typeof Abc_tmpScalarFieldEnum)[keyof typeof Abc_tmpScalarFieldEnum]
+
+
 export const Aft_vouchersScalarFieldEnum = {
+  tmp: 'tmp',
   vocno: 'vocno',
   vocdate: 'vocdate',
   vochead: 'vochead',
@@ -626,8 +646,7 @@ export const Aft_vouchersScalarFieldEnum = {
   VocNTNNo: 'VocNTNNo',
   VocNICNo: 'VocNICNo',
   VocEmpName: 'VocEmpName',
-  VocEmpCode: 'VocEmpCode',
-  tmp: 'tmp'
+  VocEmpCode: 'VocEmpCode'
 } as const
 
 export type Aft_vouchersScalarFieldEnum = (typeof Aft_vouchersScalarFieldEnum)[keyof typeof Aft_vouchersScalarFieldEnum]
@@ -708,8 +727,8 @@ export type UserInfoScalarFieldEnum = (typeof UserInfoScalarFieldEnum)[keyof typ
 
 
 export const Tmp_Annual_FeeReceiptScalarFieldEnum = {
-  MemberID: 'MemberID',
   Voc__: 'Voc__',
+  MemberID: 'MemberID',
   Date: 'Date',
   Fee: 'Fee',
   MemMembershipNo: 'MemMembershipNo',
@@ -747,12 +766,12 @@ export type Tmp_auto_DescScalarFieldEnum = (typeof Tmp_auto_DescScalarFieldEnum)
 
 
 export const Tmp_deathcert_ListScalarFieldEnum = {
+  Dth_Auto_Id: 'Dth_Auto_Id',
   MemName: 'MemName',
   surname: 'surname',
   gndname: 'gndname',
   Mem_DeceasedDate: 'Mem_DeceasedDate',
   GVY_Name: 'GVY_Name',
-  Dth_Auto_Id: 'Dth_Auto_Id',
   Dth_Age: 'Dth_Age',
   Dth_Grave_No: 'Dth_Grave_No',
   Dth_Burial_Date: 'Dth_Burial_Date',
@@ -763,6 +782,222 @@ export const Tmp_deathcert_ListScalarFieldEnum = {
 } as const
 
 export type Tmp_deathcert_ListScalarFieldEnum = (typeof Tmp_deathcert_ListScalarFieldEnum)[keyof typeof Tmp_deathcert_ListScalarFieldEnum]
+
+
+export const Tmp_linked_memScalarFieldEnum = {
+  DOJ_RegDate: 'DOJ_RegDate',
+  DOJ_Name: 'DOJ_Name',
+  DOJ_HusbandName: 'DOJ_HusbandName'
+} as const
+
+export type Tmp_linked_memScalarFieldEnum = (typeof Tmp_linked_memScalarFieldEnum)[keyof typeof Tmp_linked_memScalarFieldEnum]
+
+
+export const Tmp_member_linkedScalarFieldEnum = {
+  MemComputerID: 'MemComputerID',
+  Membership__: 'Membership__',
+  Name: 'Name',
+  Father_Name: 'Father_Name'
+} as const
+
+export type Tmp_member_linkedScalarFieldEnum = (typeof Tmp_member_linkedScalarFieldEnum)[keyof typeof Tmp_member_linkedScalarFieldEnum]
+
+
+export const Tmp_member_notgeneratedScalarFieldEnum = {
+  MemComputerID: 'MemComputerID',
+  Membership__: 'Membership__',
+  Name: 'Name',
+  Father_Name: 'Father_Name'
+} as const
+
+export type Tmp_member_notgeneratedScalarFieldEnum = (typeof Tmp_member_notgeneratedScalarFieldEnum)[keyof typeof Tmp_member_notgeneratedScalarFieldEnum]
+
+
+export const Tmp_MemberShip_FormScalarFieldEnum = {
+  MemComputerID: 'MemComputerID',
+  MemComputerDate: 'MemComputerDate',
+  MemWehvariaNo: 'MemWehvariaNo',
+  MemRegistrationDate: 'MemRegistrationDate',
+  MemMembershipNo: 'MemMembershipNo',
+  MemName: 'MemName',
+  MemSurNameCode: 'MemSurNameCode',
+  MemCNIC: 'MemCNIC',
+  MemDOB: 'MemDOB',
+  MemGenderCode: 'MemGenderCode',
+  MemFatherName: 'MemFatherName',
+  MemMotherName: 'MemMotherName',
+  MemPostalAddress: 'MemPostalAddress',
+  MemAreaCode: 'MemAreaCode',
+  MemCountryCode: 'MemCountryCode',
+  Remarks: 'Remarks',
+  Mem_Pic: 'Mem_Pic',
+  Mem_DeceasedDate: 'Mem_DeceasedDate',
+  Mem_DeceasedDetails: 'Mem_DeceasedDetails',
+  CorrectCompid: 'CorrectCompid',
+  autoBacktick: 'autoBacktick',
+  memComputerIdBackup: 'memComputerIdBackup',
+  Mem_DeActive: 'Mem_DeActive',
+  Mem_DeActive_Date: 'Mem_DeActive_Date',
+  Mem_DeActive_Details: 'Mem_DeActive_Details',
+  Mem_Dth_Cert_Req: 'Mem_Dth_Cert_Req',
+  Surname: 'Surname',
+  genderNAME: 'genderNAME',
+  AREANAME: 'AREANAME',
+  COUNTRYNAME: 'COUNTRYNAME',
+  MarriedstatusName: 'MarriedstatusName',
+  occupation: 'occupation',
+  qualification: 'qualification',
+  cellno: 'cellno',
+  MemEmail: 'MemEmail',
+  Card_Issued: 'Card_Issued'
+} as const
+
+export type Tmp_MemberShip_FormScalarFieldEnum = (typeof Tmp_MemberShip_FormScalarFieldEnum)[keyof typeof Tmp_MemberShip_FormScalarFieldEnum]
+
+
+export const Tmp_MemberShip_Form_DOJScalarFieldEnum = {
+  DOJ_Daughter_Code: 'DOJ_Daughter_Code',
+  DOJ_RegDate: 'DOJ_RegDate',
+  DOJ_DOB: 'DOJ_DOB',
+  DOJ_CNIC: 'DOJ_CNIC',
+  DOJ_Name: 'DOJ_Name',
+  DOJ_SurName_Code: 'DOJ_SurName_Code',
+  DOJ_HusbandName: 'DOJ_HusbandName',
+  DOJ_FatherName: 'DOJ_FatherName',
+  DOJ_MotherName: 'DOJ_MotherName',
+  DOJ_PostalAddress: 'DOJ_PostalAddress',
+  DOJ_Area_Code: 'DOJ_Area_Code',
+  DOJ_Country_Code: 'DOJ_Country_Code',
+  DOJ_Cell: 'DOJ_Cell',
+  DOJ_Email: 'DOJ_Email',
+  DOJ_Remarks: 'DOJ_Remarks',
+  DOJ_Pic: 'DOJ_Pic',
+  DOJ_DeceasedDate: 'DOJ_DeceasedDate',
+  DOJ_DeceasedDetails: 'DOJ_DeceasedDetails',
+  Doj_Linked_Member: 'Doj_Linked_Member',
+  Doj_Husband_Father: 'Doj_Husband_Father',
+  Doj_Husband_CNIC: 'Doj_Husband_CNIC',
+  Doj_Husband_SurName: 'Doj_Husband_SurName',
+  Doj_Husband_Cell: 'Doj_Husband_Cell',
+  Doj_Community: 'Doj_Community',
+  Surname: 'Surname',
+  AREANAME: 'AREANAME',
+  COUNTRYNAME: 'COUNTRYNAME'
+} as const
+
+export type Tmp_MemberShip_Form_DOJScalarFieldEnum = (typeof Tmp_MemberShip_Form_DOJScalarFieldEnum)[keyof typeof Tmp_MemberShip_Form_DOJScalarFieldEnum]
+
+
+export const TmpAllMemberListScalarFieldEnum = {
+  MemComputerID: 'MemComputerID',
+  MemRegistrationDate: 'MemRegistrationDate',
+  MemMembershipNo: 'MemMembershipNo',
+  MemName: 'MemName',
+  Mem_DECEASEDDAte: 'Mem_DECEASEDDAte',
+  Surname: 'Surname',
+  MemCNIC: 'MemCNIC',
+  MemDOB: 'MemDOB',
+  genderNAME: 'genderNAME',
+  MemFatherName: 'MemFatherName',
+  MemMotherName: 'MemMotherName',
+  MemPostalAddress: 'MemPostalAddress',
+  AREANAME: 'AREANAME',
+  COUNTRYNAME: 'COUNTRYNAME',
+  Remarks: 'Remarks',
+  MemStatus: 'MemStatus',
+  MarriedstatusName: 'MarriedstatusName',
+  MemActive: 'MemActive',
+  occupation: 'occupation',
+  qualification: 'qualification',
+  AgeYearsDecimal: 'AgeYearsDecimal',
+  AgeYearsIntRound: 'AgeYearsIntRound',
+  AgeYearsIntTrunc: 'AgeYearsIntTrunc',
+  Card_Issued: 'Card_Issued',
+  CellNumber: 'CellNumber'
+} as const
+
+export type TmpAllMemberListScalarFieldEnum = (typeof TmpAllMemberListScalarFieldEnum)[keyof typeof TmpAllMemberListScalarFieldEnum]
+
+
+export const TmpbalfeeScalarFieldEnum = {
+  MemComputerID: 'MemComputerID',
+  tot_fee: 'tot_fee',
+  tot_Rec: 'tot_Rec'
+} as const
+
+export type TmpbalfeeScalarFieldEnum = (typeof TmpbalfeeScalarFieldEnum)[keyof typeof TmpbalfeeScalarFieldEnum]
+
+
+export const TmpfatherdetailsScalarFieldEnum = {
+  child_wehvaria_no: 'child_wehvaria_no',
+  Father_memberNo: 'Father_memberNo',
+  Father_Name: 'Father_Name',
+  Father_CNIC: 'Father_CNIC',
+  Father_DOB: 'Father_DOB',
+  father_Cellno: 'father_Cellno'
+} as const
+
+export type TmpfatherdetailsScalarFieldEnum = (typeof TmpfatherdetailsScalarFieldEnum)[keyof typeof TmpfatherdetailsScalarFieldEnum]
+
+
+export const TmpMotherdetailsScalarFieldEnum = {
+  child_wehvaria_no: 'child_wehvaria_no',
+  Mother_memberNo: 'Mother_memberNo',
+  Mother_Name: 'Mother_Name',
+  Mother_CNIC: 'Mother_CNIC',
+  Mother_DOB: 'Mother_DOB',
+  Mother_Cellno: 'Mother_Cellno'
+} as const
+
+export type TmpMotherdetailsScalarFieldEnum = (typeof TmpMotherdetailsScalarFieldEnum)[keyof typeof TmpMotherdetailsScalarFieldEnum]
+
+
+export const TmpstatusChildScalarFieldEnum = {
+  MemMembershipNo: 'MemMembershipNo',
+  chd_StatusDate: 'chd_StatusDate',
+  MemName: 'MemName',
+  MemCNIC: 'MemCNIC',
+  MemDOB: 'MemDOB',
+  Gender: 'Gender',
+  SurName: 'SurName',
+  Father_memberNo: 'Father_memberNo',
+  FaTHER_Name: 'FaTHER_Name',
+  mother_memberNo: 'mother_memberNo',
+  mother_Name: 'mother_Name',
+  Chd_DeactiveDate: 'Chd_DeactiveDate'
+} as const
+
+export type TmpstatusChildScalarFieldEnum = (typeof TmpstatusChildScalarFieldEnum)[keyof typeof TmpstatusChildScalarFieldEnum]
+
+
+export const TmpstatusheadoffamilyScalarFieldEnum = {
+  Memwehvariano: 'Memwehvariano',
+  MemMembershipNo: 'MemMembershipNo',
+  MemName: 'MemName',
+  MemCNIC: 'MemCNIC',
+  MemDOB: 'MemDOB',
+  Par_StatusDate: 'Par_StatusDate',
+  Gender: 'Gender',
+  SurName: 'SurName'
+} as const
+
+export type TmpstatusheadoffamilyScalarFieldEnum = (typeof TmpstatusheadoffamilyScalarFieldEnum)[keyof typeof TmpstatusheadoffamilyScalarFieldEnum]
+
+
+export const TmpstatusSpouseScalarFieldEnum = {
+  MemMembershipNo: 'MemMembershipNo',
+  Spu_StatusDate: 'Spu_StatusDate',
+  MemName: 'MemName',
+  MemCNIC: 'MemCNIC',
+  MemDOB: 'MemDOB',
+  Gender: 'Gender',
+  SurName: 'SurName',
+  PARENT_memberNo: 'PARENT_memberNo',
+  PARENT_Name: 'PARENT_Name',
+  Spu_DeactiveDate: 'Spu_DeactiveDate'
+} as const
+
+export type TmpstatusSpouseScalarFieldEnum = (typeof TmpstatusSpouseScalarFieldEnum)[keyof typeof TmpstatusSpouseScalarFieldEnum]
 
 
 export const Rpt_MemberCardScalarFieldEnum = {
@@ -799,6 +1034,17 @@ export const RptfeeslipScalarFieldEnum = {
 } as const
 
 export type RptfeeslipScalarFieldEnum = (typeof RptfeeslipScalarFieldEnum)[keyof typeof RptfeeslipScalarFieldEnum]
+
+
+export const SysdiagramsScalarFieldEnum = {
+  name: 'name',
+  principal_id: 'principal_id',
+  diagram_id: 'diagram_id',
+  version: 'version',
+  definition: 'definition'
+} as const
+
+export type SysdiagramsScalarFieldEnum = (typeof SysdiagramsScalarFieldEnum)[keyof typeof SysdiagramsScalarFieldEnum]
 
 
 export const FormScalarFieldEnum = {
@@ -896,6 +1142,21 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const VerificationCodeScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  code: 'code',
+  expiresAt: 'expiresAt',
+  attempts: 'attempts',
+  verificationAttempts: 'verificationAttempts',
+  lastAttempt: 'lastAttempt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VerificationCodeScalarFieldEnum = (typeof VerificationCodeScalarFieldEnum)[keyof typeof VerificationCodeScalarFieldEnum]
 
 
 export const SortOrder = {

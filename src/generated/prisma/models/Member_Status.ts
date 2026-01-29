@@ -30,14 +30,12 @@ export type Member_StatusAvgAggregateOutputType = {
   Mst_Memberid: runtime.Decimal | null
   Mst_WehvariaNo: runtime.Decimal | null
   Mst_StatusCode: runtime.Decimal | null
-  id: number | null
 }
 
 export type Member_StatusSumAggregateOutputType = {
   Mst_Memberid: runtime.Decimal | null
   Mst_WehvariaNo: runtime.Decimal | null
   Mst_StatusCode: runtime.Decimal | null
-  id: bigint | null
 }
 
 export type Member_StatusMinAggregateOutputType = {
@@ -46,7 +44,6 @@ export type Member_StatusMinAggregateOutputType = {
   Mst_StatusCode: runtime.Decimal | null
   Mst_CreationDate: Date | null
   Mst_DeactiveDate: Date | null
-  id: bigint | null
 }
 
 export type Member_StatusMaxAggregateOutputType = {
@@ -55,7 +52,6 @@ export type Member_StatusMaxAggregateOutputType = {
   Mst_StatusCode: runtime.Decimal | null
   Mst_CreationDate: Date | null
   Mst_DeactiveDate: Date | null
-  id: bigint | null
 }
 
 export type Member_StatusCountAggregateOutputType = {
@@ -64,7 +60,6 @@ export type Member_StatusCountAggregateOutputType = {
   Mst_StatusCode: number
   Mst_CreationDate: number
   Mst_DeactiveDate: number
-  id: number
   _all: number
 }
 
@@ -73,14 +68,12 @@ export type Member_StatusAvgAggregateInputType = {
   Mst_Memberid?: true
   Mst_WehvariaNo?: true
   Mst_StatusCode?: true
-  id?: true
 }
 
 export type Member_StatusSumAggregateInputType = {
   Mst_Memberid?: true
   Mst_WehvariaNo?: true
   Mst_StatusCode?: true
-  id?: true
 }
 
 export type Member_StatusMinAggregateInputType = {
@@ -89,7 +82,6 @@ export type Member_StatusMinAggregateInputType = {
   Mst_StatusCode?: true
   Mst_CreationDate?: true
   Mst_DeactiveDate?: true
-  id?: true
 }
 
 export type Member_StatusMaxAggregateInputType = {
@@ -98,7 +90,6 @@ export type Member_StatusMaxAggregateInputType = {
   Mst_StatusCode?: true
   Mst_CreationDate?: true
   Mst_DeactiveDate?: true
-  id?: true
 }
 
 export type Member_StatusCountAggregateInputType = {
@@ -107,7 +98,6 @@ export type Member_StatusCountAggregateInputType = {
   Mst_StatusCode?: true
   Mst_CreationDate?: true
   Mst_DeactiveDate?: true
-  id?: true
   _all?: true
 }
 
@@ -203,7 +193,6 @@ export type Member_StatusGroupByOutputType = {
   Mst_StatusCode: runtime.Decimal
   Mst_CreationDate: Date
   Mst_DeactiveDate: Date
-  id: bigint
   _count: Member_StatusCountAggregateOutputType | null
   _avg: Member_StatusAvgAggregateOutputType | null
   _sum: Member_StatusSumAggregateOutputType | null
@@ -235,7 +224,6 @@ export type Member_StatusWhereInput = {
   Mst_StatusCode?: Prisma.DecimalFilter<"Member_Status"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   Mst_CreationDate?: Prisma.DateTimeFilter<"Member_Status"> | Date | string
   Mst_DeactiveDate?: Prisma.DateTimeFilter<"Member_Status"> | Date | string
-  id?: Prisma.BigIntFilter<"Member_Status"> | bigint | number
   member?: Prisma.XOR<Prisma.Member_InformationScalarRelationFilter, Prisma.Member_InformationWhereInput>
   status?: Prisma.XOR<Prisma.Status_LNullableScalarRelationFilter, Prisma.Status_LWhereInput> | null
 }
@@ -246,13 +234,12 @@ export type Member_StatusOrderByWithRelationInput = {
   Mst_StatusCode?: Prisma.SortOrder
   Mst_CreationDate?: Prisma.SortOrder
   Mst_DeactiveDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
   member?: Prisma.Member_InformationOrderByWithRelationInput
   status?: Prisma.Status_LOrderByWithRelationInput
 }
 
 export type Member_StatusWhereUniqueInput = Prisma.AtLeast<{
-  id?: bigint | number
+  Mst_Memberid_Mst_CreationDate?: Prisma.Member_StatusMst_MemberidMst_CreationDateCompoundUniqueInput
   AND?: Prisma.Member_StatusWhereInput | Prisma.Member_StatusWhereInput[]
   OR?: Prisma.Member_StatusWhereInput[]
   NOT?: Prisma.Member_StatusWhereInput | Prisma.Member_StatusWhereInput[]
@@ -263,7 +250,7 @@ export type Member_StatusWhereUniqueInput = Prisma.AtLeast<{
   Mst_DeactiveDate?: Prisma.DateTimeFilter<"Member_Status"> | Date | string
   member?: Prisma.XOR<Prisma.Member_InformationScalarRelationFilter, Prisma.Member_InformationWhereInput>
   status?: Prisma.XOR<Prisma.Status_LNullableScalarRelationFilter, Prisma.Status_LWhereInput> | null
-}, "id">
+}, "Mst_Memberid_Mst_CreationDate">
 
 export type Member_StatusOrderByWithAggregationInput = {
   Mst_Memberid?: Prisma.SortOrder
@@ -271,7 +258,6 @@ export type Member_StatusOrderByWithAggregationInput = {
   Mst_StatusCode?: Prisma.SortOrder
   Mst_CreationDate?: Prisma.SortOrder
   Mst_DeactiveDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
   _count?: Prisma.Member_StatusCountOrderByAggregateInput
   _avg?: Prisma.Member_StatusAvgOrderByAggregateInput
   _max?: Prisma.Member_StatusMaxOrderByAggregateInput
@@ -288,14 +274,12 @@ export type Member_StatusScalarWhereWithAggregatesInput = {
   Mst_StatusCode?: Prisma.DecimalWithAggregatesFilter<"Member_Status"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   Mst_CreationDate?: Prisma.DateTimeWithAggregatesFilter<"Member_Status"> | Date | string
   Mst_DeactiveDate?: Prisma.DateTimeWithAggregatesFilter<"Member_Status"> | Date | string
-  id?: Prisma.BigIntWithAggregatesFilter<"Member_Status"> | bigint | number
 }
 
 export type Member_StatusCreateInput = {
   Mst_WehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   Mst_CreationDate: Date | string
   Mst_DeactiveDate: Date | string
-  id?: bigint | number
   member: Prisma.Member_InformationCreateNestedOneWithoutStatusesInput
   status?: Prisma.Status_LCreateNestedOneWithoutMemberStatusesInput
 }
@@ -306,14 +290,12 @@ export type Member_StatusUncheckedCreateInput = {
   Mst_StatusCode: runtime.Decimal | runtime.DecimalJsLike | number | string
   Mst_CreationDate: Date | string
   Mst_DeactiveDate: Date | string
-  id?: bigint | number
 }
 
 export type Member_StatusUpdateInput = {
   Mst_WehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   Mst_CreationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Mst_DeactiveDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   member?: Prisma.Member_InformationUpdateOneRequiredWithoutStatusesNestedInput
   status?: Prisma.Status_LUpdateOneWithoutMemberStatusesNestedInput
 }
@@ -324,7 +306,6 @@ export type Member_StatusUncheckedUpdateInput = {
   Mst_StatusCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   Mst_CreationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Mst_DeactiveDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_StatusCreateManyInput = {
@@ -339,7 +320,6 @@ export type Member_StatusUpdateManyMutationInput = {
   Mst_WehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   Mst_CreationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Mst_DeactiveDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_StatusUncheckedUpdateManyInput = {
@@ -348,7 +328,6 @@ export type Member_StatusUncheckedUpdateManyInput = {
   Mst_StatusCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   Mst_CreationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Mst_DeactiveDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_StatusListRelationFilter = {
@@ -361,20 +340,23 @@ export type Member_StatusOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type Member_StatusMst_MemberidMst_CreationDateCompoundUniqueInput = {
+  Mst_Memberid: runtime.Decimal | runtime.DecimalJsLike | number | string
+  Mst_CreationDate: Date | string
+}
+
 export type Member_StatusCountOrderByAggregateInput = {
   Mst_Memberid?: Prisma.SortOrder
   Mst_WehvariaNo?: Prisma.SortOrder
   Mst_StatusCode?: Prisma.SortOrder
   Mst_CreationDate?: Prisma.SortOrder
   Mst_DeactiveDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_StatusAvgOrderByAggregateInput = {
   Mst_Memberid?: Prisma.SortOrder
   Mst_WehvariaNo?: Prisma.SortOrder
   Mst_StatusCode?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_StatusMaxOrderByAggregateInput = {
@@ -383,7 +365,6 @@ export type Member_StatusMaxOrderByAggregateInput = {
   Mst_StatusCode?: Prisma.SortOrder
   Mst_CreationDate?: Prisma.SortOrder
   Mst_DeactiveDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_StatusMinOrderByAggregateInput = {
@@ -392,14 +373,12 @@ export type Member_StatusMinOrderByAggregateInput = {
   Mst_StatusCode?: Prisma.SortOrder
   Mst_CreationDate?: Prisma.SortOrder
   Mst_DeactiveDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_StatusSumOrderByAggregateInput = {
   Mst_Memberid?: Prisma.SortOrder
   Mst_WehvariaNo?: Prisma.SortOrder
   Mst_StatusCode?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_StatusCreateNestedManyWithoutStatusInput = {
@@ -490,7 +469,6 @@ export type Member_StatusCreateWithoutStatusInput = {
   Mst_WehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   Mst_CreationDate: Date | string
   Mst_DeactiveDate: Date | string
-  id?: bigint | number
   member: Prisma.Member_InformationCreateNestedOneWithoutStatusesInput
 }
 
@@ -499,7 +477,6 @@ export type Member_StatusUncheckedCreateWithoutStatusInput = {
   Mst_WehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   Mst_CreationDate: Date | string
   Mst_DeactiveDate: Date | string
-  id?: bigint | number
 }
 
 export type Member_StatusCreateOrConnectWithoutStatusInput = {
@@ -536,14 +513,12 @@ export type Member_StatusScalarWhereInput = {
   Mst_StatusCode?: Prisma.DecimalFilter<"Member_Status"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   Mst_CreationDate?: Prisma.DateTimeFilter<"Member_Status"> | Date | string
   Mst_DeactiveDate?: Prisma.DateTimeFilter<"Member_Status"> | Date | string
-  id?: Prisma.BigIntFilter<"Member_Status"> | bigint | number
 }
 
 export type Member_StatusCreateWithoutMemberInput = {
   Mst_WehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   Mst_CreationDate: Date | string
   Mst_DeactiveDate: Date | string
-  id?: bigint | number
   status?: Prisma.Status_LCreateNestedOneWithoutMemberStatusesInput
 }
 
@@ -552,7 +527,6 @@ export type Member_StatusUncheckedCreateWithoutMemberInput = {
   Mst_StatusCode: runtime.Decimal | runtime.DecimalJsLike | number | string
   Mst_CreationDate: Date | string
   Mst_DeactiveDate: Date | string
-  id?: bigint | number
 }
 
 export type Member_StatusCreateOrConnectWithoutMemberInput = {
@@ -591,7 +565,6 @@ export type Member_StatusUpdateWithoutStatusInput = {
   Mst_WehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   Mst_CreationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Mst_DeactiveDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   member?: Prisma.Member_InformationUpdateOneRequiredWithoutStatusesNestedInput
 }
 
@@ -600,7 +573,6 @@ export type Member_StatusUncheckedUpdateWithoutStatusInput = {
   Mst_WehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   Mst_CreationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Mst_DeactiveDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_StatusUncheckedUpdateManyWithoutStatusInput = {
@@ -608,7 +580,6 @@ export type Member_StatusUncheckedUpdateManyWithoutStatusInput = {
   Mst_WehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   Mst_CreationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Mst_DeactiveDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_StatusCreateManyMemberInput = {
@@ -622,7 +593,6 @@ export type Member_StatusUpdateWithoutMemberInput = {
   Mst_WehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   Mst_CreationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Mst_DeactiveDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   status?: Prisma.Status_LUpdateOneWithoutMemberStatusesNestedInput
 }
 
@@ -631,7 +601,6 @@ export type Member_StatusUncheckedUpdateWithoutMemberInput = {
   Mst_StatusCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   Mst_CreationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Mst_DeactiveDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_StatusUncheckedUpdateManyWithoutMemberInput = {
@@ -639,7 +608,6 @@ export type Member_StatusUncheckedUpdateManyWithoutMemberInput = {
   Mst_StatusCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   Mst_CreationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Mst_DeactiveDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 
@@ -650,7 +618,6 @@ export type Member_StatusSelect<ExtArgs extends runtime.Types.Extensions.Interna
   Mst_StatusCode?: boolean
   Mst_CreationDate?: boolean
   Mst_DeactiveDate?: boolean
-  id?: boolean
   member?: boolean | Prisma.Member_InformationDefaultArgs<ExtArgs>
   status?: boolean | Prisma.Member_Status$statusArgs<ExtArgs>
 }, ExtArgs["result"]["member_Status"]>
@@ -663,10 +630,9 @@ export type Member_StatusSelectScalar = {
   Mst_StatusCode?: boolean
   Mst_CreationDate?: boolean
   Mst_DeactiveDate?: boolean
-  id?: boolean
 }
 
-export type Member_StatusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"Mst_Memberid" | "Mst_WehvariaNo" | "Mst_StatusCode" | "Mst_CreationDate" | "Mst_DeactiveDate" | "id", ExtArgs["result"]["member_Status"]>
+export type Member_StatusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"Mst_Memberid" | "Mst_WehvariaNo" | "Mst_StatusCode" | "Mst_CreationDate" | "Mst_DeactiveDate", ExtArgs["result"]["member_Status"]>
 export type Member_StatusInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   member?: boolean | Prisma.Member_InformationDefaultArgs<ExtArgs>
   status?: boolean | Prisma.Member_Status$statusArgs<ExtArgs>
@@ -684,7 +650,6 @@ export type $Member_StatusPayload<ExtArgs extends runtime.Types.Extensions.Inter
     Mst_StatusCode: runtime.Decimal
     Mst_CreationDate: Date
     Mst_DeactiveDate: Date
-    id: bigint
   }, ExtArgs["result"]["member_Status"]>
   composites: {}
 }
@@ -1061,7 +1026,6 @@ export interface Member_StatusFieldRefs {
   readonly Mst_StatusCode: Prisma.FieldRef<"Member_Status", 'Decimal'>
   readonly Mst_CreationDate: Prisma.FieldRef<"Member_Status", 'DateTime'>
   readonly Mst_DeactiveDate: Prisma.FieldRef<"Member_Status", 'DateTime'>
-  readonly id: Prisma.FieldRef<"Member_Status", 'BigInt'>
 }
     
 

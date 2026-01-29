@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    if (!user || user.role !== 'ADMIN') {
+    if (!user) {
       return NextResponse.json(
         { message: 'Not authenticated' },
         { status: 401 }

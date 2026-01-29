@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model SurName_L
- * The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+ * 
  */
 export type SurName_LModel = runtime.Types.Result.DefaultSelection<Prisma.$SurName_LPayload>
 

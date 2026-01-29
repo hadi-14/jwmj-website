@@ -43,8 +43,8 @@ export type Tmp_Annual_FeeReceiptSumAggregateOutputType = {
 }
 
 export type Tmp_Annual_FeeReceiptMinAggregateOutputType = {
-  MemberID: runtime.Decimal | null
   Voc__: string | null
+  MemberID: runtime.Decimal | null
   Date: Date | null
   Fee: runtime.Decimal | null
   MemMembershipNo: string | null
@@ -57,8 +57,8 @@ export type Tmp_Annual_FeeReceiptMinAggregateOutputType = {
 }
 
 export type Tmp_Annual_FeeReceiptMaxAggregateOutputType = {
-  MemberID: runtime.Decimal | null
   Voc__: string | null
+  MemberID: runtime.Decimal | null
   Date: Date | null
   Fee: runtime.Decimal | null
   MemMembershipNo: string | null
@@ -71,8 +71,8 @@ export type Tmp_Annual_FeeReceiptMaxAggregateOutputType = {
 }
 
 export type Tmp_Annual_FeeReceiptCountAggregateOutputType = {
-  MemberID: number
   Voc__: number
+  MemberID: number
   Date: number
   Fee: number
   MemMembershipNo: number
@@ -103,8 +103,8 @@ export type Tmp_Annual_FeeReceiptSumAggregateInputType = {
 }
 
 export type Tmp_Annual_FeeReceiptMinAggregateInputType = {
-  MemberID?: true
   Voc__?: true
+  MemberID?: true
   Date?: true
   Fee?: true
   MemMembershipNo?: true
@@ -117,8 +117,8 @@ export type Tmp_Annual_FeeReceiptMinAggregateInputType = {
 }
 
 export type Tmp_Annual_FeeReceiptMaxAggregateInputType = {
-  MemberID?: true
   Voc__?: true
+  MemberID?: true
   Date?: true
   Fee?: true
   MemMembershipNo?: true
@@ -131,8 +131,8 @@ export type Tmp_Annual_FeeReceiptMaxAggregateInputType = {
 }
 
 export type Tmp_Annual_FeeReceiptCountAggregateInputType = {
-  MemberID?: true
   Voc__?: true
+  MemberID?: true
   Date?: true
   Fee?: true
   MemMembershipNo?: true
@@ -232,8 +232,8 @@ export type Tmp_Annual_FeeReceiptGroupByArgs<ExtArgs extends runtime.Types.Exten
 }
 
 export type Tmp_Annual_FeeReceiptGroupByOutputType = {
-  MemberID: runtime.Decimal
   Voc__: string
+  MemberID: runtime.Decimal
   Date: Date
   Fee: runtime.Decimal | null
   MemMembershipNo: string | null
@@ -269,8 +269,8 @@ export type Tmp_Annual_FeeReceiptWhereInput = {
   AND?: Prisma.Tmp_Annual_FeeReceiptWhereInput | Prisma.Tmp_Annual_FeeReceiptWhereInput[]
   OR?: Prisma.Tmp_Annual_FeeReceiptWhereInput[]
   NOT?: Prisma.Tmp_Annual_FeeReceiptWhereInput | Prisma.Tmp_Annual_FeeReceiptWhereInput[]
-  MemberID?: Prisma.DecimalFilter<"Tmp_Annual_FeeReceipt"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   Voc__?: Prisma.StringFilter<"Tmp_Annual_FeeReceipt"> | string
+  MemberID?: Prisma.DecimalFilter<"Tmp_Annual_FeeReceipt"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   Date?: Prisma.DateTimeFilter<"Tmp_Annual_FeeReceipt"> | Date | string
   Fee?: Prisma.DecimalNullableFilter<"Tmp_Annual_FeeReceipt"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MemMembershipNo?: Prisma.StringNullableFilter<"Tmp_Annual_FeeReceipt"> | string | null
@@ -283,8 +283,8 @@ export type Tmp_Annual_FeeReceiptWhereInput = {
 }
 
 export type Tmp_Annual_FeeReceiptOrderByWithRelationInput = {
-  MemberID?: Prisma.SortOrder
   Voc__?: Prisma.SortOrder
+  MemberID?: Prisma.SortOrder
   Date?: Prisma.SortOrder
   Fee?: Prisma.SortOrderInput | Prisma.SortOrder
   MemMembershipNo?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -314,8 +314,8 @@ export type Tmp_Annual_FeeReceiptWhereUniqueInput = Prisma.AtLeast<{
 }, "Voc__">
 
 export type Tmp_Annual_FeeReceiptOrderByWithAggregationInput = {
-  MemberID?: Prisma.SortOrder
   Voc__?: Prisma.SortOrder
+  MemberID?: Prisma.SortOrder
   Date?: Prisma.SortOrder
   Fee?: Prisma.SortOrderInput | Prisma.SortOrder
   MemMembershipNo?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -336,8 +336,8 @@ export type Tmp_Annual_FeeReceiptScalarWhereWithAggregatesInput = {
   AND?: Prisma.Tmp_Annual_FeeReceiptScalarWhereWithAggregatesInput | Prisma.Tmp_Annual_FeeReceiptScalarWhereWithAggregatesInput[]
   OR?: Prisma.Tmp_Annual_FeeReceiptScalarWhereWithAggregatesInput[]
   NOT?: Prisma.Tmp_Annual_FeeReceiptScalarWhereWithAggregatesInput | Prisma.Tmp_Annual_FeeReceiptScalarWhereWithAggregatesInput[]
-  MemberID?: Prisma.DecimalWithAggregatesFilter<"Tmp_Annual_FeeReceipt"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   Voc__?: Prisma.StringWithAggregatesFilter<"Tmp_Annual_FeeReceipt"> | string
+  MemberID?: Prisma.DecimalWithAggregatesFilter<"Tmp_Annual_FeeReceipt"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   Date?: Prisma.DateTimeWithAggregatesFilter<"Tmp_Annual_FeeReceipt"> | Date | string
   Fee?: Prisma.DecimalNullableWithAggregatesFilter<"Tmp_Annual_FeeReceipt"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MemMembershipNo?: Prisma.StringNullableWithAggregatesFilter<"Tmp_Annual_FeeReceipt"> | string | null
@@ -350,8 +350,8 @@ export type Tmp_Annual_FeeReceiptScalarWhereWithAggregatesInput = {
 }
 
 export type Tmp_Annual_FeeReceiptCreateInput = {
-  MemberID: runtime.Decimal | runtime.DecimalJsLike | number | string
   Voc__: string
+  MemberID: runtime.Decimal | runtime.DecimalJsLike | number | string
   Date: Date | string
   Fee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MemMembershipNo?: string | null
@@ -364,8 +364,8 @@ export type Tmp_Annual_FeeReceiptCreateInput = {
 }
 
 export type Tmp_Annual_FeeReceiptUncheckedCreateInput = {
-  MemberID: runtime.Decimal | runtime.DecimalJsLike | number | string
   Voc__: string
+  MemberID: runtime.Decimal | runtime.DecimalJsLike | number | string
   Date: Date | string
   Fee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MemMembershipNo?: string | null
@@ -378,8 +378,8 @@ export type Tmp_Annual_FeeReceiptUncheckedCreateInput = {
 }
 
 export type Tmp_Annual_FeeReceiptUpdateInput = {
-  MemberID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   Voc__?: Prisma.StringFieldUpdateOperationsInput | string
+  MemberID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   Date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Fee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MemMembershipNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -392,8 +392,8 @@ export type Tmp_Annual_FeeReceiptUpdateInput = {
 }
 
 export type Tmp_Annual_FeeReceiptUncheckedUpdateInput = {
-  MemberID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   Voc__?: Prisma.StringFieldUpdateOperationsInput | string
+  MemberID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   Date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Fee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MemMembershipNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -406,8 +406,8 @@ export type Tmp_Annual_FeeReceiptUncheckedUpdateInput = {
 }
 
 export type Tmp_Annual_FeeReceiptCreateManyInput = {
-  MemberID: runtime.Decimal | runtime.DecimalJsLike | number | string
   Voc__: string
+  MemberID: runtime.Decimal | runtime.DecimalJsLike | number | string
   Date: Date | string
   Fee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MemMembershipNo?: string | null
@@ -420,8 +420,8 @@ export type Tmp_Annual_FeeReceiptCreateManyInput = {
 }
 
 export type Tmp_Annual_FeeReceiptUpdateManyMutationInput = {
-  MemberID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   Voc__?: Prisma.StringFieldUpdateOperationsInput | string
+  MemberID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   Date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Fee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MemMembershipNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -434,8 +434,8 @@ export type Tmp_Annual_FeeReceiptUpdateManyMutationInput = {
 }
 
 export type Tmp_Annual_FeeReceiptUncheckedUpdateManyInput = {
-  MemberID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   Voc__?: Prisma.StringFieldUpdateOperationsInput | string
+  MemberID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   Date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Fee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MemMembershipNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -448,8 +448,8 @@ export type Tmp_Annual_FeeReceiptUncheckedUpdateManyInput = {
 }
 
 export type Tmp_Annual_FeeReceiptCountOrderByAggregateInput = {
-  MemberID?: Prisma.SortOrder
   Voc__?: Prisma.SortOrder
+  MemberID?: Prisma.SortOrder
   Date?: Prisma.SortOrder
   Fee?: Prisma.SortOrder
   MemMembershipNo?: Prisma.SortOrder
@@ -470,8 +470,8 @@ export type Tmp_Annual_FeeReceiptAvgOrderByAggregateInput = {
 }
 
 export type Tmp_Annual_FeeReceiptMaxOrderByAggregateInput = {
-  MemberID?: Prisma.SortOrder
   Voc__?: Prisma.SortOrder
+  MemberID?: Prisma.SortOrder
   Date?: Prisma.SortOrder
   Fee?: Prisma.SortOrder
   MemMembershipNo?: Prisma.SortOrder
@@ -484,8 +484,8 @@ export type Tmp_Annual_FeeReceiptMaxOrderByAggregateInput = {
 }
 
 export type Tmp_Annual_FeeReceiptMinOrderByAggregateInput = {
-  MemberID?: Prisma.SortOrder
   Voc__?: Prisma.SortOrder
+  MemberID?: Prisma.SortOrder
   Date?: Prisma.SortOrder
   Fee?: Prisma.SortOrder
   MemMembershipNo?: Prisma.SortOrder
@@ -508,8 +508,8 @@ export type Tmp_Annual_FeeReceiptSumOrderByAggregateInput = {
 
 
 export type Tmp_Annual_FeeReceiptSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  MemberID?: boolean
   Voc__?: boolean
+  MemberID?: boolean
   Date?: boolean
   Fee?: boolean
   MemMembershipNo?: boolean
@@ -524,8 +524,8 @@ export type Tmp_Annual_FeeReceiptSelect<ExtArgs extends runtime.Types.Extensions
 
 
 export type Tmp_Annual_FeeReceiptSelectScalar = {
-  MemberID?: boolean
   Voc__?: boolean
+  MemberID?: boolean
   Date?: boolean
   Fee?: boolean
   MemMembershipNo?: boolean
@@ -537,14 +537,14 @@ export type Tmp_Annual_FeeReceiptSelectScalar = {
   memcellno?: boolean
 }
 
-export type Tmp_Annual_FeeReceiptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"MemberID" | "Voc__" | "Date" | "Fee" | "MemMembershipNo" | "MemName" | "MemCNIC" | "Mem_Pic" | "arm_disc" | "SurName" | "memcellno", ExtArgs["result"]["tmp_Annual_FeeReceipt"]>
+export type Tmp_Annual_FeeReceiptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"Voc__" | "MemberID" | "Date" | "Fee" | "MemMembershipNo" | "MemName" | "MemCNIC" | "Mem_Pic" | "arm_disc" | "SurName" | "memcellno", ExtArgs["result"]["tmp_Annual_FeeReceipt"]>
 
 export type $Tmp_Annual_FeeReceiptPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Tmp_Annual_FeeReceipt"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
-    MemberID: runtime.Decimal
     Voc__: string
+    MemberID: runtime.Decimal
     Date: Date
     Fee: runtime.Decimal | null
     MemMembershipNo: string | null
@@ -637,8 +637,8 @@ export interface Tmp_Annual_FeeReceiptDelegate<ExtArgs extends runtime.Types.Ext
    * // Get first 10 Tmp_Annual_FeeReceipts
    * const tmp_Annual_FeeReceipts = await prisma.tmp_Annual_FeeReceipt.findMany({ take: 10 })
    * 
-   * // Only select the `MemberID`
-   * const tmp_Annual_FeeReceiptWithMemberIDOnly = await prisma.tmp_Annual_FeeReceipt.findMany({ select: { MemberID: true } })
+   * // Only select the `Voc__`
+   * const tmp_Annual_FeeReceiptWithVoc__Only = await prisma.tmp_Annual_FeeReceipt.findMany({ select: { Voc__: true } })
    * 
    */
   findMany<T extends Tmp_Annual_FeeReceiptFindManyArgs>(args?: Prisma.SelectSubset<T, Tmp_Annual_FeeReceiptFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$Tmp_Annual_FeeReceiptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -923,8 +923,8 @@ export interface Prisma__Tmp_Annual_FeeReceiptClient<T, Null = never, ExtArgs ex
  * Fields of the Tmp_Annual_FeeReceipt model
  */
 export interface Tmp_Annual_FeeReceiptFieldRefs {
-  readonly MemberID: Prisma.FieldRef<"Tmp_Annual_FeeReceipt", 'Decimal'>
   readonly Voc__: Prisma.FieldRef<"Tmp_Annual_FeeReceipt", 'String'>
+  readonly MemberID: Prisma.FieldRef<"Tmp_Annual_FeeReceipt", 'Decimal'>
   readonly Date: Prisma.FieldRef<"Tmp_Annual_FeeReceipt", 'DateTime'>
   readonly Fee: Prisma.FieldRef<"Tmp_Annual_FeeReceipt", 'Decimal'>
   readonly MemMembershipNo: Prisma.FieldRef<"Tmp_Annual_FeeReceipt", 'String'>

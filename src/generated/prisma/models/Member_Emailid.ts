@@ -29,34 +29,29 @@ export type AggregateMember_Emailid = {
 export type Member_EmailidAvgAggregateOutputType = {
   MEM_MemComputerID: runtime.Decimal | null
   MEM_MemWehvariaNo: runtime.Decimal | null
-  id: number | null
 }
 
 export type Member_EmailidSumAggregateOutputType = {
   MEM_MemComputerID: runtime.Decimal | null
   MEM_MemWehvariaNo: runtime.Decimal | null
-  id: bigint | null
 }
 
 export type Member_EmailidMinAggregateOutputType = {
   MEM_MemComputerID: runtime.Decimal | null
   MEM_MemWehvariaNo: runtime.Decimal | null
   MEM_Emailid: string | null
-  id: bigint | null
 }
 
 export type Member_EmailidMaxAggregateOutputType = {
   MEM_MemComputerID: runtime.Decimal | null
   MEM_MemWehvariaNo: runtime.Decimal | null
   MEM_Emailid: string | null
-  id: bigint | null
 }
 
 export type Member_EmailidCountAggregateOutputType = {
   MEM_MemComputerID: number
   MEM_MemWehvariaNo: number
   MEM_Emailid: number
-  id: number
   _all: number
 }
 
@@ -64,34 +59,29 @@ export type Member_EmailidCountAggregateOutputType = {
 export type Member_EmailidAvgAggregateInputType = {
   MEM_MemComputerID?: true
   MEM_MemWehvariaNo?: true
-  id?: true
 }
 
 export type Member_EmailidSumAggregateInputType = {
   MEM_MemComputerID?: true
   MEM_MemWehvariaNo?: true
-  id?: true
 }
 
 export type Member_EmailidMinAggregateInputType = {
   MEM_MemComputerID?: true
   MEM_MemWehvariaNo?: true
   MEM_Emailid?: true
-  id?: true
 }
 
 export type Member_EmailidMaxAggregateInputType = {
   MEM_MemComputerID?: true
   MEM_MemWehvariaNo?: true
   MEM_Emailid?: true
-  id?: true
 }
 
 export type Member_EmailidCountAggregateInputType = {
   MEM_MemComputerID?: true
   MEM_MemWehvariaNo?: true
   MEM_Emailid?: true
-  id?: true
   _all?: true
 }
 
@@ -184,8 +174,7 @@ export type Member_EmailidGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
 export type Member_EmailidGroupByOutputType = {
   MEM_MemComputerID: runtime.Decimal
   MEM_MemWehvariaNo: runtime.Decimal
-  MEM_Emailid: string | null
-  id: bigint
+  MEM_Emailid: string
   _count: Member_EmailidCountAggregateOutputType | null
   _avg: Member_EmailidAvgAggregateOutputType | null
   _sum: Member_EmailidSumAggregateOutputType | null
@@ -214,35 +203,32 @@ export type Member_EmailidWhereInput = {
   NOT?: Prisma.Member_EmailidWhereInput | Prisma.Member_EmailidWhereInput[]
   MEM_MemComputerID?: Prisma.DecimalFilter<"Member_Emailid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   MEM_MemWehvariaNo?: Prisma.DecimalFilter<"Member_Emailid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: Prisma.StringNullableFilter<"Member_Emailid"> | string | null
-  id?: Prisma.BigIntFilter<"Member_Emailid"> | bigint | number
+  MEM_Emailid?: Prisma.StringFilter<"Member_Emailid"> | string
   member?: Prisma.XOR<Prisma.Member_InformationScalarRelationFilter, Prisma.Member_InformationWhereInput>
 }
 
 export type Member_EmailidOrderByWithRelationInput = {
   MEM_MemComputerID?: Prisma.SortOrder
   MEM_MemWehvariaNo?: Prisma.SortOrder
-  MEM_Emailid?: Prisma.SortOrderInput | Prisma.SortOrder
-  id?: Prisma.SortOrder
+  MEM_Emailid?: Prisma.SortOrder
   member?: Prisma.Member_InformationOrderByWithRelationInput
 }
 
 export type Member_EmailidWhereUniqueInput = Prisma.AtLeast<{
-  id?: bigint | number
+  MEM_MemComputerID_MEM_Emailid?: Prisma.Member_EmailidMEM_MemComputerIDMEM_EmailidCompoundUniqueInput
   AND?: Prisma.Member_EmailidWhereInput | Prisma.Member_EmailidWhereInput[]
   OR?: Prisma.Member_EmailidWhereInput[]
   NOT?: Prisma.Member_EmailidWhereInput | Prisma.Member_EmailidWhereInput[]
   MEM_MemComputerID?: Prisma.DecimalFilter<"Member_Emailid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   MEM_MemWehvariaNo?: Prisma.DecimalFilter<"Member_Emailid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: Prisma.StringNullableFilter<"Member_Emailid"> | string | null
+  MEM_Emailid?: Prisma.StringFilter<"Member_Emailid"> | string
   member?: Prisma.XOR<Prisma.Member_InformationScalarRelationFilter, Prisma.Member_InformationWhereInput>
-}, "id">
+}, "MEM_MemComputerID_MEM_Emailid">
 
 export type Member_EmailidOrderByWithAggregationInput = {
   MEM_MemComputerID?: Prisma.SortOrder
   MEM_MemWehvariaNo?: Prisma.SortOrder
-  MEM_Emailid?: Prisma.SortOrderInput | Prisma.SortOrder
-  id?: Prisma.SortOrder
+  MEM_Emailid?: Prisma.SortOrder
   _count?: Prisma.Member_EmailidCountOrderByAggregateInput
   _avg?: Prisma.Member_EmailidAvgOrderByAggregateInput
   _max?: Prisma.Member_EmailidMaxOrderByAggregateInput
@@ -256,55 +242,48 @@ export type Member_EmailidScalarWhereWithAggregatesInput = {
   NOT?: Prisma.Member_EmailidScalarWhereWithAggregatesInput | Prisma.Member_EmailidScalarWhereWithAggregatesInput[]
   MEM_MemComputerID?: Prisma.DecimalWithAggregatesFilter<"Member_Emailid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   MEM_MemWehvariaNo?: Prisma.DecimalWithAggregatesFilter<"Member_Emailid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: Prisma.StringNullableWithAggregatesFilter<"Member_Emailid"> | string | null
-  id?: Prisma.BigIntWithAggregatesFilter<"Member_Emailid"> | bigint | number
+  MEM_Emailid?: Prisma.StringWithAggregatesFilter<"Member_Emailid"> | string
 }
 
 export type Member_EmailidCreateInput = {
   MEM_MemWehvariaNo: runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: string | null
-  id?: bigint | number
+  MEM_Emailid: string
   member: Prisma.Member_InformationCreateNestedOneWithoutEmailsInput
 }
 
 export type Member_EmailidUncheckedCreateInput = {
   MEM_MemComputerID: runtime.Decimal | runtime.DecimalJsLike | number | string
   MEM_MemWehvariaNo: runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: string | null
-  id?: bigint | number
+  MEM_Emailid: string
 }
 
 export type Member_EmailidUpdateInput = {
   MEM_MemWehvariaNo?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  MEM_Emailid?: Prisma.StringFieldUpdateOperationsInput | string
   member?: Prisma.Member_InformationUpdateOneRequiredWithoutEmailsNestedInput
 }
 
 export type Member_EmailidUncheckedUpdateInput = {
   MEM_MemComputerID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MEM_MemWehvariaNo?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  MEM_Emailid?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type Member_EmailidCreateManyInput = {
   MEM_MemComputerID: runtime.Decimal | runtime.DecimalJsLike | number | string
   MEM_MemWehvariaNo: runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: string | null
+  MEM_Emailid: string
 }
 
 export type Member_EmailidUpdateManyMutationInput = {
   MEM_MemWehvariaNo?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  MEM_Emailid?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type Member_EmailidUncheckedUpdateManyInput = {
   MEM_MemComputerID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MEM_MemWehvariaNo?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  MEM_Emailid?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type Member_EmailidListRelationFilter = {
@@ -317,37 +296,37 @@ export type Member_EmailidOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type Member_EmailidMEM_MemComputerIDMEM_EmailidCompoundUniqueInput = {
+  MEM_MemComputerID: runtime.Decimal | runtime.DecimalJsLike | number | string
+  MEM_Emailid: string
+}
+
 export type Member_EmailidCountOrderByAggregateInput = {
   MEM_MemComputerID?: Prisma.SortOrder
   MEM_MemWehvariaNo?: Prisma.SortOrder
   MEM_Emailid?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_EmailidAvgOrderByAggregateInput = {
   MEM_MemComputerID?: Prisma.SortOrder
   MEM_MemWehvariaNo?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_EmailidMaxOrderByAggregateInput = {
   MEM_MemComputerID?: Prisma.SortOrder
   MEM_MemWehvariaNo?: Prisma.SortOrder
   MEM_Emailid?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_EmailidMinOrderByAggregateInput = {
   MEM_MemComputerID?: Prisma.SortOrder
   MEM_MemWehvariaNo?: Prisma.SortOrder
   MEM_Emailid?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_EmailidSumOrderByAggregateInput = {
   MEM_MemComputerID?: Prisma.SortOrder
   MEM_MemWehvariaNo?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_EmailidCreateNestedManyWithoutMemberInput = {
@@ -394,14 +373,12 @@ export type Member_EmailidUncheckedUpdateManyWithoutMemberNestedInput = {
 
 export type Member_EmailidCreateWithoutMemberInput = {
   MEM_MemWehvariaNo: runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: string | null
-  id?: bigint | number
+  MEM_Emailid: string
 }
 
 export type Member_EmailidUncheckedCreateWithoutMemberInput = {
   MEM_MemWehvariaNo: runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: string | null
-  id?: bigint | number
+  MEM_Emailid: string
 }
 
 export type Member_EmailidCreateOrConnectWithoutMemberInput = {
@@ -435,31 +412,27 @@ export type Member_EmailidScalarWhereInput = {
   NOT?: Prisma.Member_EmailidScalarWhereInput | Prisma.Member_EmailidScalarWhereInput[]
   MEM_MemComputerID?: Prisma.DecimalFilter<"Member_Emailid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   MEM_MemWehvariaNo?: Prisma.DecimalFilter<"Member_Emailid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: Prisma.StringNullableFilter<"Member_Emailid"> | string | null
-  id?: Prisma.BigIntFilter<"Member_Emailid"> | bigint | number
+  MEM_Emailid?: Prisma.StringFilter<"Member_Emailid"> | string
 }
 
 export type Member_EmailidCreateManyMemberInput = {
   MEM_MemWehvariaNo: runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: string | null
+  MEM_Emailid: string
 }
 
 export type Member_EmailidUpdateWithoutMemberInput = {
   MEM_MemWehvariaNo?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  MEM_Emailid?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type Member_EmailidUncheckedUpdateWithoutMemberInput = {
   MEM_MemWehvariaNo?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  MEM_Emailid?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type Member_EmailidUncheckedUpdateManyWithoutMemberInput = {
   MEM_MemWehvariaNo?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  MEM_Emailid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  MEM_Emailid?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -468,7 +441,6 @@ export type Member_EmailidSelect<ExtArgs extends runtime.Types.Extensions.Intern
   MEM_MemComputerID?: boolean
   MEM_MemWehvariaNo?: boolean
   MEM_Emailid?: boolean
-  id?: boolean
   member?: boolean | Prisma.Member_InformationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["member_Emailid"]>
 
@@ -478,10 +450,9 @@ export type Member_EmailidSelectScalar = {
   MEM_MemComputerID?: boolean
   MEM_MemWehvariaNo?: boolean
   MEM_Emailid?: boolean
-  id?: boolean
 }
 
-export type Member_EmailidOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"MEM_MemComputerID" | "MEM_MemWehvariaNo" | "MEM_Emailid" | "id", ExtArgs["result"]["member_Emailid"]>
+export type Member_EmailidOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"MEM_MemComputerID" | "MEM_MemWehvariaNo" | "MEM_Emailid", ExtArgs["result"]["member_Emailid"]>
 export type Member_EmailidInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   member?: boolean | Prisma.Member_InformationDefaultArgs<ExtArgs>
 }
@@ -494,8 +465,7 @@ export type $Member_EmailidPayload<ExtArgs extends runtime.Types.Extensions.Inte
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     MEM_MemComputerID: runtime.Decimal
     MEM_MemWehvariaNo: runtime.Decimal
-    MEM_Emailid: string | null
-    id: bigint
+    MEM_Emailid: string
   }, ExtArgs["result"]["member_Emailid"]>
   composites: {}
 }
@@ -869,7 +839,6 @@ export interface Member_EmailidFieldRefs {
   readonly MEM_MemComputerID: Prisma.FieldRef<"Member_Emailid", 'Decimal'>
   readonly MEM_MemWehvariaNo: Prisma.FieldRef<"Member_Emailid", 'Decimal'>
   readonly MEM_Emailid: Prisma.FieldRef<"Member_Emailid", 'String'>
-  readonly id: Prisma.FieldRef<"Member_Emailid", 'BigInt'>
 }
     
 

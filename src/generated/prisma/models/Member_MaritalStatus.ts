@@ -30,14 +30,12 @@ export type Member_MaritalStatusAvgAggregateOutputType = {
   MMr_MemComputerID: runtime.Decimal | null
   MMr_MemWehvariaNo: runtime.Decimal | null
   MMr_MaritalCode: runtime.Decimal | null
-  id: number | null
 }
 
 export type Member_MaritalStatusSumAggregateOutputType = {
   MMr_MemComputerID: runtime.Decimal | null
   MMr_MemWehvariaNo: runtime.Decimal | null
   MMr_MaritalCode: runtime.Decimal | null
-  id: bigint | null
 }
 
 export type Member_MaritalStatusMinAggregateOutputType = {
@@ -45,7 +43,6 @@ export type Member_MaritalStatusMinAggregateOutputType = {
   MMr_MemWehvariaNo: runtime.Decimal | null
   MMr_MaritalCode: runtime.Decimal | null
   MMr_StatusDate: Date | null
-  id: bigint | null
 }
 
 export type Member_MaritalStatusMaxAggregateOutputType = {
@@ -53,7 +50,6 @@ export type Member_MaritalStatusMaxAggregateOutputType = {
   MMr_MemWehvariaNo: runtime.Decimal | null
   MMr_MaritalCode: runtime.Decimal | null
   MMr_StatusDate: Date | null
-  id: bigint | null
 }
 
 export type Member_MaritalStatusCountAggregateOutputType = {
@@ -61,7 +57,6 @@ export type Member_MaritalStatusCountAggregateOutputType = {
   MMr_MemWehvariaNo: number
   MMr_MaritalCode: number
   MMr_StatusDate: number
-  id: number
   _all: number
 }
 
@@ -70,14 +65,12 @@ export type Member_MaritalStatusAvgAggregateInputType = {
   MMr_MemComputerID?: true
   MMr_MemWehvariaNo?: true
   MMr_MaritalCode?: true
-  id?: true
 }
 
 export type Member_MaritalStatusSumAggregateInputType = {
   MMr_MemComputerID?: true
   MMr_MemWehvariaNo?: true
   MMr_MaritalCode?: true
-  id?: true
 }
 
 export type Member_MaritalStatusMinAggregateInputType = {
@@ -85,7 +78,6 @@ export type Member_MaritalStatusMinAggregateInputType = {
   MMr_MemWehvariaNo?: true
   MMr_MaritalCode?: true
   MMr_StatusDate?: true
-  id?: true
 }
 
 export type Member_MaritalStatusMaxAggregateInputType = {
@@ -93,7 +85,6 @@ export type Member_MaritalStatusMaxAggregateInputType = {
   MMr_MemWehvariaNo?: true
   MMr_MaritalCode?: true
   MMr_StatusDate?: true
-  id?: true
 }
 
 export type Member_MaritalStatusCountAggregateInputType = {
@@ -101,7 +92,6 @@ export type Member_MaritalStatusCountAggregateInputType = {
   MMr_MemWehvariaNo?: true
   MMr_MaritalCode?: true
   MMr_StatusDate?: true
-  id?: true
   _all?: true
 }
 
@@ -196,7 +186,6 @@ export type Member_MaritalStatusGroupByOutputType = {
   MMr_MemWehvariaNo: runtime.Decimal | null
   MMr_MaritalCode: runtime.Decimal
   MMr_StatusDate: Date
-  id: bigint
   _count: Member_MaritalStatusCountAggregateOutputType | null
   _avg: Member_MaritalStatusAvgAggregateOutputType | null
   _sum: Member_MaritalStatusSumAggregateOutputType | null
@@ -227,7 +216,6 @@ export type Member_MaritalStatusWhereInput = {
   MMr_MemWehvariaNo?: Prisma.DecimalNullableFilter<"Member_MaritalStatus"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_MaritalCode?: Prisma.DecimalFilter<"Member_MaritalStatus"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   MMr_StatusDate?: Prisma.DateTimeFilter<"Member_MaritalStatus"> | Date | string
-  id?: Prisma.BigIntFilter<"Member_MaritalStatus"> | bigint | number
   member?: Prisma.XOR<Prisma.Member_InformationScalarRelationFilter, Prisma.Member_InformationWhereInput>
   maritalStatus?: Prisma.XOR<Prisma.Marital_LNullableScalarRelationFilter, Prisma.Marital_LWhereInput> | null
 }
@@ -237,13 +225,12 @@ export type Member_MaritalStatusOrderByWithRelationInput = {
   MMr_MemWehvariaNo?: Prisma.SortOrderInput | Prisma.SortOrder
   MMr_MaritalCode?: Prisma.SortOrder
   MMr_StatusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
   member?: Prisma.Member_InformationOrderByWithRelationInput
   maritalStatus?: Prisma.Marital_LOrderByWithRelationInput
 }
 
 export type Member_MaritalStatusWhereUniqueInput = Prisma.AtLeast<{
-  id?: bigint | number
+  MMr_MemComputerID_MMr_MaritalCode_MMr_StatusDate?: Prisma.Member_MaritalStatusMMr_MemComputerIDMMr_MaritalCodeMMr_StatusDateCompoundUniqueInput
   AND?: Prisma.Member_MaritalStatusWhereInput | Prisma.Member_MaritalStatusWhereInput[]
   OR?: Prisma.Member_MaritalStatusWhereInput[]
   NOT?: Prisma.Member_MaritalStatusWhereInput | Prisma.Member_MaritalStatusWhereInput[]
@@ -253,14 +240,13 @@ export type Member_MaritalStatusWhereUniqueInput = Prisma.AtLeast<{
   MMr_StatusDate?: Prisma.DateTimeFilter<"Member_MaritalStatus"> | Date | string
   member?: Prisma.XOR<Prisma.Member_InformationScalarRelationFilter, Prisma.Member_InformationWhereInput>
   maritalStatus?: Prisma.XOR<Prisma.Marital_LNullableScalarRelationFilter, Prisma.Marital_LWhereInput> | null
-}, "id">
+}, "MMr_MemComputerID_MMr_MaritalCode_MMr_StatusDate">
 
 export type Member_MaritalStatusOrderByWithAggregationInput = {
   MMr_MemComputerID?: Prisma.SortOrder
   MMr_MemWehvariaNo?: Prisma.SortOrderInput | Prisma.SortOrder
   MMr_MaritalCode?: Prisma.SortOrder
   MMr_StatusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
   _count?: Prisma.Member_MaritalStatusCountOrderByAggregateInput
   _avg?: Prisma.Member_MaritalStatusAvgOrderByAggregateInput
   _max?: Prisma.Member_MaritalStatusMaxOrderByAggregateInput
@@ -276,13 +262,11 @@ export type Member_MaritalStatusScalarWhereWithAggregatesInput = {
   MMr_MemWehvariaNo?: Prisma.DecimalNullableWithAggregatesFilter<"Member_MaritalStatus"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_MaritalCode?: Prisma.DecimalWithAggregatesFilter<"Member_MaritalStatus"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   MMr_StatusDate?: Prisma.DateTimeWithAggregatesFilter<"Member_MaritalStatus"> | Date | string
-  id?: Prisma.BigIntWithAggregatesFilter<"Member_MaritalStatus"> | bigint | number
 }
 
 export type Member_MaritalStatusCreateInput = {
   MMr_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_StatusDate: Date | string
-  id?: bigint | number
   member: Prisma.Member_InformationCreateNestedOneWithoutMaritalStatusInput
   maritalStatus?: Prisma.Marital_LCreateNestedOneWithoutMemberMaritalStatusesInput
 }
@@ -292,13 +276,11 @@ export type Member_MaritalStatusUncheckedCreateInput = {
   MMr_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_MaritalCode: runtime.Decimal | runtime.DecimalJsLike | number | string
   MMr_StatusDate: Date | string
-  id?: bigint | number
 }
 
 export type Member_MaritalStatusUpdateInput = {
   MMr_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   member?: Prisma.Member_InformationUpdateOneRequiredWithoutMaritalStatusNestedInput
   maritalStatus?: Prisma.Marital_LUpdateOneWithoutMemberMaritalStatusesNestedInput
 }
@@ -308,7 +290,6 @@ export type Member_MaritalStatusUncheckedUpdateInput = {
   MMr_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_MaritalCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MMr_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_MaritalStatusCreateManyInput = {
@@ -321,7 +302,6 @@ export type Member_MaritalStatusCreateManyInput = {
 export type Member_MaritalStatusUpdateManyMutationInput = {
   MMr_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_MaritalStatusUncheckedUpdateManyInput = {
@@ -329,7 +309,6 @@ export type Member_MaritalStatusUncheckedUpdateManyInput = {
   MMr_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_MaritalCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MMr_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_MaritalStatusListRelationFilter = {
@@ -342,19 +321,23 @@ export type Member_MaritalStatusOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type Member_MaritalStatusMMr_MemComputerIDMMr_MaritalCodeMMr_StatusDateCompoundUniqueInput = {
+  MMr_MemComputerID: runtime.Decimal | runtime.DecimalJsLike | number | string
+  MMr_MaritalCode: runtime.Decimal | runtime.DecimalJsLike | number | string
+  MMr_StatusDate: Date | string
+}
+
 export type Member_MaritalStatusCountOrderByAggregateInput = {
   MMr_MemComputerID?: Prisma.SortOrder
   MMr_MemWehvariaNo?: Prisma.SortOrder
   MMr_MaritalCode?: Prisma.SortOrder
   MMr_StatusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_MaritalStatusAvgOrderByAggregateInput = {
   MMr_MemComputerID?: Prisma.SortOrder
   MMr_MemWehvariaNo?: Prisma.SortOrder
   MMr_MaritalCode?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_MaritalStatusMaxOrderByAggregateInput = {
@@ -362,7 +345,6 @@ export type Member_MaritalStatusMaxOrderByAggregateInput = {
   MMr_MemWehvariaNo?: Prisma.SortOrder
   MMr_MaritalCode?: Prisma.SortOrder
   MMr_StatusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_MaritalStatusMinOrderByAggregateInput = {
@@ -370,14 +352,12 @@ export type Member_MaritalStatusMinOrderByAggregateInput = {
   MMr_MemWehvariaNo?: Prisma.SortOrder
   MMr_MaritalCode?: Prisma.SortOrder
   MMr_StatusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_MaritalStatusSumOrderByAggregateInput = {
   MMr_MemComputerID?: Prisma.SortOrder
   MMr_MemWehvariaNo?: Prisma.SortOrder
   MMr_MaritalCode?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_MaritalStatusCreateNestedManyWithoutMaritalStatusInput = {
@@ -467,7 +447,6 @@ export type Member_MaritalStatusUncheckedUpdateManyWithoutMemberNestedInput = {
 export type Member_MaritalStatusCreateWithoutMaritalStatusInput = {
   MMr_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_StatusDate: Date | string
-  id?: bigint | number
   member: Prisma.Member_InformationCreateNestedOneWithoutMaritalStatusInput
 }
 
@@ -475,7 +454,6 @@ export type Member_MaritalStatusUncheckedCreateWithoutMaritalStatusInput = {
   MMr_MemComputerID: runtime.Decimal | runtime.DecimalJsLike | number | string
   MMr_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_StatusDate: Date | string
-  id?: bigint | number
 }
 
 export type Member_MaritalStatusCreateOrConnectWithoutMaritalStatusInput = {
@@ -511,13 +489,11 @@ export type Member_MaritalStatusScalarWhereInput = {
   MMr_MemWehvariaNo?: Prisma.DecimalNullableFilter<"Member_MaritalStatus"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_MaritalCode?: Prisma.DecimalFilter<"Member_MaritalStatus"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   MMr_StatusDate?: Prisma.DateTimeFilter<"Member_MaritalStatus"> | Date | string
-  id?: Prisma.BigIntFilter<"Member_MaritalStatus"> | bigint | number
 }
 
 export type Member_MaritalStatusCreateWithoutMemberInput = {
   MMr_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_StatusDate: Date | string
-  id?: bigint | number
   maritalStatus?: Prisma.Marital_LCreateNestedOneWithoutMemberMaritalStatusesInput
 }
 
@@ -525,7 +501,6 @@ export type Member_MaritalStatusUncheckedCreateWithoutMemberInput = {
   MMr_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_MaritalCode: runtime.Decimal | runtime.DecimalJsLike | number | string
   MMr_StatusDate: Date | string
-  id?: bigint | number
 }
 
 export type Member_MaritalStatusCreateOrConnectWithoutMemberInput = {
@@ -562,7 +537,6 @@ export type Member_MaritalStatusCreateManyMaritalStatusInput = {
 export type Member_MaritalStatusUpdateWithoutMaritalStatusInput = {
   MMr_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   member?: Prisma.Member_InformationUpdateOneRequiredWithoutMaritalStatusNestedInput
 }
 
@@ -570,14 +544,12 @@ export type Member_MaritalStatusUncheckedUpdateWithoutMaritalStatusInput = {
   MMr_MemComputerID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MMr_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_MaritalStatusUncheckedUpdateManyWithoutMaritalStatusInput = {
   MMr_MemComputerID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MMr_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_MaritalStatusCreateManyMemberInput = {
@@ -589,7 +561,6 @@ export type Member_MaritalStatusCreateManyMemberInput = {
 export type Member_MaritalStatusUpdateWithoutMemberInput = {
   MMr_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   maritalStatus?: Prisma.Marital_LUpdateOneWithoutMemberMaritalStatusesNestedInput
 }
 
@@ -597,14 +568,12 @@ export type Member_MaritalStatusUncheckedUpdateWithoutMemberInput = {
   MMr_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_MaritalCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MMr_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_MaritalStatusUncheckedUpdateManyWithoutMemberInput = {
   MMr_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MMr_MaritalCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MMr_StatusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 
@@ -614,7 +583,6 @@ export type Member_MaritalStatusSelect<ExtArgs extends runtime.Types.Extensions.
   MMr_MemWehvariaNo?: boolean
   MMr_MaritalCode?: boolean
   MMr_StatusDate?: boolean
-  id?: boolean
   member?: boolean | Prisma.Member_InformationDefaultArgs<ExtArgs>
   maritalStatus?: boolean | Prisma.Member_MaritalStatus$maritalStatusArgs<ExtArgs>
 }, ExtArgs["result"]["member_MaritalStatus"]>
@@ -626,10 +594,9 @@ export type Member_MaritalStatusSelectScalar = {
   MMr_MemWehvariaNo?: boolean
   MMr_MaritalCode?: boolean
   MMr_StatusDate?: boolean
-  id?: boolean
 }
 
-export type Member_MaritalStatusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"MMr_MemComputerID" | "MMr_MemWehvariaNo" | "MMr_MaritalCode" | "MMr_StatusDate" | "id", ExtArgs["result"]["member_MaritalStatus"]>
+export type Member_MaritalStatusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"MMr_MemComputerID" | "MMr_MemWehvariaNo" | "MMr_MaritalCode" | "MMr_StatusDate", ExtArgs["result"]["member_MaritalStatus"]>
 export type Member_MaritalStatusInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   member?: boolean | Prisma.Member_InformationDefaultArgs<ExtArgs>
   maritalStatus?: boolean | Prisma.Member_MaritalStatus$maritalStatusArgs<ExtArgs>
@@ -646,7 +613,6 @@ export type $Member_MaritalStatusPayload<ExtArgs extends runtime.Types.Extension
     MMr_MemWehvariaNo: runtime.Decimal | null
     MMr_MaritalCode: runtime.Decimal
     MMr_StatusDate: Date
-    id: bigint
   }, ExtArgs["result"]["member_MaritalStatus"]>
   composites: {}
 }
@@ -1022,7 +988,6 @@ export interface Member_MaritalStatusFieldRefs {
   readonly MMr_MemWehvariaNo: Prisma.FieldRef<"Member_MaritalStatus", 'Decimal'>
   readonly MMr_MaritalCode: Prisma.FieldRef<"Member_MaritalStatus", 'Decimal'>
   readonly MMr_StatusDate: Prisma.FieldRef<"Member_MaritalStatus", 'DateTime'>
-  readonly id: Prisma.FieldRef<"Member_MaritalStatus", 'BigInt'>
 }
     
 

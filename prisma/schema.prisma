@@ -12,7 +12,6 @@ datasource db {
   provider = "sqlserver" 
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model SurName_L {
   SurCode   Decimal @id @db.Decimal(18, 0)
   surName   String  @db.NChar(100)
@@ -20,7 +19,6 @@ model SurName_L {
   surActive Decimal @default(1, map: "DF_sur_L_surActive") @db.Decimal(18, 0)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Gender_L {
   GndCode   Decimal  @id @db.Decimal(18, 0)
   GndName   String?  @db.NChar(30)
@@ -35,7 +33,6 @@ model Area_L {
   Areactive Decimal @default(1, map: "DF_Area_L_Areactive") @db.Decimal(18, 0)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Country_L {
   CtrCode   Decimal  @id @db.Decimal(18, 0)
   CtrName   String?  @db.NChar(100)
@@ -43,7 +40,6 @@ model Country_L {
   CtrActive Decimal? @default(1, map: "DF_Country_L_CtrActive") @db.Decimal(18, 0)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Community_L {
   CMMCode   Decimal  @id @db.Decimal(18, 0)
   CMMName   String?  @db.NChar(100)
@@ -51,14 +47,12 @@ model Community_L {
   CMMActive Decimal? @default(1, map: "DF_Community_L_CMMActive") @db.Decimal(18, 0)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Status_L {
   Sts_Code       Decimal         @id @db.Decimal(18, 0)
   Sts_Name       String?         @db.NChar(100)
   memberStatuses Member_Status[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Marital_L {
   MrtCode               Decimal                @id @db.Decimal(18, 0)
   MrtName               String                 @db.NChar(100)
@@ -67,7 +61,6 @@ model Marital_L {
   memberMaritalStatuses Member_MaritalStatus[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Occupation_L {
   OccCode           Decimal             @id @db.Decimal(18, 0)
   OccName           String              @db.NChar(100)
@@ -76,7 +69,6 @@ model Occupation_L {
   memberOccupations Member_Occupation[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Qualification_L {
   QuaCode              Decimal                @id @db.Decimal(18, 0)
   QuaName              String?                @db.NChar(100)
@@ -85,7 +77,6 @@ model Qualification_L {
   memberQualifications Member_Qualification[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model GraveYard_L {
   GVY_Code                Decimal                    @id @db.Decimal(18, 0)
   GVY_Name                String?                    @db.NChar(100)
@@ -154,7 +145,6 @@ model Member_Information {
   Mem_DeActive_Details String?   @db.Char(250)
   Mem_Dth_Cert_Req     Int?      @db.SmallInt
 
-  // Relations
   maritalStatus      Member_MaritalStatus[]
   occupations        Member_Occupation[]
   qualifications     Member_Qualification[]
@@ -269,7 +259,6 @@ model Children_List {
   Chd_motherWehvariaNo Decimal?  @db.Decimal(18, 0)
   Chd_FatherWehvariaNo Decimal?  @db.Decimal(18, 0)
 
-  // Foreign Keys
   member Member_Information  @relation("MemberChildren", fields: [Chd_memberId], references: [MemComputerID], onDelete: NoAction, onUpdate: NoAction)
   mother Member_Information? @relation("MotherRelation", fields: [Chd_MotherMemberID], references: [MemComputerID], onDelete: NoAction, onUpdate: NoAction)
   father Member_Information? @relation("FatherRelation", fields: [Chd_FatherMemberID], references: [MemComputerID], onDelete: NoAction, onUpdate: NoAction)
@@ -278,7 +267,6 @@ model Children_List {
   @@index([Chd_WehvariaNo], map: "IX_Children_List_1")
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Children_List_bkup {
   Chd_memberId         Decimal   @db.Decimal(18, 0)
   Chd_WehvariaNo       Decimal   @db.Decimal(18, 0)
@@ -304,7 +292,7 @@ model Spouse_List {
   Spu_Details          String?            @db.NChar(300)
   Spu_ParentMemberID   Decimal?           @db.Decimal(18, 0)
   Spu_ParentWehvariano Decimal?           @db.Decimal(18, 0)
-  // Foreign Keys
+  
   member               Member_Information @relation(fields: [Spu_MemberId], references: [MemComputerID])
 
   @@index([Spu_MemberId], map: "IX_Spouse_List")
@@ -319,7 +307,6 @@ model Parents_List {
   Par_DeactiveDate DateTime? @db.DateTime
   Par_Details      String?   @db.NChar(300)
 
-  // Foreign Keys
   member Member_Information  @relation("MemberAsParent", fields: [Par_MemberID], references: [MemComputerID], onDelete: NoAction, onUpdate: NoAction)
   parent Member_Information? @relation("ParentOfMember", fields: [Par_WehvariaNo], references: [MemComputerID], onDelete: NoAction, onUpdate: NoAction)
 
@@ -332,12 +319,11 @@ model Member_MaritalStatus {
   MMr_MemWehvariaNo Decimal? @db.Decimal(18, 0)
   MMr_MaritalCode   Decimal  @db.Decimal(18, 0)
   MMr_StatusDate    DateTime @db.DateTime
-  id                BigInt   @id @default(autoincrement())
 
-  // Foreign Keys
   member        Member_Information @relation(fields: [MMr_MemComputerID], references: [MemComputerID])
   maritalStatus Marital_L?         @relation(fields: [MMr_MaritalCode], references: [MrtCode])
 
+  @@id([MMr_MemComputerID, MMr_MaritalCode, MMr_StatusDate])
   @@index([MMr_MemComputerID])
 }
 
@@ -346,12 +332,11 @@ model Member_Occupation {
   MOc_MemWehvariaNo  Decimal? @db.Decimal(18, 0)
   MOc_OccupationCode Decimal  @db.Decimal(18, 0)
   MOc_statusDate     DateTime @db.Date
-  id                 BigInt   @id @default(autoincrement())
 
-  // Foreign Keys
   member     Member_Information @relation(fields: [MOc_MemComputerID], references: [MemComputerID])
   occupation Occupation_L?      @relation(fields: [MOc_OccupationCode], references: [OccCode])
 
+  @@id([MOc_MemComputerID, MOc_OccupationCode, MOc_statusDate])
   @@index([MOc_MemComputerID])
 }
 
@@ -360,12 +345,11 @@ model Member_Qualification {
   MQu_MemWehvariaNo     Decimal? @db.Decimal(18, 0)
   MQu_QualificationCode Decimal  @db.Decimal(18, 0)
   MQu_StatusDate        DateTime @db.DateTime
-  id                    BigInt   @id @default(autoincrement())
 
-  // Foreign Keys
   member        Member_Information @relation(fields: [MQu_MemComputerID], references: [MemComputerID])
   qualification Qualification_L?   @relation(fields: [MQu_QualificationCode], references: [QuaCode])
 
+  @@id([MQu_MemComputerID, MQu_QualificationCode, MQu_StatusDate])
   @@index([MQu_MemComputerID])
 }
 
@@ -375,12 +359,11 @@ model Member_Status {
   Mst_StatusCode   Decimal  @db.Decimal(18, 0)
   Mst_CreationDate DateTime @db.Date
   Mst_DeactiveDate DateTime @db.Date
-  id               BigInt   @id @default(autoincrement())
 
-  // Foreign Keys
   member Member_Information @relation(fields: [Mst_Memberid], references: [MemComputerID])
   status Status_L?          @relation(fields: [Mst_StatusCode], references: [Sts_Code])
 
+  @@id([Mst_Memberid, Mst_CreationDate])
   @@index([Mst_Memberid])
 }
 
@@ -389,7 +372,6 @@ model Member_CellNumber {
   MCL_MemWehvariaNo Decimal @db.Decimal(18, 0)
   MCL_CellNumber    Decimal @db.Decimal(18, 0)
 
-  // Foreign Keys
   member Member_Information @relation(fields: [MCL_MemComputerid], references: [MemComputerID])
 
   @@id([MCL_MemComputerid, MCL_CellNumber])
@@ -399,12 +381,11 @@ model Member_CellNumber {
 model Member_Emailid {
   MEM_MemComputerID Decimal @db.Decimal(18, 0)
   MEM_MemWehvariaNo Decimal @db.Decimal(18, 0)
-  MEM_Emailid       String? @db.NChar(100)
-  id                BigInt  @id @default(autoincrement())
+  MEM_Emailid       String @db.NChar(100)
 
-  // Foreign Keys
   member Member_Information @relation(fields: [MEM_MemComputerID], references: [MemComputerID])
 
+  @@id([MEM_MemComputerID, MEM_Emailid])
   @@index([MEM_MemComputerID])
 }
 
@@ -431,7 +412,6 @@ model Amount_Receive {
   CPY_FeeFor         String?  @db.Char(250)
   CPY_Member_Type    Int?
 
-  // Foreign Keys
   member Member_Information? @relation(fields: [CPY_Membershipid], references: [MemComputerID])
 
   @@index([CPY_Membershipid])
@@ -446,7 +426,6 @@ model Member_AnnualFee {
   RFE_Details      String?  @db.Char(250)
   RFE_Acc_Voucher  String?  @db.NChar(30)
 
-  // Foreign Keys
   member Member_Information? @relation(fields: [RFE_MemberID], references: [MemComputerID])
 
   @@index([RFE_MemberID])
@@ -482,7 +461,6 @@ model Annual_Fee_Receive_M {
   ARM_Bank_HeadCode String?   @db.NChar(30)
   ARM_Fee_HeadCode  String?   @db.NChar(30)
 
-  // Foreign Keys
   member Member_Information? @relation(fields: [ARM_MemberID], references: [MemComputerID])
 
   @@index([ARM_MemberID])
@@ -503,14 +481,15 @@ model abc {
 }
 
 model abc_tmp {
-  ARM_VoucherNo   String   @db.NChar(50)
-  ARM_MemberID    Decimal? @db.Decimal(18, 0)
-  MemMembershipNo String?  @db.NChar(50)
+  ARM_VoucherNo   String  @db.NChar(50)
+  ARM_MemberID    Decimal @default(0) @db.Decimal(18, 0)
+  MemMembershipNo String? @db.NChar(50)
 
-  @@ignore
+  @@id([ARM_VoucherNo, ARM_MemberID])
 }
 
 model aft_vouchers {
+  tmp             Decimal   @id @db.Decimal(18, 0)
   vocno           String    @db.Char(40)
   vocdate         DateTime  @db.DateTime
   vochead         String    @db.Char(50)
@@ -538,7 +517,6 @@ model aft_vouchers {
   VocNICNo        String?   @db.Char(50)
   VocEmpName      String?   @db.Char(150)
   VocEmpCode      String?   @db.Char(50)
-  tmp             Decimal   @id @db.Decimal(18, 0)
 }
 
 model Donation_Application {
@@ -584,7 +562,6 @@ model Member_Death_Certificate {
   Dth_Time                  DateTime? @db.DateTime
   Dth_DeathDate             DateTime? @db.DateTime
 
-  // Foreign Keys
   member    Member_Information? @relation(fields: [Dth_MemComputerID], references: [MemComputerID])
   graveYard GraveYard_L?        @relation(fields: [Dth_GraveYard_Code], references: [GVY_Code])
 
@@ -599,7 +576,6 @@ model EmployeeInfo {
   empuser_id       String? @db.Char(50)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model UserInfo {
   EmpCode          String  @id @db.Char(50)
   EmpName          String? @db.Char(50)
@@ -609,8 +585,8 @@ model UserInfo {
 }
 
 model Tmp_Annual_FeeReceipt {
-  MemberID        Decimal  @db.Decimal(18, 0)
   Voc__           String   @id @map("Voc #") @db.NChar(50)
+  MemberID        Decimal  @db.Decimal(18, 0)
   Date            DateTime @db.Date
   Fee             Decimal? @db.Decimal(18, 0)
   MemMembershipNo String?  @db.NChar(50)
@@ -639,12 +615,12 @@ model tmp_auto_Desc {
 }
 
 model tmp_deathcert_List {
+  Dth_Auto_Id               BigInt    @id
   MemName                   String?   @db.NChar(100)
   surname                   String    @db.NChar(100)
   gndname                   String?   @db.NChar(30)
   Mem_DeceasedDate          DateTime? @db.DateTime
   GVY_Name                  String?   @db.NChar(100)
-  Dth_Auto_Id               BigInt    @id
   Dth_Age                   String?   @db.VarChar(50)
   Dth_Grave_No              Int?
   Dth_Burial_Date           DateTime? @db.DateTime
@@ -655,8 +631,8 @@ model tmp_deathcert_List {
 }
 
 model tmp_doj_list {
-  DOJ_Daughter_Code   Decimal   @db.Decimal(18, 0)
-  DOJ_RegDate         DateTime? @db.DateTime
+  DOJ_Daughter_Code   Decimal  @db.Decimal(18, 0)
+  DOJ_RegDate         DateTime @default(now()) @db.DateTime
   DOJ_DOB             DateTime? @db.DateTime
   DOJ_CNIC            String?   @db.Char(30)
   DOJ_Name            String?   @db.NChar(70)
@@ -680,7 +656,6 @@ model tmp_doj_list {
   @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model tmp_Don_App {
   DAP_Member_ID          Int?
   DAP_TypeWise_SrNo      Int?
@@ -699,11 +674,9 @@ model tmp_Don_App {
   MemFatherName          String?   @db.NChar(100)
   MemMotherName          String?   @db.NChar(100)
   Spouse_Name            String?   @db.NChar(100)
-
   @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model tmp_fee_generate {
   RFE_Acc_Voucher  String?   @db.NChar(30)
   RFE_INVOICE_dATE DateTime? @db.Date
@@ -713,36 +686,28 @@ model tmp_fee_generate {
   @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model tmp_linked_mem {
   DOJ_RegDate     DateTime? @db.DateTime
   DOJ_Name        String?   @db.NChar(70)
-  DOJ_HusbandName String?   @db.NChar(70)
+  DOJ_HusbandName String    @db.NChar(70)
 
-  @@ignore
+  @@id([DOJ_HusbandName])
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model tmp_member_linked {
-  MemComputerID Decimal @db.Decimal(18, 0)
+  MemComputerID Decimal @id @db.Decimal(18, 0)
   Membership__  String? @map("Membership #") @db.NChar(50)
   Name          String? @db.NChar(100)
   Father_Name   String? @map("Father Name") @db.NChar(100)
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model tmp_member_notgenerated {
-  MemComputerID Decimal @db.Decimal(18, 0)
+  MemComputerID Decimal @id @db.Decimal(18, 0)
   Membership__  String? @map("Membership #") @db.NChar(50)
   Name          String? @db.NChar(100)
   Father_Name   String? @map("Father Name") @db.NChar(100)
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model tmp_member_tree_final {
   MemComputerID        Decimal   @db.Decimal(18, 0)
   MemComputerDate      DateTime? @db.DateTime
@@ -785,7 +750,7 @@ model tmp_member_tree_final {
   @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+
 model tmp_member_tree_spouse {
   MemComputerID        Decimal   @db.Decimal(18, 0)
   MemComputerDate      DateTime? @db.DateTime
@@ -822,9 +787,8 @@ model tmp_member_tree_spouse {
   @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Tmp_MemberShip_Form {
-  MemComputerID        Decimal   @db.Decimal(18, 0)
+  MemComputerID        Decimal   @id @db.Decimal(18, 0)
   MemComputerDate      DateTime? @db.DateTime
   MemWehvariaNo        Decimal?  @db.Decimal(18, 0)
   MemRegistrationDate  DateTime? @db.DateTime
@@ -860,14 +824,11 @@ model Tmp_MemberShip_Form {
   cellno               Decimal?  @db.Decimal(18, 0)
   MemEmail             String?   @db.NChar(100)
   Card_Issued          String?   @db.VarChar(3)
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Tmp_MemberShip_Form_DOJ {
-  DOJ_Daughter_Code   Decimal?  @db.Decimal(18, 0)
-  DOJ_RegDate         DateTime? @db.DateTime
+  DOJ_Daughter_Code   Decimal   @default(0) @db.Decimal(18, 0)
+  DOJ_RegDate         DateTime  @db.DateTime
   DOJ_DOB             DateTime? @db.DateTime
   DOJ_CNIC            String?   @db.Char(30)
   DOJ_Name            String?   @db.NChar(70)
@@ -894,12 +855,11 @@ model Tmp_MemberShip_Form_DOJ {
   AREANAME            String?   @db.NVarChar(100)
   COUNTRYNAME         String?   @db.NVarChar(100)
 
-  @@ignore
+  @@id([DOJ_RegDate, DOJ_Daughter_Code])
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model TmpAllMemberList {
-  MemComputerID       Decimal   @db.Decimal(18, 0)
+  MemComputerID       Decimal   @id @db.Decimal(18, 0)
   MemRegistrationDate DateTime? @db.DateTime
   MemMembershipNo     String?   @db.NChar(50)
   MemName             String?   @db.NChar(100)
@@ -924,50 +884,38 @@ model TmpAllMemberList {
   AgeYearsIntTrunc    Int?
   Card_Issued         String?   @db.VarChar(3)
   CellNumber          Decimal?  @db.Decimal(18, 0)
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model tmpbalfee {
-  MemComputerID Decimal  @db.Decimal(18, 0)
+  MemComputerID Decimal  @id @db.Decimal(18, 0)
   tot_fee       Decimal? @db.Decimal(38, 0)
   tot_Rec       Decimal? @db.Decimal(38, 0)
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model tmpfatherdetails {
-  child_wehvaria_no Decimal?  @db.Decimal(18, 0)
+  child_wehvaria_no Decimal   @id @db.Decimal(18, 0)
   Father_memberNo   String?   @db.NChar(50)
   Father_Name       String?   @db.NChar(100)
   Father_CNIC       String?   @db.VarChar(41)
   Father_DOB        DateTime? @db.DateTime
   father_Cellno     Decimal?  @db.Decimal(18, 0)
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model tmpMotherdetails {
-  child_wehvaria_no Decimal?  @db.Decimal(18, 0)
+  child_wehvaria_no Decimal   @id @db.Decimal(18, 0)
   Mother_memberNo   String?   @db.NChar(50)
   Mother_Name       String?   @db.NChar(100)
   Mother_CNIC       Decimal?  @db.Decimal(18, 0)
   Mother_DOB        DateTime? @db.DateTime
   Mother_Cellno     Decimal?  @db.Decimal(18, 0)
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model tmpstatusChild {
-  MemMembershipNo  String?   @db.NChar(50)
+  MemMembershipNo  String    @db.NChar(50)
+  chd_StatusDate   DateTime  @db.DateTime
   MemName          String?   @db.NChar(100)
   MemCNIC          Decimal?  @db.Decimal(18, 0)
   MemDOB           DateTime? @db.DateTime
-  chd_StatusDate   DateTime? @db.DateTime
   Gender           String?   @db.NVarChar(30)
   SurName          String?   @db.NVarChar(100)
   Father_memberNo  String?   @db.NChar(50)
@@ -976,12 +924,11 @@ model tmpstatusChild {
   mother_Name      String?   @db.NChar(100)
   Chd_DeactiveDate DateTime? @db.DateTime
 
-  @@ignore
+  @@id([MemMembershipNo, chd_StatusDate])
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model tmpstatusheadoffamily {
-  Memwehvariano   Decimal?  @db.Decimal(18, 0)
+  Memwehvariano   Decimal   @id @db.Decimal(18, 0)
   MemMembershipNo String?   @db.NChar(50)
   MemName         String?   @db.NChar(100)
   MemCNIC         Decimal?  @db.Decimal(18, 0)
@@ -989,24 +936,21 @@ model tmpstatusheadoffamily {
   Par_StatusDate  DateTime? @db.DateTime
   Gender          String?   @db.NVarChar(30)
   SurName         String?   @db.NVarChar(100)
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model tmpstatusSpouse {
-  MemMembershipNo  String?   @db.NChar(50)
+  MemMembershipNo  String    @db.NChar(50)
+  Spu_StatusDate   DateTime  @db.DateTime
   MemName          String?   @db.NChar(100)
   MemCNIC          Decimal?  @db.Decimal(18, 0)
   MemDOB           DateTime? @db.DateTime
-  Spu_StatusDate   DateTime? @db.DateTime
   Gender           String?   @db.NVarChar(30)
   SurName          String?   @db.NVarChar(100)
   PARENT_memberNo  String?   @db.NChar(50)
   PARENT_Name      String?   @db.NChar(100)
   Spu_DeactiveDate DateTime? @db.DateTime
 
-  @@ignore
+  @@id([MemMembershipNo, Spu_StatusDate])
 }
 
 model Rpt_MemberCard {
@@ -1047,17 +991,13 @@ model sysdiagrams {
   definition   Bytes?
 
   @@unique([principal_id, name], map: "UK_principal_name")
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model testtable {
   testtime Bytes? @db.VarBinary(50)
-
   @@ignore
 }
 
-// Main Forms Definition Table
 model Form {
   id                String   @id @default(cuid())
   name              String   @db.NVarChar(255)
@@ -1075,7 +1015,6 @@ model Form {
   @@index([isActive])
 }
 
-// Dynamic Fields for Forms
 model FormField {
   id                String   @id @default(cuid())
   formId            String
@@ -1101,7 +1040,6 @@ model FormField {
   @@index([formId])
 }
 
-// Form Submissions - Main Data Table
 model FormSubmission {
   id                String   @id @default(cuid())
   formId            String
@@ -1128,8 +1066,6 @@ model FormSubmission {
   @@index([submissionDate])
 }
 
-// Form Field Values - Stores actual form data
-// FIX: Changed to use NoAction to prevent cyclic cascade
 model FormFieldValue {
   id                String   @id @default(cuid())
   submissionId      String
@@ -1149,7 +1085,6 @@ model FormFieldValue {
   @@index([fieldId])
 }
 
-// Form Metadata/Audit Log
 model FormAuditLog {
   id                String   @id @default(cuid())
   submissionId      String
@@ -1173,4 +1108,19 @@ model User {
   role      String   @default("USER") @db.NVarChar(20)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model VerificationCode {
+  id                    String   @id @default(cuid())
+  email                 String   @unique
+  code                  String
+  expiresAt             DateTime
+  attempts              Int      @default(0)
+  verificationAttempts  Int      @default(0)
+  lastAttempt           DateTime @default(now())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([email])
+  @@index([expiresAt])
 }

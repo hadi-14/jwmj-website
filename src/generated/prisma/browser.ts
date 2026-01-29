@@ -19,12 +19,12 @@ export * as $Enums from './enums.ts'
 export * from './enums.ts';
 /**
  * Model SurName_L
- * The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+ * 
  */
 export type SurName_L = Prisma.SurName_LModel
 /**
  * Model Gender_L
- * The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+ * 
  */
 export type Gender_L = Prisma.Gender_LModel
 /**
@@ -34,37 +34,37 @@ export type Gender_L = Prisma.Gender_LModel
 export type Area_L = Prisma.Area_LModel
 /**
  * Model Country_L
- * The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+ * 
  */
 export type Country_L = Prisma.Country_LModel
 /**
  * Model Community_L
- * The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+ * 
  */
 export type Community_L = Prisma.Community_LModel
 /**
  * Model Status_L
- * The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+ * 
  */
 export type Status_L = Prisma.Status_LModel
 /**
  * Model Marital_L
- * The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+ * 
  */
 export type Marital_L = Prisma.Marital_LModel
 /**
  * Model Occupation_L
- * The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+ * 
  */
 export type Occupation_L = Prisma.Occupation_LModel
 /**
  * Model Qualification_L
- * The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+ * 
  */
 export type Qualification_L = Prisma.Qualification_LModel
 /**
  * Model GraveYard_L
- * The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+ * 
  */
 export type GraveYard_L = Prisma.GraveYard_LModel
 /**
@@ -198,6 +198,11 @@ export type Annual_Fee_Receive_D = Prisma.Annual_Fee_Receive_DModel
  */
 export type abc = Prisma.abcModel
 /**
+ * Model abc_tmp
+ * 
+ */
+export type abc_tmp = Prisma.abc_tmpModel
+/**
  * Model aft_vouchers
  * 
  */
@@ -224,7 +229,7 @@ export type Member_Death_Certificate = Prisma.Member_Death_CertificateModel
 export type EmployeeInfo = Prisma.EmployeeInfoModel
 /**
  * Model UserInfo
- * The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+ * 
  */
 export type UserInfo = Prisma.UserInfoModel
 /**
@@ -248,6 +253,66 @@ export type tmp_auto_Desc = Prisma.tmp_auto_DescModel
  */
 export type tmp_deathcert_List = Prisma.tmp_deathcert_ListModel
 /**
+ * Model tmp_linked_mem
+ * 
+ */
+export type tmp_linked_mem = Prisma.tmp_linked_memModel
+/**
+ * Model tmp_member_linked
+ * 
+ */
+export type tmp_member_linked = Prisma.tmp_member_linkedModel
+/**
+ * Model tmp_member_notgenerated
+ * 
+ */
+export type tmp_member_notgenerated = Prisma.tmp_member_notgeneratedModel
+/**
+ * Model Tmp_MemberShip_Form
+ * 
+ */
+export type Tmp_MemberShip_Form = Prisma.Tmp_MemberShip_FormModel
+/**
+ * Model Tmp_MemberShip_Form_DOJ
+ * 
+ */
+export type Tmp_MemberShip_Form_DOJ = Prisma.Tmp_MemberShip_Form_DOJModel
+/**
+ * Model TmpAllMemberList
+ * 
+ */
+export type TmpAllMemberList = Prisma.TmpAllMemberListModel
+/**
+ * Model tmpbalfee
+ * 
+ */
+export type tmpbalfee = Prisma.tmpbalfeeModel
+/**
+ * Model tmpfatherdetails
+ * 
+ */
+export type tmpfatherdetails = Prisma.tmpfatherdetailsModel
+/**
+ * Model tmpMotherdetails
+ * 
+ */
+export type tmpMotherdetails = Prisma.tmpMotherdetailsModel
+/**
+ * Model tmpstatusChild
+ * 
+ */
+export type tmpstatusChild = Prisma.tmpstatusChildModel
+/**
+ * Model tmpstatusheadoffamily
+ * 
+ */
+export type tmpstatusheadoffamily = Prisma.tmpstatusheadoffamilyModel
+/**
+ * Model tmpstatusSpouse
+ * 
+ */
+export type tmpstatusSpouse = Prisma.tmpstatusSpouseModel
+/**
  * Model Rpt_MemberCard
  * 
  */
@@ -257,6 +322,11 @@ export type Rpt_MemberCard = Prisma.Rpt_MemberCardModel
  * 
  */
 export type rptfeeslip = Prisma.rptfeeslipModel
+/**
+ * Model sysdiagrams
+ * 
+ */
+export type sysdiagrams = Prisma.sysdiagramsModel
 /**
  * Model Form
  * 
@@ -287,3 +357,8 @@ export type FormAuditLog = Prisma.FormAuditLogModel
  * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model VerificationCode
+ * 
+ */
+export type VerificationCode = Prisma.VerificationCodeModel

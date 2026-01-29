@@ -28,9 +28,25 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // Protect all /member routes
+  if (pathname.startsWith('/member')) {
+    const token = request.cookies.get('auth-token')?.value;
+
+    if (!token) {
+      return NextResponse.redirect(new URL('/member/login', request.url));
+    }
+
+    try {
+      jwt.verify(token, JWT_SECRET);
+      return NextResponse.next();
+    } catch (error) {
+      return NextResponse.redirect(new URL('/member/login', request.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: '/admin/:path*',
+  matcher: '/admin/:path*, /member/:path*',
 };

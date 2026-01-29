@@ -37,12 +37,12 @@ export type Tmp_deathcert_ListSumAggregateOutputType = {
 }
 
 export type Tmp_deathcert_ListMinAggregateOutputType = {
+  Dth_Auto_Id: bigint | null
   MemName: string | null
   surname: string | null
   gndname: string | null
   Mem_DeceasedDate: Date | null
   GVY_Name: string | null
-  Dth_Auto_Id: bigint | null
   Dth_Age: string | null
   Dth_Grave_No: number | null
   Dth_Burial_Date: Date | null
@@ -53,12 +53,12 @@ export type Tmp_deathcert_ListMinAggregateOutputType = {
 }
 
 export type Tmp_deathcert_ListMaxAggregateOutputType = {
+  Dth_Auto_Id: bigint | null
   MemName: string | null
   surname: string | null
   gndname: string | null
   Mem_DeceasedDate: Date | null
   GVY_Name: string | null
-  Dth_Auto_Id: bigint | null
   Dth_Age: string | null
   Dth_Grave_No: number | null
   Dth_Burial_Date: Date | null
@@ -69,12 +69,12 @@ export type Tmp_deathcert_ListMaxAggregateOutputType = {
 }
 
 export type Tmp_deathcert_ListCountAggregateOutputType = {
+  Dth_Auto_Id: number
   MemName: number
   surname: number
   gndname: number
   Mem_DeceasedDate: number
   GVY_Name: number
-  Dth_Auto_Id: number
   Dth_Age: number
   Dth_Grave_No: number
   Dth_Burial_Date: number
@@ -97,12 +97,12 @@ export type Tmp_deathcert_ListSumAggregateInputType = {
 }
 
 export type Tmp_deathcert_ListMinAggregateInputType = {
+  Dth_Auto_Id?: true
   MemName?: true
   surname?: true
   gndname?: true
   Mem_DeceasedDate?: true
   GVY_Name?: true
-  Dth_Auto_Id?: true
   Dth_Age?: true
   Dth_Grave_No?: true
   Dth_Burial_Date?: true
@@ -113,12 +113,12 @@ export type Tmp_deathcert_ListMinAggregateInputType = {
 }
 
 export type Tmp_deathcert_ListMaxAggregateInputType = {
+  Dth_Auto_Id?: true
   MemName?: true
   surname?: true
   gndname?: true
   Mem_DeceasedDate?: true
   GVY_Name?: true
-  Dth_Auto_Id?: true
   Dth_Age?: true
   Dth_Grave_No?: true
   Dth_Burial_Date?: true
@@ -129,12 +129,12 @@ export type Tmp_deathcert_ListMaxAggregateInputType = {
 }
 
 export type Tmp_deathcert_ListCountAggregateInputType = {
+  Dth_Auto_Id?: true
   MemName?: true
   surname?: true
   gndname?: true
   Mem_DeceasedDate?: true
   GVY_Name?: true
-  Dth_Auto_Id?: true
   Dth_Age?: true
   Dth_Grave_No?: true
   Dth_Burial_Date?: true
@@ -232,12 +232,12 @@ export type tmp_deathcert_ListGroupByArgs<ExtArgs extends runtime.Types.Extensio
 }
 
 export type Tmp_deathcert_ListGroupByOutputType = {
+  Dth_Auto_Id: bigint
   MemName: string | null
   surname: string
   gndname: string | null
   Mem_DeceasedDate: Date | null
   GVY_Name: string | null
-  Dth_Auto_Id: bigint
   Dth_Age: string | null
   Dth_Grave_No: number | null
   Dth_Burial_Date: Date | null
@@ -271,12 +271,12 @@ export type tmp_deathcert_ListWhereInput = {
   AND?: Prisma.tmp_deathcert_ListWhereInput | Prisma.tmp_deathcert_ListWhereInput[]
   OR?: Prisma.tmp_deathcert_ListWhereInput[]
   NOT?: Prisma.tmp_deathcert_ListWhereInput | Prisma.tmp_deathcert_ListWhereInput[]
+  Dth_Auto_Id?: Prisma.BigIntFilter<"tmp_deathcert_List"> | bigint | number
   MemName?: Prisma.StringNullableFilter<"tmp_deathcert_List"> | string | null
   surname?: Prisma.StringFilter<"tmp_deathcert_List"> | string
   gndname?: Prisma.StringNullableFilter<"tmp_deathcert_List"> | string | null
   Mem_DeceasedDate?: Prisma.DateTimeNullableFilter<"tmp_deathcert_List"> | Date | string | null
   GVY_Name?: Prisma.StringNullableFilter<"tmp_deathcert_List"> | string | null
-  Dth_Auto_Id?: Prisma.BigIntFilter<"tmp_deathcert_List"> | bigint | number
   Dth_Age?: Prisma.StringNullableFilter<"tmp_deathcert_List"> | string | null
   Dth_Grave_No?: Prisma.IntNullableFilter<"tmp_deathcert_List"> | number | null
   Dth_Burial_Date?: Prisma.DateTimeNullableFilter<"tmp_deathcert_List"> | Date | string | null
@@ -287,12 +287,12 @@ export type tmp_deathcert_ListWhereInput = {
 }
 
 export type tmp_deathcert_ListOrderByWithRelationInput = {
+  Dth_Auto_Id?: Prisma.SortOrder
   MemName?: Prisma.SortOrderInput | Prisma.SortOrder
   surname?: Prisma.SortOrder
   gndname?: Prisma.SortOrderInput | Prisma.SortOrder
   Mem_DeceasedDate?: Prisma.SortOrderInput | Prisma.SortOrder
   GVY_Name?: Prisma.SortOrderInput | Prisma.SortOrder
-  Dth_Auto_Id?: Prisma.SortOrder
   Dth_Age?: Prisma.SortOrderInput | Prisma.SortOrder
   Dth_Grave_No?: Prisma.SortOrderInput | Prisma.SortOrder
   Dth_Burial_Date?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -322,12 +322,12 @@ export type tmp_deathcert_ListWhereUniqueInput = Prisma.AtLeast<{
 }, "Dth_Auto_Id">
 
 export type tmp_deathcert_ListOrderByWithAggregationInput = {
+  Dth_Auto_Id?: Prisma.SortOrder
   MemName?: Prisma.SortOrderInput | Prisma.SortOrder
   surname?: Prisma.SortOrder
   gndname?: Prisma.SortOrderInput | Prisma.SortOrder
   Mem_DeceasedDate?: Prisma.SortOrderInput | Prisma.SortOrder
   GVY_Name?: Prisma.SortOrderInput | Prisma.SortOrder
-  Dth_Auto_Id?: Prisma.SortOrder
   Dth_Age?: Prisma.SortOrderInput | Prisma.SortOrder
   Dth_Grave_No?: Prisma.SortOrderInput | Prisma.SortOrder
   Dth_Burial_Date?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -346,12 +346,12 @@ export type tmp_deathcert_ListScalarWhereWithAggregatesInput = {
   AND?: Prisma.tmp_deathcert_ListScalarWhereWithAggregatesInput | Prisma.tmp_deathcert_ListScalarWhereWithAggregatesInput[]
   OR?: Prisma.tmp_deathcert_ListScalarWhereWithAggregatesInput[]
   NOT?: Prisma.tmp_deathcert_ListScalarWhereWithAggregatesInput | Prisma.tmp_deathcert_ListScalarWhereWithAggregatesInput[]
+  Dth_Auto_Id?: Prisma.BigIntWithAggregatesFilter<"tmp_deathcert_List"> | bigint | number
   MemName?: Prisma.StringNullableWithAggregatesFilter<"tmp_deathcert_List"> | string | null
   surname?: Prisma.StringWithAggregatesFilter<"tmp_deathcert_List"> | string
   gndname?: Prisma.StringNullableWithAggregatesFilter<"tmp_deathcert_List"> | string | null
   Mem_DeceasedDate?: Prisma.DateTimeNullableWithAggregatesFilter<"tmp_deathcert_List"> | Date | string | null
   GVY_Name?: Prisma.StringNullableWithAggregatesFilter<"tmp_deathcert_List"> | string | null
-  Dth_Auto_Id?: Prisma.BigIntWithAggregatesFilter<"tmp_deathcert_List"> | bigint | number
   Dth_Age?: Prisma.StringNullableWithAggregatesFilter<"tmp_deathcert_List"> | string | null
   Dth_Grave_No?: Prisma.IntNullableWithAggregatesFilter<"tmp_deathcert_List"> | number | null
   Dth_Burial_Date?: Prisma.DateTimeNullableWithAggregatesFilter<"tmp_deathcert_List"> | Date | string | null
@@ -362,12 +362,12 @@ export type tmp_deathcert_ListScalarWhereWithAggregatesInput = {
 }
 
 export type tmp_deathcert_ListCreateInput = {
+  Dth_Auto_Id: bigint | number
   MemName?: string | null
   surname: string
   gndname?: string | null
   Mem_DeceasedDate?: Date | string | null
   GVY_Name?: string | null
-  Dth_Auto_Id: bigint | number
   Dth_Age?: string | null
   Dth_Grave_No?: number | null
   Dth_Burial_Date?: Date | string | null
@@ -378,12 +378,12 @@ export type tmp_deathcert_ListCreateInput = {
 }
 
 export type tmp_deathcert_ListUncheckedCreateInput = {
+  Dth_Auto_Id: bigint | number
   MemName?: string | null
   surname: string
   gndname?: string | null
   Mem_DeceasedDate?: Date | string | null
   GVY_Name?: string | null
-  Dth_Auto_Id: bigint | number
   Dth_Age?: string | null
   Dth_Grave_No?: number | null
   Dth_Burial_Date?: Date | string | null
@@ -394,12 +394,12 @@ export type tmp_deathcert_ListUncheckedCreateInput = {
 }
 
 export type tmp_deathcert_ListUpdateInput = {
+  Dth_Auto_Id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   MemName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   gndname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Mem_DeceasedDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   GVY_Name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  Dth_Auto_Id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   Dth_Age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Dth_Grave_No?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   Dth_Burial_Date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -410,12 +410,12 @@ export type tmp_deathcert_ListUpdateInput = {
 }
 
 export type tmp_deathcert_ListUncheckedUpdateInput = {
+  Dth_Auto_Id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   MemName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   gndname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Mem_DeceasedDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   GVY_Name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  Dth_Auto_Id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   Dth_Age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Dth_Grave_No?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   Dth_Burial_Date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -426,12 +426,12 @@ export type tmp_deathcert_ListUncheckedUpdateInput = {
 }
 
 export type tmp_deathcert_ListCreateManyInput = {
+  Dth_Auto_Id: bigint | number
   MemName?: string | null
   surname: string
   gndname?: string | null
   Mem_DeceasedDate?: Date | string | null
   GVY_Name?: string | null
-  Dth_Auto_Id: bigint | number
   Dth_Age?: string | null
   Dth_Grave_No?: number | null
   Dth_Burial_Date?: Date | string | null
@@ -442,12 +442,12 @@ export type tmp_deathcert_ListCreateManyInput = {
 }
 
 export type tmp_deathcert_ListUpdateManyMutationInput = {
+  Dth_Auto_Id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   MemName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   gndname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Mem_DeceasedDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   GVY_Name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  Dth_Auto_Id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   Dth_Age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Dth_Grave_No?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   Dth_Burial_Date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -458,12 +458,12 @@ export type tmp_deathcert_ListUpdateManyMutationInput = {
 }
 
 export type tmp_deathcert_ListUncheckedUpdateManyInput = {
+  Dth_Auto_Id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   MemName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   gndname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Mem_DeceasedDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   GVY_Name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  Dth_Auto_Id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   Dth_Age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Dth_Grave_No?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   Dth_Burial_Date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -474,12 +474,12 @@ export type tmp_deathcert_ListUncheckedUpdateManyInput = {
 }
 
 export type tmp_deathcert_ListCountOrderByAggregateInput = {
+  Dth_Auto_Id?: Prisma.SortOrder
   MemName?: Prisma.SortOrder
   surname?: Prisma.SortOrder
   gndname?: Prisma.SortOrder
   Mem_DeceasedDate?: Prisma.SortOrder
   GVY_Name?: Prisma.SortOrder
-  Dth_Auto_Id?: Prisma.SortOrder
   Dth_Age?: Prisma.SortOrder
   Dth_Grave_No?: Prisma.SortOrder
   Dth_Burial_Date?: Prisma.SortOrder
@@ -495,12 +495,12 @@ export type tmp_deathcert_ListAvgOrderByAggregateInput = {
 }
 
 export type tmp_deathcert_ListMaxOrderByAggregateInput = {
+  Dth_Auto_Id?: Prisma.SortOrder
   MemName?: Prisma.SortOrder
   surname?: Prisma.SortOrder
   gndname?: Prisma.SortOrder
   Mem_DeceasedDate?: Prisma.SortOrder
   GVY_Name?: Prisma.SortOrder
-  Dth_Auto_Id?: Prisma.SortOrder
   Dth_Age?: Prisma.SortOrder
   Dth_Grave_No?: Prisma.SortOrder
   Dth_Burial_Date?: Prisma.SortOrder
@@ -511,12 +511,12 @@ export type tmp_deathcert_ListMaxOrderByAggregateInput = {
 }
 
 export type tmp_deathcert_ListMinOrderByAggregateInput = {
+  Dth_Auto_Id?: Prisma.SortOrder
   MemName?: Prisma.SortOrder
   surname?: Prisma.SortOrder
   gndname?: Prisma.SortOrder
   Mem_DeceasedDate?: Prisma.SortOrder
   GVY_Name?: Prisma.SortOrder
-  Dth_Auto_Id?: Prisma.SortOrder
   Dth_Age?: Prisma.SortOrder
   Dth_Grave_No?: Prisma.SortOrder
   Dth_Burial_Date?: Prisma.SortOrder
@@ -534,12 +534,12 @@ export type tmp_deathcert_ListSumOrderByAggregateInput = {
 
 
 export type tmp_deathcert_ListSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  Dth_Auto_Id?: boolean
   MemName?: boolean
   surname?: boolean
   gndname?: boolean
   Mem_DeceasedDate?: boolean
   GVY_Name?: boolean
-  Dth_Auto_Id?: boolean
   Dth_Age?: boolean
   Dth_Grave_No?: boolean
   Dth_Burial_Date?: boolean
@@ -552,12 +552,12 @@ export type tmp_deathcert_ListSelect<ExtArgs extends runtime.Types.Extensions.In
 
 
 export type tmp_deathcert_ListSelectScalar = {
+  Dth_Auto_Id?: boolean
   MemName?: boolean
   surname?: boolean
   gndname?: boolean
   Mem_DeceasedDate?: boolean
   GVY_Name?: boolean
-  Dth_Auto_Id?: boolean
   Dth_Age?: boolean
   Dth_Grave_No?: boolean
   Dth_Burial_Date?: boolean
@@ -567,18 +567,18 @@ export type tmp_deathcert_ListSelectScalar = {
   Dth_Certificate_IssueDate?: boolean
 }
 
-export type tmp_deathcert_ListOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"MemName" | "surname" | "gndname" | "Mem_DeceasedDate" | "GVY_Name" | "Dth_Auto_Id" | "Dth_Age" | "Dth_Grave_No" | "Dth_Burial_Date" | "Dth_Applicant_Name" | "Dth_Applicant_Relation" | "Dth_Applicant_Contact" | "Dth_Certificate_IssueDate", ExtArgs["result"]["tmp_deathcert_List"]>
+export type tmp_deathcert_ListOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"Dth_Auto_Id" | "MemName" | "surname" | "gndname" | "Mem_DeceasedDate" | "GVY_Name" | "Dth_Age" | "Dth_Grave_No" | "Dth_Burial_Date" | "Dth_Applicant_Name" | "Dth_Applicant_Relation" | "Dth_Applicant_Contact" | "Dth_Certificate_IssueDate", ExtArgs["result"]["tmp_deathcert_List"]>
 
 export type $tmp_deathcert_ListPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "tmp_deathcert_List"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    Dth_Auto_Id: bigint
     MemName: string | null
     surname: string
     gndname: string | null
     Mem_DeceasedDate: Date | null
     GVY_Name: string | null
-    Dth_Auto_Id: bigint
     Dth_Age: string | null
     Dth_Grave_No: number | null
     Dth_Burial_Date: Date | null
@@ -669,8 +669,8 @@ export interface tmp_deathcert_ListDelegate<ExtArgs extends runtime.Types.Extens
    * // Get first 10 Tmp_deathcert_Lists
    * const tmp_deathcert_Lists = await prisma.tmp_deathcert_List.findMany({ take: 10 })
    * 
-   * // Only select the `MemName`
-   * const tmp_deathcert_ListWithMemNameOnly = await prisma.tmp_deathcert_List.findMany({ select: { MemName: true } })
+   * // Only select the `Dth_Auto_Id`
+   * const tmp_deathcert_ListWithDth_Auto_IdOnly = await prisma.tmp_deathcert_List.findMany({ select: { Dth_Auto_Id: true } })
    * 
    */
   findMany<T extends tmp_deathcert_ListFindManyArgs>(args?: Prisma.SelectSubset<T, tmp_deathcert_ListFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$tmp_deathcert_ListPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -955,12 +955,12 @@ export interface Prisma__tmp_deathcert_ListClient<T, Null = never, ExtArgs exten
  * Fields of the tmp_deathcert_List model
  */
 export interface tmp_deathcert_ListFieldRefs {
+  readonly Dth_Auto_Id: Prisma.FieldRef<"tmp_deathcert_List", 'BigInt'>
   readonly MemName: Prisma.FieldRef<"tmp_deathcert_List", 'String'>
   readonly surname: Prisma.FieldRef<"tmp_deathcert_List", 'String'>
   readonly gndname: Prisma.FieldRef<"tmp_deathcert_List", 'String'>
   readonly Mem_DeceasedDate: Prisma.FieldRef<"tmp_deathcert_List", 'DateTime'>
   readonly GVY_Name: Prisma.FieldRef<"tmp_deathcert_List", 'String'>
-  readonly Dth_Auto_Id: Prisma.FieldRef<"tmp_deathcert_List", 'BigInt'>
   readonly Dth_Age: Prisma.FieldRef<"tmp_deathcert_List", 'String'>
   readonly Dth_Grave_No: Prisma.FieldRef<"tmp_deathcert_List", 'Int'>
   readonly Dth_Burial_Date: Prisma.FieldRef<"tmp_deathcert_List", 'DateTime'>

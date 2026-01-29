@@ -54,3 +54,28 @@ END
 
 -- Cleanup
 DROP TABLE #FieldColumns;
+
+
+
+-- Query to retrieve children along with their grandparents' IDs
+SELECT DISTINCT
+    child.Chd_memberId AS child_id,
+    child.Chd_MotherMemberID AS mother_id,
+    child.Chd_FatherMemberID AS father_id,
+    mother.Chd_MotherMemberID AS maternal_grandmother_id,
+    mother.Chd_FatherMemberID AS maternal_grandfather_id,
+    father.Chd_MotherMemberID AS paternal_grandmother_id,
+    father.Chd_FatherMemberID AS paternal_grandfather_id
+FROM Children_List child
+INNER JOIN Children_List mother 
+    ON child.Chd_MotherMemberID = mother.Chd_memberId
+INNER JOIN Children_List father 
+    ON child.Chd_FatherMemberID = father.Chd_memberId
+WHERE EXISTS (
+    SELECT 1 
+    WHERE mother.Chd_MotherMemberID IS NOT NULL 
+       OR mother.Chd_FatherMemberID IS NOT NULL
+       OR father.Chd_MotherMemberID IS NOT NULL 
+       OR father.Chd_FatherMemberID IS NOT NULL
+)
+ORDER BY child.Chd_memberId;

@@ -30,14 +30,12 @@ export type Member_OccupationAvgAggregateOutputType = {
   MOc_MemComputerID: runtime.Decimal | null
   MOc_MemWehvariaNo: runtime.Decimal | null
   MOc_OccupationCode: runtime.Decimal | null
-  id: number | null
 }
 
 export type Member_OccupationSumAggregateOutputType = {
   MOc_MemComputerID: runtime.Decimal | null
   MOc_MemWehvariaNo: runtime.Decimal | null
   MOc_OccupationCode: runtime.Decimal | null
-  id: bigint | null
 }
 
 export type Member_OccupationMinAggregateOutputType = {
@@ -45,7 +43,6 @@ export type Member_OccupationMinAggregateOutputType = {
   MOc_MemWehvariaNo: runtime.Decimal | null
   MOc_OccupationCode: runtime.Decimal | null
   MOc_statusDate: Date | null
-  id: bigint | null
 }
 
 export type Member_OccupationMaxAggregateOutputType = {
@@ -53,7 +50,6 @@ export type Member_OccupationMaxAggregateOutputType = {
   MOc_MemWehvariaNo: runtime.Decimal | null
   MOc_OccupationCode: runtime.Decimal | null
   MOc_statusDate: Date | null
-  id: bigint | null
 }
 
 export type Member_OccupationCountAggregateOutputType = {
@@ -61,7 +57,6 @@ export type Member_OccupationCountAggregateOutputType = {
   MOc_MemWehvariaNo: number
   MOc_OccupationCode: number
   MOc_statusDate: number
-  id: number
   _all: number
 }
 
@@ -70,14 +65,12 @@ export type Member_OccupationAvgAggregateInputType = {
   MOc_MemComputerID?: true
   MOc_MemWehvariaNo?: true
   MOc_OccupationCode?: true
-  id?: true
 }
 
 export type Member_OccupationSumAggregateInputType = {
   MOc_MemComputerID?: true
   MOc_MemWehvariaNo?: true
   MOc_OccupationCode?: true
-  id?: true
 }
 
 export type Member_OccupationMinAggregateInputType = {
@@ -85,7 +78,6 @@ export type Member_OccupationMinAggregateInputType = {
   MOc_MemWehvariaNo?: true
   MOc_OccupationCode?: true
   MOc_statusDate?: true
-  id?: true
 }
 
 export type Member_OccupationMaxAggregateInputType = {
@@ -93,7 +85,6 @@ export type Member_OccupationMaxAggregateInputType = {
   MOc_MemWehvariaNo?: true
   MOc_OccupationCode?: true
   MOc_statusDate?: true
-  id?: true
 }
 
 export type Member_OccupationCountAggregateInputType = {
@@ -101,7 +92,6 @@ export type Member_OccupationCountAggregateInputType = {
   MOc_MemWehvariaNo?: true
   MOc_OccupationCode?: true
   MOc_statusDate?: true
-  id?: true
   _all?: true
 }
 
@@ -196,7 +186,6 @@ export type Member_OccupationGroupByOutputType = {
   MOc_MemWehvariaNo: runtime.Decimal | null
   MOc_OccupationCode: runtime.Decimal
   MOc_statusDate: Date
-  id: bigint
   _count: Member_OccupationCountAggregateOutputType | null
   _avg: Member_OccupationAvgAggregateOutputType | null
   _sum: Member_OccupationSumAggregateOutputType | null
@@ -227,7 +216,6 @@ export type Member_OccupationWhereInput = {
   MOc_MemWehvariaNo?: Prisma.DecimalNullableFilter<"Member_Occupation"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_OccupationCode?: Prisma.DecimalFilter<"Member_Occupation"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   MOc_statusDate?: Prisma.DateTimeFilter<"Member_Occupation"> | Date | string
-  id?: Prisma.BigIntFilter<"Member_Occupation"> | bigint | number
   member?: Prisma.XOR<Prisma.Member_InformationScalarRelationFilter, Prisma.Member_InformationWhereInput>
   occupation?: Prisma.XOR<Prisma.Occupation_LNullableScalarRelationFilter, Prisma.Occupation_LWhereInput> | null
 }
@@ -237,13 +225,12 @@ export type Member_OccupationOrderByWithRelationInput = {
   MOc_MemWehvariaNo?: Prisma.SortOrderInput | Prisma.SortOrder
   MOc_OccupationCode?: Prisma.SortOrder
   MOc_statusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
   member?: Prisma.Member_InformationOrderByWithRelationInput
   occupation?: Prisma.Occupation_LOrderByWithRelationInput
 }
 
 export type Member_OccupationWhereUniqueInput = Prisma.AtLeast<{
-  id?: bigint | number
+  MOc_MemComputerID_MOc_OccupationCode_MOc_statusDate?: Prisma.Member_OccupationMOc_MemComputerIDMOc_OccupationCodeMOc_statusDateCompoundUniqueInput
   AND?: Prisma.Member_OccupationWhereInput | Prisma.Member_OccupationWhereInput[]
   OR?: Prisma.Member_OccupationWhereInput[]
   NOT?: Prisma.Member_OccupationWhereInput | Prisma.Member_OccupationWhereInput[]
@@ -253,14 +240,13 @@ export type Member_OccupationWhereUniqueInput = Prisma.AtLeast<{
   MOc_statusDate?: Prisma.DateTimeFilter<"Member_Occupation"> | Date | string
   member?: Prisma.XOR<Prisma.Member_InformationScalarRelationFilter, Prisma.Member_InformationWhereInput>
   occupation?: Prisma.XOR<Prisma.Occupation_LNullableScalarRelationFilter, Prisma.Occupation_LWhereInput> | null
-}, "id">
+}, "MOc_MemComputerID_MOc_OccupationCode_MOc_statusDate">
 
 export type Member_OccupationOrderByWithAggregationInput = {
   MOc_MemComputerID?: Prisma.SortOrder
   MOc_MemWehvariaNo?: Prisma.SortOrderInput | Prisma.SortOrder
   MOc_OccupationCode?: Prisma.SortOrder
   MOc_statusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
   _count?: Prisma.Member_OccupationCountOrderByAggregateInput
   _avg?: Prisma.Member_OccupationAvgOrderByAggregateInput
   _max?: Prisma.Member_OccupationMaxOrderByAggregateInput
@@ -276,13 +262,11 @@ export type Member_OccupationScalarWhereWithAggregatesInput = {
   MOc_MemWehvariaNo?: Prisma.DecimalNullableWithAggregatesFilter<"Member_Occupation"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_OccupationCode?: Prisma.DecimalWithAggregatesFilter<"Member_Occupation"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   MOc_statusDate?: Prisma.DateTimeWithAggregatesFilter<"Member_Occupation"> | Date | string
-  id?: Prisma.BigIntWithAggregatesFilter<"Member_Occupation"> | bigint | number
 }
 
 export type Member_OccupationCreateInput = {
   MOc_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_statusDate: Date | string
-  id?: bigint | number
   member: Prisma.Member_InformationCreateNestedOneWithoutOccupationsInput
   occupation?: Prisma.Occupation_LCreateNestedOneWithoutMemberOccupationsInput
 }
@@ -292,13 +276,11 @@ export type Member_OccupationUncheckedCreateInput = {
   MOc_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_OccupationCode: runtime.Decimal | runtime.DecimalJsLike | number | string
   MOc_statusDate: Date | string
-  id?: bigint | number
 }
 
 export type Member_OccupationUpdateInput = {
   MOc_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_statusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   member?: Prisma.Member_InformationUpdateOneRequiredWithoutOccupationsNestedInput
   occupation?: Prisma.Occupation_LUpdateOneWithoutMemberOccupationsNestedInput
 }
@@ -308,7 +290,6 @@ export type Member_OccupationUncheckedUpdateInput = {
   MOc_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_OccupationCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MOc_statusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_OccupationCreateManyInput = {
@@ -321,7 +302,6 @@ export type Member_OccupationCreateManyInput = {
 export type Member_OccupationUpdateManyMutationInput = {
   MOc_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_statusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_OccupationUncheckedUpdateManyInput = {
@@ -329,7 +309,6 @@ export type Member_OccupationUncheckedUpdateManyInput = {
   MOc_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_OccupationCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MOc_statusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_OccupationListRelationFilter = {
@@ -342,19 +321,23 @@ export type Member_OccupationOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type Member_OccupationMOc_MemComputerIDMOc_OccupationCodeMOc_statusDateCompoundUniqueInput = {
+  MOc_MemComputerID: runtime.Decimal | runtime.DecimalJsLike | number | string
+  MOc_OccupationCode: runtime.Decimal | runtime.DecimalJsLike | number | string
+  MOc_statusDate: Date | string
+}
+
 export type Member_OccupationCountOrderByAggregateInput = {
   MOc_MemComputerID?: Prisma.SortOrder
   MOc_MemWehvariaNo?: Prisma.SortOrder
   MOc_OccupationCode?: Prisma.SortOrder
   MOc_statusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_OccupationAvgOrderByAggregateInput = {
   MOc_MemComputerID?: Prisma.SortOrder
   MOc_MemWehvariaNo?: Prisma.SortOrder
   MOc_OccupationCode?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_OccupationMaxOrderByAggregateInput = {
@@ -362,7 +345,6 @@ export type Member_OccupationMaxOrderByAggregateInput = {
   MOc_MemWehvariaNo?: Prisma.SortOrder
   MOc_OccupationCode?: Prisma.SortOrder
   MOc_statusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_OccupationMinOrderByAggregateInput = {
@@ -370,14 +352,12 @@ export type Member_OccupationMinOrderByAggregateInput = {
   MOc_MemWehvariaNo?: Prisma.SortOrder
   MOc_OccupationCode?: Prisma.SortOrder
   MOc_statusDate?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_OccupationSumOrderByAggregateInput = {
   MOc_MemComputerID?: Prisma.SortOrder
   MOc_MemWehvariaNo?: Prisma.SortOrder
   MOc_OccupationCode?: Prisma.SortOrder
-  id?: Prisma.SortOrder
 }
 
 export type Member_OccupationCreateNestedManyWithoutOccupationInput = {
@@ -467,7 +447,6 @@ export type Member_OccupationUncheckedUpdateManyWithoutMemberNestedInput = {
 export type Member_OccupationCreateWithoutOccupationInput = {
   MOc_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_statusDate: Date | string
-  id?: bigint | number
   member: Prisma.Member_InformationCreateNestedOneWithoutOccupationsInput
 }
 
@@ -475,7 +454,6 @@ export type Member_OccupationUncheckedCreateWithoutOccupationInput = {
   MOc_MemComputerID: runtime.Decimal | runtime.DecimalJsLike | number | string
   MOc_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_statusDate: Date | string
-  id?: bigint | number
 }
 
 export type Member_OccupationCreateOrConnectWithoutOccupationInput = {
@@ -511,13 +489,11 @@ export type Member_OccupationScalarWhereInput = {
   MOc_MemWehvariaNo?: Prisma.DecimalNullableFilter<"Member_Occupation"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_OccupationCode?: Prisma.DecimalFilter<"Member_Occupation"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   MOc_statusDate?: Prisma.DateTimeFilter<"Member_Occupation"> | Date | string
-  id?: Prisma.BigIntFilter<"Member_Occupation"> | bigint | number
 }
 
 export type Member_OccupationCreateWithoutMemberInput = {
   MOc_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_statusDate: Date | string
-  id?: bigint | number
   occupation?: Prisma.Occupation_LCreateNestedOneWithoutMemberOccupationsInput
 }
 
@@ -525,7 +501,6 @@ export type Member_OccupationUncheckedCreateWithoutMemberInput = {
   MOc_MemWehvariaNo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_OccupationCode: runtime.Decimal | runtime.DecimalJsLike | number | string
   MOc_statusDate: Date | string
-  id?: bigint | number
 }
 
 export type Member_OccupationCreateOrConnectWithoutMemberInput = {
@@ -562,7 +537,6 @@ export type Member_OccupationCreateManyOccupationInput = {
 export type Member_OccupationUpdateWithoutOccupationInput = {
   MOc_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_statusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   member?: Prisma.Member_InformationUpdateOneRequiredWithoutOccupationsNestedInput
 }
 
@@ -570,14 +544,12 @@ export type Member_OccupationUncheckedUpdateWithoutOccupationInput = {
   MOc_MemComputerID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MOc_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_statusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_OccupationUncheckedUpdateManyWithoutOccupationInput = {
   MOc_MemComputerID?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MOc_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_statusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_OccupationCreateManyMemberInput = {
@@ -589,7 +561,6 @@ export type Member_OccupationCreateManyMemberInput = {
 export type Member_OccupationUpdateWithoutMemberInput = {
   MOc_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_statusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   occupation?: Prisma.Occupation_LUpdateOneWithoutMemberOccupationsNestedInput
 }
 
@@ -597,14 +568,12 @@ export type Member_OccupationUncheckedUpdateWithoutMemberInput = {
   MOc_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_OccupationCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MOc_statusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 export type Member_OccupationUncheckedUpdateManyWithoutMemberInput = {
   MOc_MemWehvariaNo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   MOc_OccupationCode?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   MOc_statusDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
 }
 
 
@@ -614,7 +583,6 @@ export type Member_OccupationSelect<ExtArgs extends runtime.Types.Extensions.Int
   MOc_MemWehvariaNo?: boolean
   MOc_OccupationCode?: boolean
   MOc_statusDate?: boolean
-  id?: boolean
   member?: boolean | Prisma.Member_InformationDefaultArgs<ExtArgs>
   occupation?: boolean | Prisma.Member_Occupation$occupationArgs<ExtArgs>
 }, ExtArgs["result"]["member_Occupation"]>
@@ -626,10 +594,9 @@ export type Member_OccupationSelectScalar = {
   MOc_MemWehvariaNo?: boolean
   MOc_OccupationCode?: boolean
   MOc_statusDate?: boolean
-  id?: boolean
 }
 
-export type Member_OccupationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"MOc_MemComputerID" | "MOc_MemWehvariaNo" | "MOc_OccupationCode" | "MOc_statusDate" | "id", ExtArgs["result"]["member_Occupation"]>
+export type Member_OccupationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"MOc_MemComputerID" | "MOc_MemWehvariaNo" | "MOc_OccupationCode" | "MOc_statusDate", ExtArgs["result"]["member_Occupation"]>
 export type Member_OccupationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   member?: boolean | Prisma.Member_InformationDefaultArgs<ExtArgs>
   occupation?: boolean | Prisma.Member_Occupation$occupationArgs<ExtArgs>
@@ -646,7 +613,6 @@ export type $Member_OccupationPayload<ExtArgs extends runtime.Types.Extensions.I
     MOc_MemWehvariaNo: runtime.Decimal | null
     MOc_OccupationCode: runtime.Decimal
     MOc_statusDate: Date
-    id: bigint
   }, ExtArgs["result"]["member_Occupation"]>
   composites: {}
 }
@@ -1022,7 +988,6 @@ export interface Member_OccupationFieldRefs {
   readonly MOc_MemWehvariaNo: Prisma.FieldRef<"Member_Occupation", 'Decimal'>
   readonly MOc_OccupationCode: Prisma.FieldRef<"Member_Occupation", 'Decimal'>
   readonly MOc_statusDate: Prisma.FieldRef<"Member_Occupation", 'DateTime'>
-  readonly id: Prisma.FieldRef<"Member_Occupation", 'BigInt'>
 }
     
 

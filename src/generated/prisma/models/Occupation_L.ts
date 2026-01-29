@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model Occupation_L
- * The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+ * 
  */
 export type Occupation_LModel = runtime.Types.Result.DefaultSelection<Prisma.$Occupation_LPayload>
 

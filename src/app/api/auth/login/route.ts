@@ -46,14 +46,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user has admin role
-    if (user.role !== 'ADMIN') {
-      return NextResponse.json(
-        { message: 'Unauthorized access' },
-        { status: 403 }
-      );
-    }
-
     // Create JWT token
     const token = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
