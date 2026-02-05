@@ -6,16 +6,30 @@ import { ZodError } from "zod";
 /**
  * Helper function to transform form data from database format to API format
  * Parses JSON strings for options and validationRule back into objects
+ * IMPORTANT: Also includes pdfFileName and pdfFileUrl from the form
  */
 function transformFormData(form: any) {
+  console.log("Transforming form data:", form);
   return {
     ...form,
+    // Keep the PDF file fields at the form level
+    pdfFileName: form.pdfFileName,
+    pdfFileUrl: form.pdfFileUrl,
     fields: form.fields.map((field: any) => ({
       ...field,
       options: field.options ? JSON.parse(field.options) : null,
       validationRule: field.validationRule ? JSON.parse(field.validationRule) : null,
     })),
   };
+}
+
+/**
+ * Helper to ensure a value is stringified if it's not already a string
+ */
+function ensureString(value: any): string | null {
+  if (value === null || value === undefined) return null;
+  if (typeof value === 'string') return value;
+  return JSON.stringify(value);
 }
 
 /**
@@ -65,7 +79,7 @@ export async function GET(req: NextRequest) {
       prisma.form.count({ where }),
     ]);
 
-    // Transform forms to parse JSON strings
+    // Transform forms to parse JSON strings and include PDF fields
     const transformedForms = forms.map(transformFormData);
 
     const response = Schemas.GetFormsResponse.parse({
@@ -119,6 +133,8 @@ export async function POST(req: NextRequest) {
         formType: validatedData.formType,
         version: validatedData.version,
         isActive: true,
+        pdfFileUrl: validatedData.pdfFileUrl || null,
+        pdfFileName: validatedData.pdfFileName || null,
         fields: {
           create: validatedData.fields.map((field) => ({
             fieldName: field.fieldName,
@@ -130,10 +146,9 @@ export async function POST(req: NextRequest) {
             placeholder: field.placeholder,
             helpText: field.helpText,
             defaultValue: field.defaultValue,
-            options: field.options ? JSON.stringify(field.options) : null,
-            validationRule: field.validationRule
-              ? JSON.stringify(field.validationRule)
-              : null,
+            // Ensure options and validationRule are always strings in DB
+            options: ensureString(field.options),
+            validationRule: ensureString(field.validationRule),
             columnWidth: field.columnWidth,
           })),
         },
@@ -145,7 +160,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Transform form to parse JSON strings
+    // Transform form to parse JSON strings and include PDF fields
     const transformedForm = transformFormData(form);
 
     const response = Schemas.CreateFormResponse.parse({

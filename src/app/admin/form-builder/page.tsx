@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Eye, Download, X, GripVertical, Save, Edit, Copy, AlertCircle, CheckCircle2, FileText, Clock, Users, Settings, ArrowLeft, Loader, Search, Filter } from 'lucide-react';
+import { Plus, Trash2, Eye, Download, X, GripVertical, Save, Edit, Copy, AlertCircle, CheckCircle2, FileText, Clock, Users, Settings, ArrowLeft, Loader, Search, Filter, Upload, FileUp, ExternalLink, FilePlus } from 'lucide-react';
 import type { IForm, IFormField } from '@/types/forms';
 import DynamicForm from '@/components/form/DynamicForm';
 
@@ -13,10 +13,18 @@ interface Field {
   isRequired: boolean;
   placeholder?: string;
   helpText?: string;
-  options?: { value: string; label: string }[];
-  validationRule?: { minLength?: number; maxLength?: number };
+  options?: { value: string; label: string }[] | string;
+  validationRule?: { minLength?: number; maxLength?: number } | string;
   columnWidth?: 'full' | 'half' | 'third';
   fieldOrder?: number;
+}
+
+interface PdfFile {
+  originalName: string;
+  fileName: string;
+  url: string;
+  size: number;
+  uploadedAt: string;
 }
 
 interface FormData {
@@ -28,6 +36,7 @@ interface FormData {
   createdAt?: string;
   updatedAt?: string;
   version?: number;
+  pdfFile?: PdfFile;
 }
 
 export default function FormBuilder() {
@@ -43,7 +52,8 @@ export default function FormBuilder() {
     name: '',
     description: '',
     formType: '',
-    fields: [] as Field[]
+    fields: [] as Field[],
+    pdfFile: undefined as PdfFile | undefined
   });
   const [currentField, setCurrentField] = useState<Partial<Field>>({
     columnWidth: 'full',
@@ -54,6 +64,8 @@ export default function FormBuilder() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [templates, setTemplates] = useState<IForm[]>([]);
+  const [isUploadingPdf, setIsUploadingPdf] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState('');
 
   // Fetch all forms on component mount
   useEffect(() => {
@@ -153,6 +165,83 @@ export default function FormBuilder() {
     };
   };
 
+  const handlePdfUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      showNotification('error', 'Please upload a PDF file');
+      return;
+    }
+
+    setIsUploadingPdf(true);
+    setUploadedFileName(file.name);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/forms/upload-pdf', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || 'Failed to process PDF');
+      }
+
+      // Populate form with extracted data
+      setFormConfig({
+        name: result.data.formName,
+        description: result.data.description,
+        formType: result.data.formType,
+        fields: result.data.fields,
+        pdfFile: result.data.pdfFile
+      });
+
+      setShowTemplateSelection(false);
+      setShowBuilder(true);
+      showNotification('success', `PDF processed successfully! ${result.data.fields.length} fields extracted.`);
+    } catch (error: any) {
+      console.error('PDF upload error:', error);
+      showNotification('error', error.message || 'Failed to process PDF');
+    } finally {
+      setIsUploadingPdf(false);
+      // Reset file input
+      event.target.value = '';
+    }
+  };
+
+  const downloadFormPdf = async (formId: string) => {
+    try {
+      showNotification('success', 'Generating PDF...');
+      
+      const res = await fetch(`/api/forms/generate-pdf/${formId}`);
+      
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Failed to generate PDF');
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `form_${formId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      showNotification('success', 'PDF downloaded successfully');
+    } catch (error: any) {
+      console.error('PDF download error:', error);
+      showNotification('error', error.message || 'Failed to download PDF');
+    }
+  };
+
   const addOrUpdateField = () => {
     if (!currentField.fieldName || !currentField.fieldLabel || !currentField.fieldType) {
       showNotification('error', 'Field name, label, and type are required');
@@ -226,10 +315,17 @@ export default function FormBuilder() {
         formType: formConfig.formType,
         fields: formConfig.fields.map(field => ({
           ...field,
-          options: field.options ? JSON.stringify(field.options) : null,
-          validationRule: field.validationRule ? JSON.stringify(field.validationRule) : null
+          // Only stringify if not already a string (handles PDF upload case)
+          options: field.options 
+            ? (typeof field.options === 'string' ? field.options : JSON.stringify(field.options))
+            : null,
+          validationRule: field.validationRule 
+            ? (typeof field.validationRule === 'string' ? field.validationRule : JSON.stringify(field.validationRule))
+            : null
         })),
-        version: 1
+        version: 1,
+        pdfFileUrl: formConfig.pdfFile?.url,
+        pdfFileName: formConfig.pdfFile?.originalName
       };
 
       const res = await fetch('/api/forms', {
@@ -276,10 +372,11 @@ export default function FormBuilder() {
   };
 
   const resetForm = () => {
-    setFormConfig({ name: '', description: '', formType: '', fields: [] });
+    setFormConfig({ name: '', description: '', formType: '', fields: [], pdfFile: undefined });
     setShowBuilder(false);
     setCurrentField({ columnWidth: 'full', isRequired: false });
     setEditingFieldIndex(null);
+    setUploadedFileName('');
   };
 
   const loadTemplate = (template: IForm) => {
@@ -290,6 +387,7 @@ export default function FormBuilder() {
       description: template.description || '',
       formType: template.formType,
       fields: parsedFields,
+      pdfFile: undefined
     });
     
     setShowTemplateSelection(false);
@@ -299,7 +397,7 @@ export default function FormBuilder() {
   };
 
   const startFromScratch = () => {
-    setFormConfig({ name: '', description: '', formType: '', fields: [] });
+    setFormConfig({ name: '', description: '', formType: '', fields: [], pdfFile: undefined });
     setShowTemplateSelection(false);
     setShowBuilder(true);
     setCurrentField({ columnWidth: 'full', isRequired: false });
@@ -402,15 +500,51 @@ export default function FormBuilder() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-slate-900 mb-2">Choose Your Starting Point</h2>
-                <p className="text-slate-600">Select a template or start from scratch</p>
+                <p className="text-slate-600">Select a template, upload a PDF, or start from scratch</p>
               </div>
               <button onClick={() => setShowTemplateSelection(false)} className="p-2 hover:bg-slate-100 rounded-lg">
                 <X className="w-6 h-6" />
               </button>
             </div>
 
+            {/* PDF Upload Section */}
+            <div className="mb-8 p-6 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border-2 border-amber-200">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Upload className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">Upload PDF Form</h3>
+                  <p className="text-sm text-slate-600 mb-4">
+                    Upload an existing PDF form and we'll automatically extract fields. The PDF will be saved and attached to your form.
+                  </p>
+                  <label className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold cursor-pointer transition-all">
+                    <FileUp className="w-5 h-5" />
+                    {isUploadingPdf ? 'Processing...' : 'Choose PDF File'}
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      onChange={handlePdfUpload}
+                      disabled={isUploadingPdf}
+                      className="hidden"
+                    />
+                  </label>
+                  {isUploadingPdf && (
+                    <div className="mt-3 flex items-center gap-2 text-sm text-amber-700">
+                      <Loader className="w-4 h-4 animate-spin" />
+                      <span>Processing {uploadedFileName}...</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Templates Section */}
             {templates.length > 0 && (
               <>
+                <div className="mb-4">
+                  <h3 className="text-lg font-bold text-slate-900">Or Choose a Template</h3>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                   {templates.map((template) => (
                     <div
@@ -454,7 +588,7 @@ export default function FormBuilder() {
               </>
             )}
 
-            {templates.length === 0 && (
+            {templates.length === 0 && !isUploadingPdf && (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <FileText className="w-8 h-8 text-slate-400" />
@@ -476,7 +610,25 @@ export default function FormBuilder() {
         {showBuilder && (
           <div className="bg-white rounded-2xl shadow-xl border-2 border-slate-200 p-8 mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-slate-900">Build Your Form</h2>
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">Build Your Form</h2>
+                {formConfig.pdfFile && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <FilePlus className="w-4 h-4 text-amber-600" />
+                    <p className="text-sm text-slate-600">
+                      Source PDF: <span className="font-semibold">{formConfig.pdfFile.originalName}</span>
+                    </p>
+                    <a
+                      href={formConfig.pdfFile.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#038DCD] hover:underline flex items-center gap-1 text-sm"
+                    >
+                      <ExternalLink className="w-3 h-3" /> View
+                    </a>
+                  </div>
+                )}
+              </div>
               <button
                 onClick={resetForm}
                 className="flex items-center gap-2 px-4 py-2 hover:bg-slate-100 rounded-lg transition-colors"
@@ -485,6 +637,31 @@ export default function FormBuilder() {
               </button>
             </div>
 
+            {/* Uploaded PDF Info Card */}
+            {formConfig.pdfFile && (
+              <div className="mb-6 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-bold text-slate-900">{formConfig.pdfFile.originalName}</p>
+                    <p className="text-xs text-slate-600">
+                      {(formConfig.pdfFile.size / 1024).toFixed(2)} KB • Uploaded {new Date(formConfig.pdfFile.uploadedAt).toLocaleString()}
+                    </p>
+                  </div>
+                  <a
+                    href={formConfig.pdfFile.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold flex items-center gap-2 transition-colors"
+                  >
+                    <ExternalLink className="w-4 h-4" /> View PDF
+                  </a>
+                </div>
+              </div>
+            )}
+            
             {/* Form Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 bg-slate-50 rounded-xl border-2 border-slate-200">
               <div>
@@ -732,7 +909,7 @@ export default function FormBuilder() {
           </div>
         )}
 
-        {/* Search and Filter */}
+        {/* Forms Grid */}
         {!showBuilder && !showTemplateSelection && (
           <>
             {/* Stats Cards */}
@@ -818,6 +995,25 @@ export default function FormBuilder() {
                     </div>
                   </div>
                   
+                  {/* PDF indicator if form has source PDF */}
+                  {form.pdfFile && (
+                    <div className="mb-3 p-2 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2">
+                      <FilePlus className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                      <span className="text-xs text-slate-600 truncate">
+                        Source: {form.pdfFile.originalName}
+                      </span>
+                      <a
+                        href={form.pdfFile.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-auto text-amber-600 hover:text-amber-700"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
+                  
                   <div className="space-y-2 mb-4 pb-4 border-b border-slate-200">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold text-slate-500">Type:</span>
@@ -845,9 +1041,16 @@ export default function FormBuilder() {
                       <Eye className="w-4 h-4" /> Preview
                     </button>
                     <button
+                      onClick={() => downloadFormPdf(form.id)}
+                      className="px-3 py-2 bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors"
+                      title="Download PDF"
+                    >
+                      <Download className="w-4 h-4" />
+                    </button>
+                    <button
                       onClick={() => exportForm(form.id)}
                       className="px-3 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors"
-                      title="Export form"
+                      title="Export JSON"
                     >
                       <Download className="w-4 h-4" />
                     </button>

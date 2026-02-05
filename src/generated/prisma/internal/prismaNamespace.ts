@@ -5981,6 +5981,8 @@ export const FormScalarFieldEnum = {
   formType: 'formType',
   version: 'version',
   isActive: 'isActive',
+  pdfFileUrl: 'pdfFileUrl',
+  pdfFileName: 'pdfFileName',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

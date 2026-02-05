@@ -39,6 +39,7 @@ export type FormFieldValidationRule = z.infer<
   typeof FormFieldValidationRuleSchema
 >;
 
+// Modified schema to accept either array/object OR string (for PDF uploads)
 export const CreateFormFieldSchema = z.object({
   fieldName: z
     .string()
@@ -52,8 +53,18 @@ export const CreateFormFieldSchema = z.object({
   placeholder: z.string().optional().nullable(),
   helpText: z.string().optional().nullable(),
   defaultValue: z.string().optional().nullable(),
-  validationRule: FormFieldValidationRuleSchema.optional().nullable(),
-  options: z.array(FormFieldOptionSchema).optional().nullable(),
+  // Accept both object and string for validationRule
+  validationRule: z.union([
+    FormFieldValidationRuleSchema,
+    z.string(),
+    z.null()
+  ]).optional().nullable(),
+  // Accept both array and string for options
+  options: z.union([
+    z.array(FormFieldOptionSchema),
+    z.string(),
+    z.null()
+  ]).optional().nullable(),
   columnWidth: z.enum(["full", "half", "third"]).default("full"),
 });
 
@@ -119,6 +130,9 @@ export const CreateFormSchema = z.object({
     .max(100, "Form type must be less than 100 characters"),
   version: z.number().int().min(1).default(1),
   fields: z.array(CreateFormFieldSchema).min(1, "At least one field required"),
+  // Add optional PDF file fields
+  pdfFileUrl: z.string().optional().nullable(),
+  pdfFileName: z.string().optional().nullable(),
 });
 
 export type CreateForm = z.infer<typeof CreateFormSchema>;
@@ -142,6 +156,8 @@ export const FormSchema = z.object({
   formType: z.string(),
   version: z.number(),
   isActive: z.boolean(),
+  pdfFileName: z.string(),      // ← ADD THIS
+  pdfFileUrl: z.string(),       // ← ADD THIS
   createdAt: z.date(),
   updatedAt: z.date(),
   fields: z.array(FormFieldSchema),
@@ -161,9 +177,14 @@ export const FormWithParsedFieldsSchema = z.object({
   formType: z.string(),
   version: z.number(),
   isActive: z.boolean(),
+  pdfFileName: z.string(),      // ← ADD THIS
+  pdfFileUrl: z.string(),       // ← ADD THIS
   createdAt: z.date(),
   updatedAt: z.date(),
   fields: z.array(FormFieldWithParsedDataSchema),
+  _count: z.object({            // ← ADD THIS (optional, for the submission count)
+    submissions: z.number(),
+  }).optional(),
 });
 
 export type FormWithParsedFields = z.infer<typeof FormWithParsedFieldsSchema>;

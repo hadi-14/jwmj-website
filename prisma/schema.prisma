@@ -1005,6 +1005,10 @@ model Form {
   formType          String   @db.NVarChar(100)
   version           Int      @default(1)
   isActive          Boolean  @default(true)
+  
+  pdfFileUrl        String   @db.NVarChar(500)
+  pdfFileName       String   @db.NVarChar(255)
+  
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   
@@ -1014,7 +1018,6 @@ model Form {
   @@index([formType])
   @@index([isActive])
 }
-
 model FormField {
   id                String   @id @default(cuid())
   formId            String

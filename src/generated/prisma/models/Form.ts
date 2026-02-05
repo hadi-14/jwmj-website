@@ -41,6 +41,8 @@ export type FormMinAggregateOutputType = {
   formType: string | null
   version: number | null
   isActive: boolean | null
+  pdfFileUrl: string | null
+  pdfFileName: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -52,6 +54,8 @@ export type FormMaxAggregateOutputType = {
   formType: string | null
   version: number | null
   isActive: boolean | null
+  pdfFileUrl: string | null
+  pdfFileName: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -63,6 +67,8 @@ export type FormCountAggregateOutputType = {
   formType: number
   version: number
   isActive: number
+  pdfFileUrl: number
+  pdfFileName: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -84,6 +90,8 @@ export type FormMinAggregateInputType = {
   formType?: true
   version?: true
   isActive?: true
+  pdfFileUrl?: true
+  pdfFileName?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -95,6 +103,8 @@ export type FormMaxAggregateInputType = {
   formType?: true
   version?: true
   isActive?: true
+  pdfFileUrl?: true
+  pdfFileName?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -106,6 +116,8 @@ export type FormCountAggregateInputType = {
   formType?: true
   version?: true
   isActive?: true
+  pdfFileUrl?: true
+  pdfFileName?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -204,6 +216,8 @@ export type FormGroupByOutputType = {
   formType: string
   version: number
   isActive: boolean
+  pdfFileUrl: string
+  pdfFileName: string
   createdAt: Date
   updatedAt: Date
   _count: FormCountAggregateOutputType | null
@@ -238,6 +252,8 @@ export type FormWhereInput = {
   formType?: Prisma.StringFilter<"Form"> | string
   version?: Prisma.IntFilter<"Form"> | number
   isActive?: Prisma.BoolFilter<"Form"> | boolean
+  pdfFileUrl?: Prisma.StringFilter<"Form"> | string
+  pdfFileName?: Prisma.StringFilter<"Form"> | string
   createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   fields?: Prisma.FormFieldListRelationFilter
@@ -251,6 +267,8 @@ export type FormOrderByWithRelationInput = {
   formType?: Prisma.SortOrder
   version?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  pdfFileUrl?: Prisma.SortOrder
+  pdfFileName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   fields?: Prisma.FormFieldOrderByRelationAggregateInput
@@ -267,6 +285,8 @@ export type FormWhereUniqueInput = Prisma.AtLeast<{
   formType?: Prisma.StringFilter<"Form"> | string
   version?: Prisma.IntFilter<"Form"> | number
   isActive?: Prisma.BoolFilter<"Form"> | boolean
+  pdfFileUrl?: Prisma.StringFilter<"Form"> | string
+  pdfFileName?: Prisma.StringFilter<"Form"> | string
   createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   fields?: Prisma.FormFieldListRelationFilter
@@ -280,6 +300,8 @@ export type FormOrderByWithAggregationInput = {
   formType?: Prisma.SortOrder
   version?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  pdfFileUrl?: Prisma.SortOrder
+  pdfFileName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.FormCountOrderByAggregateInput
@@ -299,6 +321,8 @@ export type FormScalarWhereWithAggregatesInput = {
   formType?: Prisma.StringWithAggregatesFilter<"Form"> | string
   version?: Prisma.IntWithAggregatesFilter<"Form"> | number
   isActive?: Prisma.BoolWithAggregatesFilter<"Form"> | boolean
+  pdfFileUrl?: Prisma.StringWithAggregatesFilter<"Form"> | string
+  pdfFileName?: Prisma.StringWithAggregatesFilter<"Form"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Form"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Form"> | Date | string
 }
@@ -310,6 +334,8 @@ export type FormCreateInput = {
   formType: string
   version?: number
   isActive?: boolean
+  pdfFileUrl: string
+  pdfFileName: string
   createdAt?: Date | string
   updatedAt?: Date | string
   fields?: Prisma.FormFieldCreateNestedManyWithoutFormInput
@@ -323,6 +349,8 @@ export type FormUncheckedCreateInput = {
   formType: string
   version?: number
   isActive?: boolean
+  pdfFileUrl: string
+  pdfFileName: string
   createdAt?: Date | string
   updatedAt?: Date | string
   fields?: Prisma.FormFieldUncheckedCreateNestedManyWithoutFormInput
@@ -336,6 +364,8 @@ export type FormUpdateInput = {
   formType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pdfFileUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  pdfFileName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
@@ -349,6 +379,8 @@ export type FormUncheckedUpdateInput = {
   formType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pdfFileUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  pdfFileName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
@@ -362,6 +394,8 @@ export type FormCreateManyInput = {
   formType: string
   version?: number
   isActive?: boolean
+  pdfFileUrl: string
+  pdfFileName: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -373,6 +407,8 @@ export type FormUpdateManyMutationInput = {
   formType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pdfFileUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  pdfFileName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -384,6 +420,8 @@ export type FormUncheckedUpdateManyInput = {
   formType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pdfFileUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  pdfFileName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -395,6 +433,8 @@ export type FormCountOrderByAggregateInput = {
   formType?: Prisma.SortOrder
   version?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  pdfFileUrl?: Prisma.SortOrder
+  pdfFileName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -410,6 +450,8 @@ export type FormMaxOrderByAggregateInput = {
   formType?: Prisma.SortOrder
   version?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  pdfFileUrl?: Prisma.SortOrder
+  pdfFileName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -421,6 +463,8 @@ export type FormMinOrderByAggregateInput = {
   formType?: Prisma.SortOrder
   version?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  pdfFileUrl?: Prisma.SortOrder
+  pdfFileName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -469,6 +513,8 @@ export type FormCreateWithoutFieldsInput = {
   formType: string
   version?: number
   isActive?: boolean
+  pdfFileUrl: string
+  pdfFileName: string
   createdAt?: Date | string
   updatedAt?: Date | string
   submissions?: Prisma.FormSubmissionCreateNestedManyWithoutFormInput
@@ -481,6 +527,8 @@ export type FormUncheckedCreateWithoutFieldsInput = {
   formType: string
   version?: number
   isActive?: boolean
+  pdfFileUrl: string
+  pdfFileName: string
   createdAt?: Date | string
   updatedAt?: Date | string
   submissions?: Prisma.FormSubmissionUncheckedCreateNestedManyWithoutFormInput
@@ -509,6 +557,8 @@ export type FormUpdateWithoutFieldsInput = {
   formType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pdfFileUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  pdfFileName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submissions?: Prisma.FormSubmissionUpdateManyWithoutFormNestedInput
@@ -521,6 +571,8 @@ export type FormUncheckedUpdateWithoutFieldsInput = {
   formType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pdfFileUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  pdfFileName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submissions?: Prisma.FormSubmissionUncheckedUpdateManyWithoutFormNestedInput
@@ -533,6 +585,8 @@ export type FormCreateWithoutSubmissionsInput = {
   formType: string
   version?: number
   isActive?: boolean
+  pdfFileUrl: string
+  pdfFileName: string
   createdAt?: Date | string
   updatedAt?: Date | string
   fields?: Prisma.FormFieldCreateNestedManyWithoutFormInput
@@ -545,6 +599,8 @@ export type FormUncheckedCreateWithoutSubmissionsInput = {
   formType: string
   version?: number
   isActive?: boolean
+  pdfFileUrl: string
+  pdfFileName: string
   createdAt?: Date | string
   updatedAt?: Date | string
   fields?: Prisma.FormFieldUncheckedCreateNestedManyWithoutFormInput
@@ -573,6 +629,8 @@ export type FormUpdateWithoutSubmissionsInput = {
   formType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pdfFileUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  pdfFileName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
@@ -585,6 +643,8 @@ export type FormUncheckedUpdateWithoutSubmissionsInput = {
   formType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pdfFileUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  pdfFileName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
@@ -637,6 +697,8 @@ export type FormSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   formType?: boolean
   version?: boolean
   isActive?: boolean
+  pdfFileUrl?: boolean
+  pdfFileName?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
@@ -653,11 +715,13 @@ export type FormSelectScalar = {
   formType?: boolean
   version?: boolean
   isActive?: boolean
+  pdfFileUrl?: boolean
+  pdfFileName?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "formType" | "version" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["form"]>
+export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "formType" | "version" | "isActive" | "pdfFileUrl" | "pdfFileName" | "createdAt" | "updatedAt", ExtArgs["result"]["form"]>
 export type FormInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
   submissions?: boolean | Prisma.Form$submissionsArgs<ExtArgs>
@@ -677,6 +741,8 @@ export type $FormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     formType: string
     version: number
     isActive: boolean
+    pdfFileUrl: string
+    pdfFileName: string
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["form"]>
@@ -1056,6 +1122,8 @@ export interface FormFieldRefs {
   readonly formType: Prisma.FieldRef<"Form", 'String'>
   readonly version: Prisma.FieldRef<"Form", 'Int'>
   readonly isActive: Prisma.FieldRef<"Form", 'Boolean'>
+  readonly pdfFileUrl: Prisma.FieldRef<"Form", 'String'>
+  readonly pdfFileName: Prisma.FieldRef<"Form", 'String'>
   readonly createdAt: Prisma.FieldRef<"Form", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Form", 'DateTime'>
 }

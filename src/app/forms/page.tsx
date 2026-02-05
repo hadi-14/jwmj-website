@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FileText, ChevronRight, Loader, Search, Filter, CheckCircle, Clock, AlertCircle, Calendar, Users, TrendingUp } from 'lucide-react';
+import { FileText, ChevronRight, Loader, Search, Filter, CheckCircle, Clock, AlertCircle, Calendar, Users, TrendingUp, Download, LogIn, FileDown, ArrowRight, Sparkles, Lock, Unlock, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
 interface FormData {
@@ -13,6 +13,8 @@ interface FormData {
     isActive: boolean;
     createdAt?: string;
     updatedAt?: string;
+    pdfFileUrl?: string;
+    pdfFileName?: string;
 }
 
 export default function FormsPage() {
@@ -22,14 +24,26 @@ export default function FormsPage() {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
     useEffect(() => {
         fetchForms();
+        checkAuthStatus();
     }, []);
 
     useEffect(() => {
         filterForms();
     }, [searchTerm, selectedCategory, forms]);
+
+    const checkAuthStatus = async () => {
+        try {
+            const response = await fetch('/api/member');
+            setIsAuthenticated(response.ok);
+        } catch (error) {
+            setIsAuthenticated(false);
+        }
+    };
 
     const fetchForms = async () => {
         try {
@@ -37,6 +51,13 @@ export default function FormsPage() {
             const response = await res.json();
 
             if (response.success && response.data) {
+                console.log('📋 Forms received:', response.data);
+                console.log('📄 PDF check:', response.data.map((f: FormData) => ({
+                    name: f.name,
+                    hasPdfUrl: !!f.pdfFileUrl,
+                    pdfFileUrl: f.pdfFileUrl,
+                    pdfFileName: f.pdfFileName
+                })));
                 setForms(response.data);
                 setFilteredForms(response.data);
             } else {
@@ -53,7 +74,6 @@ export default function FormsPage() {
     const filterForms = () => {
         let filtered = forms;
 
-        // Filter by search term
         if (searchTerm) {
             filtered = filtered.filter(form =>
                 form.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -62,7 +82,6 @@ export default function FormsPage() {
             );
         }
 
-        // Filter by category
         if (selectedCategory !== 'all') {
             filtered = filtered.filter(form => form.formType === selectedCategory);
         }
@@ -71,7 +90,6 @@ export default function FormsPage() {
     };
 
     const getFormIcon = (formType: string) => {
-        // You can customize icons based on form type
         return FileText;
     };
 
@@ -81,6 +99,8 @@ export default function FormsPage() {
             'membership': 'from-blue-500 to-blue-600',
             'donation': 'from-amber-500 to-amber-600',
             'welfare': 'from-purple-500 to-purple-600',
+            'business_loan': 'from-orange-500 to-red-500',
+            'widow_female': 'from-pink-500 to-rose-500',
             'default': 'from-[#038DCD] to-[#0369A1]'
         };
         return colors[formType] || colors['default'];
@@ -105,16 +125,61 @@ export default function FormsPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-amber-50/20">
             {/* Header Section */}
-            <div className="bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white relative overflow-hidden">
+                {/* Decorative background elements */}
+                <div className="absolute inset-0 overflow-hidden">
+                    <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+                    <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+                </div>
+                
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
                     <div className="text-center">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl mb-4">
-                            <FileText className="w-8 h-8" />
+                        <div className="inline-flex items-center justify-center w-20 h-20 bg-white/10 backdrop-blur-sm rounded-3xl mb-6 shadow-lg">
+                            <FileText className="w-10 h-10" />
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-bold mb-4">Available Forms</h1>
-                        <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-                            Complete the forms below to submit your applications or information to JWMJ
+                        <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">
+                            Available Forms
+                        </h1>
+                        <p className="text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
+                            Submit your applications online or download PDF forms for offline completion
                         </p>
+                        
+                        {/* Auth Status Banner */}
+                        {!isAuthenticated && (
+                            <div className="mt-8 max-w-2xl mx-auto">
+                                <div className="bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl p-6">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div className="flex items-center gap-3 flex-1">
+                                            <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                                                <Lock className="w-6 h-6 text-amber-300" />
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="font-bold text-white text-lg">Submit Forms Online</p>
+                                                <p className="text-blue-100 text-sm">Login to submit forms digitally and track your applications</p>
+                                            </div>
+                                        </div>
+                                        <Link
+                                            href="/member"
+                                            className="px-6 py-3 bg-white hover:bg-blue-50 text-[#038DCD] rounded-xl font-bold transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 whitespace-nowrap"
+                                        >
+                                            <LogIn className="w-4 h-4" />
+                                            Login
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {isAuthenticated && (
+                            <div className="mt-8 max-w-2xl mx-auto">
+                                <div className="bg-emerald-500/20 backdrop-blur-md border-2 border-emerald-400/30 rounded-2xl p-4">
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Unlock className="w-5 h-5 text-emerald-300" />
+                                        <p className="font-bold text-white">You're logged in - Submit forms online instantly!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -135,11 +200,11 @@ export default function FormsPage() {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                    <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                         <div className="flex items-start justify-between">
                             <div className="flex-1">
                                 <p className="text-slate-600 font-medium mb-2">Total Forms</p>
-                                <p className="text-3xl font-bold text-[#038DCD]">{forms.length}</p>
+                                <p className="text-4xl font-bold text-[#038DCD]">{forms.length}</p>
                             </div>
                             <div className="p-3 bg-blue-50 rounded-xl">
                                 <FileText className="w-6 h-6 text-[#038DCD]" />
@@ -147,11 +212,11 @@ export default function FormsPage() {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                         <div className="flex items-start justify-between">
                             <div className="flex-1">
                                 <p className="text-slate-600 font-medium mb-2">Categories</p>
-                                <p className="text-3xl font-bold text-emerald-600">{categories.length - 1}</p>
+                                <p className="text-4xl font-bold text-emerald-600">{categories.length - 1}</p>
                             </div>
                             <div className="p-3 bg-emerald-50 rounded-xl">
                                 <Filter className="w-6 h-6 text-emerald-600" />
@@ -159,14 +224,17 @@ export default function FormsPage() {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                         <div className="flex items-start justify-between">
                             <div className="flex-1">
-                                <p className="text-slate-600 font-medium mb-2">Active Status</p>
-                                <p className="text-3xl font-bold text-amber-600">Live</p>
+                                <p className="text-slate-600 font-medium mb-2">PDF Forms</p>
+                                <p className="text-4xl font-bold text-amber-600">
+                                    {forms.filter(f => f.pdfFileUrl).length}
+                                </p>
+                                <p className="text-xs text-slate-500 mt-1">Available for download</p>
                             </div>
                             <div className="p-3 bg-amber-50 rounded-xl">
-                                <CheckCircle className="w-6 h-6 text-amber-600" />
+                                <Download className="w-6 h-6 text-amber-600" />
                             </div>
                         </div>
                     </div>
@@ -247,71 +315,124 @@ export default function FormsPage() {
                         {filteredForms.map((form) => {
                             const FormIcon = getFormIcon(form.formType);
                             const colorGradient = getFormColor(form.formType);
+                            const hasPDF = !!form.pdfFileUrl;
+                            
+                            // Debug log for each form
+                            console.log(`Form: ${form.name}, hasPDF: ${hasPDF}, pdfFileUrl: ${form.pdfFileUrl}`);
                             
                             return (
-                                <Link href={`/forms/${form.formType}`} key={form.id}>
-                                    <div className="bg-white rounded-2xl shadow-sm border-2 border-slate-200 hover:shadow-xl hover:border-[#038DCD] transition-all duration-300 hover:-translate-y-1 cursor-pointer group overflow-hidden h-full flex flex-col">
-                                        {/* Card Header with Gradient */}
-                                        <div className={`bg-gradient-to-r ${colorGradient} p-6 relative overflow-hidden`}>
-                                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-                                            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
-                                            
-                                            <div className="relative flex items-start justify-between">
-                                                <div className="flex-1">
-                                                    <div className="inline-flex items-center justify-center w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl mb-3">
-                                                        <FormIcon className="w-6 h-6 text-white" />
-                                                    </div>
-                                                    <h2 className="text-xl font-bold text-white mb-2 line-clamp-2">
-                                                        {form.name}
-                                                    </h2>
-                                                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full">
-                                                        <span className="text-xs font-semibold text-white">
-                                                            {form.formType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                <div key={form.id} className="bg-white rounded-2xl shadow-sm border-2 border-slate-200 hover:shadow-2xl hover:border-[#038DCD] transition-all duration-300 hover:-translate-y-1 overflow-hidden group">
+                                    {/* Card Header with Gradient */}
+                                    <div className={`bg-gradient-to-r ${colorGradient} p-6 relative overflow-hidden`}>
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
+                                        
+                                        <div className="relative">
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div className="inline-flex items-center justify-center w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl">
+                                                    <FormIcon className="w-7 h-7 text-white" />
+                                                </div>
+                                                {hasPDF && (
+                                                    <div className="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg">
+                                                        <span className="text-xs font-bold text-white flex items-center gap-1">
+                                                            <FileDown className="w-3 h-3" /> PDF Available
                                                         </span>
                                                     </div>
-                                                </div>
-                                                <div className="p-2 bg-white/20 backdrop-blur-sm rounded-full group-hover:bg-white/30 transition-colors">
-                                                    <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
-                                                </div>
+                                                )}
                                             </div>
-                                        </div>
-
-                                        {/* Card Body */}
-                                        <div className="p-6 flex-1 flex flex-col">
-                                            <p className="text-slate-600 mb-4 line-clamp-3 flex-1">
-                                                {form.description || 'Complete this form to submit your information.'}
-                                            </p>
-
-                                            {/* Form Meta Info */}
-                                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                                                        <FileText className="w-4 h-4 text-[#038DCD]" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-xs text-slate-500 font-medium">Fields</p>
-                                                        <p className="text-sm font-bold text-slate-900">{form.fields.length}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
-                                                        <CheckCircle className="w-4 h-4 text-emerald-600" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-xs text-slate-500 font-medium">Status</p>
-                                                        <p className="text-sm font-bold text-emerald-600">Active</p>
-                                                    </div>
-                                                </div>
+                                            
+                                            <h2 className="text-2xl font-bold text-white mb-2 line-clamp-2">
+                                                {form.name}
+                                            </h2>
+                                            
+                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full">
+                                                <span className="text-xs font-semibold text-white">
+                                                    {form.formType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                </span>
                                             </div>
-
-                                            {/* CTA Button */}
-                                            <button className="mt-4 w-full py-3 bg-slate-50 hover:bg-[#038DCD] text-slate-700 hover:text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-lg">
-                                                Start Application
-                                                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                            </button>
                                         </div>
                                     </div>
-                                </Link>
+
+                                    {/* Card Body */}
+                                    <div className="p-6">
+                                        <p className="text-slate-600 mb-6 line-clamp-3 min-h-[4.5rem]">
+                                            {form.description || 'Complete this form to submit your information to JWMJ.'}
+                                        </p>
+
+                                        {/* Form Meta Info */}
+                                        <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-slate-200">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                                                    <FileText className="w-5 h-5 text-[#038DCD]" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-slate-500 font-medium">Total Fields</p>
+                                                    <p className="text-sm font-bold text-slate-900">{form.fields.length}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center">
+                                                    <CheckCircle className="w-5 h-5 text-emerald-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-slate-500 font-medium">Status</p>
+                                                    <p className="text-sm font-bold text-emerald-600">Active</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="space-y-3">
+                                            {/* Online Submission Button */}
+                                            {isAuthenticated ? (
+                                                <Link href={`/forms/${form.formType}`}>
+                                                    <button className="w-full py-3 bg-gradient-to-r from-[#038DCD] to-[#0369A1] hover:from-[#0369A1] hover:to-[#038DCD] text-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
+                                                        <Sparkles className="w-5 h-5" />
+                                                        Submit Online
+                                                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                                    </button>
+                                                </Link>
+                                            ) : (
+                                                <button
+                                                    onClick={() => setShowLoginPrompt(true)}
+                                                    className="w-full py-3 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                                                >
+                                                    <Lock className="w-4 h-4" />
+                                                    Login to Submit Online
+                                                </button>
+                                            )}
+
+                                            {/* PDF Download/View Button */}
+                                            {hasPDF ? (
+                                                <a
+                                                    href={form.pdfFileUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="w-full py-3 bg-white border-2 border-amber-300 hover:border-amber-400 hover:bg-amber-50 text-amber-700 hover:text-amber-800 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2"
+                                                >
+                                                    <Download className="w-4 h-4" />
+                                                    Download PDF Template
+                                                    <ExternalLink className="w-4 h-4" />
+                                                </a>
+                                            ) : (
+                                                <div className="w-full py-3 bg-slate-100 text-slate-400 rounded-xl font-bold flex items-center justify-center gap-2 cursor-not-allowed">
+                                                    <AlertCircle className="w-4 h-4" />
+                                                    No PDF Template Available
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Additional info */}
+                                        {hasPDF && (
+                                            <div className="mt-4 pt-4 border-t border-slate-200">
+                                                <p className="text-xs text-slate-500 flex items-center gap-2">
+                                                    <FileText className="w-3 h-3" />
+                                                    <span className="font-medium">Source:</span> {form.pdfFileName || 'PDF Template'}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             );
                         })}
                     </div>
@@ -331,7 +452,7 @@ export default function FormsPage() {
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <Link
                                 href="/contact"
-                                className="px-6 py-3 bg-[#038DCD] hover:bg-[#0369A1] text-white rounded-xl font-semibold transition-all duration-200 hover:scale-105 inline-flex items-center justify-center gap-2"
+                                className="px-6 py-3 bg-[#038DCD] hover:bg-[#0369A1] text-white rounded-xl font-semibold transition-all duration-200 hover:scale-105 inline-flex items-center justify-center gap-2 shadow-lg"
                             >
                                 Contact Support
                                 <ChevronRight className="w-4 h-4" />
@@ -346,6 +467,47 @@ export default function FormsPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Login Prompt Modal */}
+            {showLoginPrompt && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate-in zoom-in-95 duration-300">
+                        <div className="text-center mb-6">
+                            <div className="w-16 h-16 bg-gradient-to-br from-[#038DCD] to-[#0369A1] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                                <LogIn className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-2">Login Required</h3>
+                            <p className="text-slate-600">
+                                Please login to your member account to submit forms online and track your applications.
+                            </p>
+                        </div>
+
+                        <div className="space-y-3">
+                            <Link
+                                href="/member"
+                                className="block w-full py-3 bg-gradient-to-r from-[#038DCD] to-[#0369A1] hover:from-[#0369A1] hover:to-[#038DCD] text-white rounded-xl font-bold transition-all duration-200 text-center shadow-lg hover:shadow-xl"
+                            >
+                                Go to Login
+                            </Link>
+                            <button
+                                onClick={() => setShowLoginPrompt(false)}
+                                className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition-all duration-200"
+                            >
+                                Maybe Later
+                            </button>
+                        </div>
+
+                        <div className="mt-6 pt-6 border-t border-slate-200 text-center">
+                            <p className="text-sm text-slate-600">
+                                Don't have an account?{' '}
+                                <Link href="/member" className="text-[#038DCD] hover:text-[#0369A1] font-semibold">
+                                    Register here
+                                </Link>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -69,7 +69,7 @@ export async function GET(
 
 /**
  * PUT /api/forms/[formId]
- * Update form
+ * Update form - PDF fields remain mandatory
  */
 export async function PUT(
   req: NextRequest,
@@ -82,6 +82,17 @@ export async function PUT(
     // Validate request body
     const validatedData = Schemas.UpdateForm.parse(body);
 
+    // Check if trying to remove PDF fields
+    if (validatedData.pdfFileUrl === '' || validatedData.pdfFileName === '') {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: "PDF file is mandatory for all forms" 
+        },
+        { status: 400 }
+      );
+    }
+
     const form = await prisma.form.update({
       where: { id: formId },
       data: {
@@ -92,6 +103,8 @@ export async function PUT(
         ...(validatedData.isActive !== undefined && {
           isActive: validatedData.isActive,
         }),
+        ...(validatedData.pdfFileUrl && { pdfFileUrl: validatedData.pdfFileUrl }),
+        ...(validatedData.pdfFileName && { pdfFileName: validatedData.pdfFileName }),
         version: { increment: 1 },
       },
     });
@@ -99,12 +112,12 @@ export async function PUT(
     // Update fields if provided
     if (validatedData.fields) {
       await prisma.formField.deleteMany({
-        where: { formId: params.formId },
+        where: { formId: formId },
       });
 
       await prisma.formField.createMany({
         data: validatedData.fields.map((field) => ({
-          formId: params.formId,
+          formId: formId,
           fieldName: field.fieldName,
           fieldLabel: field.fieldLabel,
           fieldType: field.fieldType,
@@ -124,7 +137,7 @@ export async function PUT(
     }
 
     const updatedForm = await prisma.form.findUnique({
-      where: { id: params.formId },
+      where: { id: formId },
       include: {
         fields: { orderBy: { fieldOrder: "asc" } },
       },
