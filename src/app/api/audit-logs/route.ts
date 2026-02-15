@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: { submissionId?: string; action?: string } = {};
     if (submissionId) where.submissionId = submissionId;
     if (action) where.action = action;
 
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
         pages: Math.ceil(total / limit)
       }
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { success: false, error: 'Failed to fetch audit logs' },
       { status: 500 }

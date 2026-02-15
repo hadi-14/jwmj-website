@@ -4,6 +4,7 @@ import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const PDFExtract = require('pdf.js-extract').PDFExtract;
 const pdfExtract = new PDFExtract();
 
@@ -85,21 +86,21 @@ function extractFormFields(rawText: string, fileName: string): ExtractedForm {
   // -----------------------------------------------------------------------
   // 1.  Detect form type first – drives which fields we expect
   // -----------------------------------------------------------------------
-  const isWidowForm   = /\(WF\)/i.test(fileName) || lowerText.includes('بیوہ');
-  const isZakatForm   = /\(Z\)/i.test(fileName)  || lowerText.includes('زکوٰۃ') || lowerText.includes('زوکہ');
-  const isLoanForm    = /loan/i.test(fileName)   || lowerText.includes('قرض') || lowerText.includes('رمق');
+  const isWidowForm = /\(WF\)/i.test(fileName) || lowerText.includes('بیوہ');
+  const isZakatForm = /\(Z\)/i.test(fileName) || lowerText.includes('زکوٰۃ') || lowerText.includes('زوکہ');
+  const isLoanForm = /loan/i.test(fileName) || lowerText.includes('قرض') || lowerText.includes('رمق');
 
   if (isWidowForm) {
-    formType  = 'widow_female';
-    formName  = 'Widow Female Application Form';
+    formType = 'widow_female';
+    formName = 'Widow Female Application Form';
     description = 'بیوہ خواتین کی درخواست فارم / Widow Female Application Form';
   } else if (isZakatForm) {
-    formType  = 'zakat_application';
-    formName  = 'Zakat Application Form';
+    formType = 'zakat_application';
+    formName = 'Zakat Application Form';
     description = 'زکوٰۃ کی درخواست فارم / Zakat Application Form';
   } else if (isLoanForm) {
-    formType  = 'business_loan';
-    formName  = 'Business Loan Application Form';
+    formType = 'business_loan';
+    formName = 'Business Loan Application Form';
     description = 'کاروباری قرضہ درخواست فارم / Business Loan Application Form';
   }
 
@@ -287,10 +288,10 @@ function extractFormFields(rawText: string, fileName: string): ExtractedForm {
       isRequired: true,
       columnWidth: 'half',
       options: [
-        { value: 'married',   label: 'Married / شادی شدہ' },
+        { value: 'married', label: 'Married / شادی شدہ' },
         { value: 'unmarried', label: 'Unmarried / غیر شادی شدہ' },
-        { value: 'widow',     label: 'Widow / بیوہ' },
-        { value: 'divorced',  label: 'Divorced / مطلقہ' }
+        { value: 'widow', label: 'Widow / بیوہ' },
+        { value: 'divorced', label: 'Divorced / مطلقہ' }
       ]
     });
 
@@ -333,7 +334,7 @@ function extractFormFields(rawText: string, fileName: string): ExtractedForm {
       columnWidth: 'half',
       options: [
         { value: 'yes', label: 'Yes / ہاں' },
-        { value: 'no',  label: 'No / نہیں' }
+        { value: 'no', label: 'No / نہیں' }
       ]
     });
 
@@ -392,18 +393,18 @@ function extractFormFields(rawText: string, fileName: string): ExtractedForm {
   // -----------------------------------------------------------------------
   if (isWidowForm || isZakatForm) {
     const questions: { key: string; en: string; ur: string }[] = [
-      { key: 'q1_hasProperty',        en: 'Do you have any property?',                                            ur: 'کیا آپ کے پاس کوئی جائیداد ہے؟' },
-      { key: 'q2_hasLand',            en: 'Do you have any land?',                                                ur: 'کیا آپ کے پاس زمین موجود ہے؟' },
-      { key: 'q3_hasCashSavings',     en: 'Do you have cash savings (in Pakistani Rupees or foreign currency)?',  ur: 'کیا آپ کے پاس نقد رقم (روپے یا غیر ملکی کرنسی) موجود ہے؟' },
-      { key: 'q4_hasCertificates',    en: 'Do you have any certificates / savings bonds?',                        ur: 'کیا آپ کے پاس سرٹیفیکیٹ موجود ہے؟' },
-      { key: 'q5_hasIncome',          en: 'Do you have any source of income beyond your basic needs?',            ur: 'کیا آپ کے کام سے آیت وہں رضورت سے زائد؟' },
-      { key: 'q6_hasJob',             en: 'Do you currently have a job or business?',                              ur: 'کیا آپ کوئی کام یا اجارت کر رہے ہیں؟' },
-      { key: 'q6_1_selfEmployed',     en: 'If yes, do you have your own assets for it?',                           ur: 'اگر ہاں تو آپ کے اپنے ذاتی اسامہیر کے ہیں؟' },
-      { key: 'q7_receivedLoan',       en: 'Have you ever received a loan? If yes, have you repaid it?',           ur: 'کیا آپ نے کسی کو قرض دیا ہے اور کیا آپ نے قرض واپس کر دیا ہے؟' },
-      { key: 'q8_joinedCommittee',    en: 'Have you ever joined a committee (کمیٹی) or any group scheme?',        ur: 'کیا آپ نے کہیں کمیٹی یا کسی گروہی سکیم میں شامل کیا ہے؟' },
-      { key: 'q8_1_committeeAmount',  en: 'If yes, how much did you receive from the committee?',                 ur: 'اگر ہاں تو کتنی رقم مل کر ادارکی؟' },
-      { key: 'q9_repaidLoan',         en: 'Have you ever repaid a loan taken from someone?',                      ur: 'کیا آپ نے کسی سے قرض لے کر واپس کر دیا ہے؟' },
-      { key: 'q10_hasAssets',         en: 'Do you have any other assets?',                                        ur: 'کیا آپ نے کہیں رسامہیا اگلی وہا ہے؟' }
+      { key: 'q1_hasProperty', en: 'Do you have any property?', ur: 'کیا آپ کے پاس کوئی جائیداد ہے؟' },
+      { key: 'q2_hasLand', en: 'Do you have any land?', ur: 'کیا آپ کے پاس زمین موجود ہے؟' },
+      { key: 'q3_hasCashSavings', en: 'Do you have cash savings (in Pakistani Rupees or foreign currency)?', ur: 'کیا آپ کے پاس نقد رقم (روپے یا غیر ملکی کرنسی) موجود ہے؟' },
+      { key: 'q4_hasCertificates', en: 'Do you have any certificates / savings bonds?', ur: 'کیا آپ کے پاس سرٹیفیکیٹ موجود ہے؟' },
+      { key: 'q5_hasIncome', en: 'Do you have any source of income beyond your basic needs?', ur: 'کیا آپ کے کام سے آیت وہں رضورت سے زائد؟' },
+      { key: 'q6_hasJob', en: 'Do you currently have a job or business?', ur: 'کیا آپ کوئی کام یا اجارت کر رہے ہیں؟' },
+      { key: 'q6_1_selfEmployed', en: 'If yes, do you have your own assets for it?', ur: 'اگر ہاں تو آپ کے اپنے ذاتی اسامہیر کے ہیں؟' },
+      { key: 'q7_receivedLoan', en: 'Have you ever received a loan? If yes, have you repaid it?', ur: 'کیا آپ نے کسی کو قرض دیا ہے اور کیا آپ نے قرض واپس کر دیا ہے؟' },
+      { key: 'q8_joinedCommittee', en: 'Have you ever joined a committee (کمیٹی) or any group scheme?', ur: 'کیا آپ نے کہیں کمیٹی یا کسی گروہی سکیم میں شامل کیا ہے؟' },
+      { key: 'q8_1_committeeAmount', en: 'If yes, how much did you receive from the committee?', ur: 'اگر ہاں تو کتنی رقم مل کر ادارکی؟' },
+      { key: 'q9_repaidLoan', en: 'Have you ever repaid a loan taken from someone?', ur: 'کیا آپ نے کسی سے قرض لے کر واپس کر دیا ہے؟' },
+      { key: 'q10_hasAssets', en: 'Do you have any other assets?', ur: 'کیا آپ نے کہیں رسامہیا اگلی وہا ہے؟' }
     ];
 
     questions.forEach(q => {
@@ -415,7 +416,7 @@ function extractFormFields(rawText: string, fileName: string): ExtractedForm {
         columnWidth: 'full',
         options: [
           { value: 'yes', label: 'Yes / ہاں' },
-          { value: 'no',  label: 'No / نہیں' }
+          { value: 'no', label: 'No / نہیں' }
         ]
       });
     });
@@ -434,7 +435,7 @@ function extractFormFields(rawText: string, fileName: string): ExtractedForm {
       columnWidth: 'full',
       options: [
         { value: 'confirmed', label: 'Confirmed / تصدیق شدہ' },
-        { value: 'declined',  label: 'Declined / رد' }
+        { value: 'declined', label: 'Declined / رد' }
       ]
     });
 
@@ -481,7 +482,7 @@ function extractFormFields(rawText: string, fileName: string): ExtractedForm {
       isRequired: true,
       columnWidth: 'half',
       options: [
-        { value: 'male',   label: 'Male / مرد' },
+        { value: 'male', label: 'Male / مرد' },
         { value: 'female', label: 'Female / عورت' }
       ]
     });
@@ -494,10 +495,10 @@ function extractFormFields(rawText: string, fileName: string): ExtractedForm {
       isRequired: true,
       columnWidth: 'half',
       options: [
-        { value: 'married',   label: 'Married / شادی شدہ' },
+        { value: 'married', label: 'Married / شادی شدہ' },
         { value: 'unmarried', label: 'Unmarried / غیر شادی شدہ' },
-        { value: 'widow',     label: 'Widow / بیوہ' },
-        { value: 'divorced',  label: 'Divorced / مطلقہ' }
+        { value: 'widow', label: 'Widow / بیوہ' },
+        { value: 'divorced', label: 'Divorced / مطلقہ' }
       ]
     });
 
@@ -539,8 +540,8 @@ function extractFormFields(rawText: string, fileName: string): ExtractedForm {
       isRequired: true,
       columnWidth: 'half',
       options: [
-        { value: 'existing',  label: 'Existing Business / موجودہ کاروبار' },
-        { value: 'new',       label: 'New Business / نیا کاروبار' },
+        { value: 'existing', label: 'Existing Business / موجودہ کاروبار' },
+        { value: 'new', label: 'New Business / نیا کاروبار' },
         { value: 'expansion', label: 'Business Expansion / کاروبار کی توسیع' }
       ]
     });
@@ -593,9 +594,9 @@ function extractFormFields(rawText: string, fileName: string): ExtractedForm {
       isRequired: true,
       columnWidth: 'half',
       options: [
-        { value: 'none',     label: 'No Previous Loans / کوئی پچھلا قرض نہیں' },
-        { value: 'repaid',   label: 'Previously Repaid / پہلے واپس کر دیا' },
-        { value: 'ongoing',  label: 'Ongoing Loan / جاری قرض' }
+        { value: 'none', label: 'No Previous Loans / کوئی پچھلا قرض نہیں' },
+        { value: 'repaid', label: 'Previously Repaid / پہلے واپس کر دیا' },
+        { value: 'ongoing', label: 'Ongoing Loan / جاری قرض' }
       ]
     });
 
@@ -637,7 +638,7 @@ function extractFormFields(rawText: string, fileName: string): ExtractedForm {
       isRequired: true,
       columnWidth: 'half',
       options: [
-        { value: '6',  label: '6 Months / 6 مہینے' },
+        { value: '6', label: '6 Months / 6 مہینے' },
         { value: '12', label: '12 Months / 12 مہینے' },
         { value: '24', label: '24 Months / 24 مہینے' },
         { value: '36', label: '36 Months / 36 مہینے' }
@@ -708,7 +709,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const bytes  = await file.arrayBuffer();
+    const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
     // Save to disk
@@ -717,19 +718,22 @@ export async function POST(request: NextRequest) {
       await mkdir(uploadDir, { recursive: true });
     }
 
-    const timestamp        = Date.now();
-    const sanitizedName    = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-    const uniqueFileName   = `${timestamp}_${sanitizedName}`;
-    const filePath         = join(uploadDir, uniqueFileName);
+    const timestamp = Date.now();
+    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+    const uniqueFileName = `${timestamp}_${sanitizedName}`;
+    const filePath = join(uploadDir, uniqueFileName);
     await writeFile(filePath, buffer);
 
     // Extract raw text via pdf.js-extract
     let extractedText = '';
     try {
       const data = await pdfExtract.extractBuffer(buffer);
+      interface PDFContent { str: string }
+      interface PDFPage { content: PDFContent[] }
+
       extractedText = data.pages
-        .map((page: any) =>
-          page.content.map((item: any) => item.str).join(' ')
+        .map((page: PDFPage) =>
+          page.content.map((item: PDFContent) => item.str).join(' ')
         )
         .join('\n');
     } catch (parseError) {
@@ -756,18 +760,19 @@ export async function POST(request: NextRequest) {
         extractedText: extractedText.substring(0, 500),
         pdfFile: {
           originalName: file.name,
-          fileName:     uniqueFileName,
-          url:          pdfUrl,
-          size:         file.size,
-          uploadedAt:   new Date().toISOString()
+          fileName: uniqueFileName,
+          url: pdfUrl,
+          size: file.size,
+          uploadedAt: new Date().toISOString()
         }
       }
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('PDF upload error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to process PDF';
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to process PDF' },
+      { success: false, error: errorMessage },
       { status: 500 }
     );
   }

@@ -5,12 +5,12 @@ import bcrypt from 'bcryptjs';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    
+
     // Pagination
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const skip = (page - 1) * limit;
-    
+
     // Filters
     const role = searchParams.get('role'); // ADMIN, USER, MEMBER
     const search = searchParams.get('search');
@@ -18,12 +18,15 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     // Build where clause
-    const where: any = {};
-    
+    const where: {
+      role?: string;
+      OR?: Array<{ name?: { contains: string }; email?: { contains: string } }>;
+    } = {};
+
     if (role) {
       where.role = role;
     }
-    
+
     if (search) {
       where.OR = [
         { name: { contains: search } },
@@ -61,7 +64,7 @@ export async function GET(request: NextRequest) {
         totalPages: Math.ceil(total / limit),
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('GET /api/users error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch users' },
@@ -121,7 +124,7 @@ export async function POST(request: NextRequest) {
       data: user,
       message: 'User created successfully',
     }, { status: 201 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('POST /api/users error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to create user' },

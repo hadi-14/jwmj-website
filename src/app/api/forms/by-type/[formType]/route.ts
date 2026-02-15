@@ -2,16 +2,16 @@ import { prisma } from "@/lib/prisma";
 import { Schemas } from "@/lib/schemas/form.schema";
 import { NextRequest, NextResponse } from "next/server";
 
-/**
- * GET /api/forms/by-type/[formType]
- * Fetch form by type
- */
+// GET /api/forms/by-type/[formType]
+// Fetch form by type
 export async function GET(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ formType: string }> }
 ) {
   try {
     const { formType } = await params;
+    // Silence unused request warning
+    void request;
 
     const form = await prisma.form.findFirst({
       where: {
@@ -35,7 +35,7 @@ export async function GET(
     // Transform fields to parse JSON strings
     const transformedForm = {
       ...form,
-      fields: form.fields.map((field: any) => ({
+      fields: form.fields.map((field) => ({
         ...field,
         options: field.options ? JSON.parse(field.options) : null,
         validationRule: field.validationRule ? JSON.parse(field.validationRule) : null,

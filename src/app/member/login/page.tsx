@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useMemberAuth } from '../layout';
+import { useMemberAuth } from '@/contexts/MemberAuthContext';
+import Image from "next/image";
 
 export default function MemberLogin() {
   const { login, isLoading } = useMemberAuth();
@@ -18,20 +19,30 @@ export default function MemberLogin() {
     try {
       await login(email, password);
       // Navigation is handled by the login function in the provider
-    } catch (err: any) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Login failed. Please check your credentials.');
+      } else {
+        setError('Login failed. Please check your credentials.');
+      }
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
-        
+
         {/* Header Section */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-6">
             <div className="w-20 h-20 bg-gradient-to-br from-[#03BDCD] to-[#F9D98F] rounded-2xl flex items-center justify-center shadow-lg mx-auto">
-              <span className="text-white font-bold text-2xl">JWMJ</span>
+              <Image
+                src="/logo.png"
+                alt="JWMJ Logo"
+                width={120}
+                height={120}
+                className="object-contain"
+              />
             </div>
           </Link>
           <h1 className="text-4xl font-bold text-gray-900 mb-2 italic">Member Portal</h1>
@@ -41,7 +52,7 @@ export default function MemberLogin() {
         {/* Login Card */}
         <div className="bg-white rounded-3xl shadow-lg border border-gray-200 p-8 mb-6">
           <form onSubmit={handleLogin} className="space-y-6">
-            
+
             {/* Error Alert */}
             {error && (
               <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
@@ -125,8 +136,8 @@ export default function MemberLogin() {
                   Remember me
                 </label>
               </div>
-              <Link 
-                href="/member/forgot-password" 
+              <Link
+                href="/member/forgot-password"
                 className="text-sm font-bold text-[#038DCD] hover:text-[#038DCD]/80 transition-colors"
               >
                 Forgot password?
@@ -166,8 +177,8 @@ export default function MemberLogin() {
 
         {/* Back to Home */}
         <div className="text-center">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="inline-flex items-center gap-2 text-gray-600 hover:text-[#038DCD] font-semibold transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

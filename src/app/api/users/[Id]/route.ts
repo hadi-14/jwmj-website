@@ -4,11 +4,10 @@ import bcrypt from 'bcryptjs';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
-
+    const { id } = await params;
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
@@ -32,7 +31,7 @@ export async function GET(
       success: true,
       data: user,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('GET /api/users/[id] error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch user' },
@@ -43,10 +42,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { email, name, password, role } = body;
 
@@ -67,7 +66,6 @@ export async function PUT(
       const emailTaken = await prisma.user.findUnique({
         where: { email },
       });
-
       if (emailTaken) {
         return NextResponse.json(
           { success: false, error: 'Email already in use' },
@@ -77,7 +75,12 @@ export async function PUT(
     }
 
     // Build update data
-    const updateData: any = {};
+    const updateData: {
+      email?: string;
+      name?: string;
+      role?: string;
+      password?: string;
+    } = {};
     if (email) updateData.email = email;
     if (name !== undefined) updateData.name = name;
     if (role) updateData.role = role;
@@ -104,10 +107,10 @@ export async function PUT(
       data: user,
       message: 'User updated successfully',
     });
-  } catch (error) {
-    console.error('PUT /api/users/[id] error:', error);
+  } catch (error: unknown) {
+    console.error('Error updating profile:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to update user' },
+      { error: 'Failed to update user' },
       { status: 500 }
     );
   }
@@ -115,10 +118,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Check if user exists
     const user = await prisma.user.findUnique({
@@ -141,7 +144,7 @@ export async function DELETE(
       success: true,
       message: 'User deleted successfully',
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('DELETE /api/users/[id] error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to delete user' },

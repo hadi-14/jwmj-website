@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, Filter, Calendar, CheckCircle, Clock, Trash2, Eye, Download, Loader, AlertCircle, X, FileText, User, Mail, Hash, SlidersHorizontal, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Calendar, CheckCircle, Clock, Trash2, Eye, Download, AlertCircle, X, FileText, User, Mail, Hash, SlidersHorizontal, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 interface FormField {
@@ -580,8 +580,8 @@ export default function SubmissionsPage() {
                             key={pageNum}
                             onClick={() => setCurrentPage(pageNum)}
                             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${currentPage === pageNum
-                                ? 'bg-[#038DCD] text-white'
-                                : 'hover:bg-slate-100 text-slate-700'
+                              ? 'bg-[#038DCD] text-white'
+                              : 'hover:bg-slate-100 text-slate-700'
                               }`}
                           >
                             {pageNum}
@@ -721,5 +721,5 @@ export default function SubmissionsPage() {
         </div>
       )}
     </div>
-    );
+  );
 }

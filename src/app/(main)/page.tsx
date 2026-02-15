@@ -2,13 +2,13 @@
 
 import { getBusinesses } from "@/actions/business";
 import EventsHighlights from "@/components/eventsHighlights";
-import { Business } from "@/types/businessAds";
+import { BusinessAds } from "@/types/businessAds";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
 export default function Home() {
-  const [allCommunityBusinesses, setAllCommunityBusinesses] = useState<Business[]>([]);
+  const [allCommunityBusinesses, setAllCommunityBusinesses] = useState<BusinessAds[]>([]);
   const services = [
     { name: "HEALTHCARE", href: "/#" },
     { name: "EDUCATION", href: "/#" },

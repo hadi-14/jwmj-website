@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Send, CheckCircle2, AlertCircle, Info, Loader, FileText, ArrowLeft, Check, X } from 'lucide-react';
+import { Save, Send, CheckCircle2, AlertCircle, Info, Check, X } from 'lucide-react';
+import { IFormField, IForm } from '@/types/forms';
+
+type FormValue = string | number | boolean | File | null | undefined;
 
 // FormField Component
 const FormField = ({ field, value, error, onChange }: {
-  field: any;
-  value: any;
+  field: IFormField;
+  value: FormValue;
   error: string;
-  onChange: (value: any) => void;
+  onChange: (value: FormValue) => void;
 }) => {
   const getColumnWidthClass = () => {
     switch (field.columnWidth) {
@@ -17,11 +20,10 @@ const FormField = ({ field, value, error, onChange }: {
     }
   };
 
-  const baseInputClass = `w-full px-4 py-3 border-2 rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 ${
-    error 
-      ? 'border-rose-300 bg-rose-50 focus:border-rose-500 focus:ring-rose-500/10' 
-      : 'border-slate-200 bg-white hover:border-slate-300 focus:border-[#038DCD] focus:ring-[#038DCD]/10'
-  }`;
+  const baseInputClass = `w-full px-4 py-3 border-2 rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 ${error
+    ? 'border-rose-300 bg-rose-50 focus:border-rose-500 focus:ring-rose-500/10'
+    : 'border-slate-200 bg-white hover:border-slate-300 focus:border-[#038DCD] focus:ring-[#038DCD]/10'
+    }`;
 
   const labelClass = `block text-sm font-bold text-slate-700 mb-2 ${field.isRequired ? "after:content-['*'] after:ml-1 after:text-rose-500" : ''}`;
 
@@ -29,25 +31,25 @@ const FormField = ({ field, value, error, onChange }: {
   const isYesNoQuestion = () => {
     if (field.fieldType !== 'select') return false;
     try {
-      const options = typeof field.options === 'string' 
-        ? JSON.parse(field.options) 
+      const options = typeof field.options === 'string'
+        ? JSON.parse(field.options)
         : (field.options || []);
-      
+
       if (options.length !== 2) return false;
-      
-      const values = options.map((opt: any) => opt.value.toLowerCase());
+
+      const values = options.map((opt: { value: string }) => opt.value.toLowerCase());
       return (values.includes('yes') && values.includes('no')) ||
-             (values.includes('ہاں') && values.includes('نہیں'));
+        (values.includes('ہاں') && values.includes('نہیں'));
     } catch {
       return false;
     }
   };
 
   const renderYesNoToggle = () => {
-    let options: any[] = [];
+    let options: { value: string; label: string }[] = [];
     try {
-      options = typeof field.options === 'string' 
-        ? JSON.parse(field.options) 
+      options = typeof field.options === 'string'
+        ? JSON.parse(field.options)
         : (field.options || []);
     } catch {
       options = [];
@@ -58,19 +60,18 @@ const FormField = ({ field, value, error, onChange }: {
         {options.map((opt, idx) => {
           const isSelected = value === opt.value;
           const isYes = opt.value.toLowerCase() === 'yes' || opt.value === 'ہاں';
-          
+
           return (
             <button
               key={idx}
               type="button"
               onClick={() => onChange(opt.value)}
-              className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-200 border-2 ${
-                isSelected
-                  ? isYes
-                    ? 'bg-emerald-500 border-emerald-600 text-white shadow-lg shadow-emerald-500/30'
-                    : 'bg-rose-500 border-rose-600 text-white shadow-lg shadow-rose-500/30'
-                  : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'
-              }`}
+              className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-200 border-2 ${isSelected
+                ? isYes
+                  ? 'bg-emerald-500 border-emerald-600 text-white shadow-lg shadow-emerald-500/30'
+                  : 'bg-rose-500 border-rose-600 text-white shadow-lg shadow-rose-500/30'
+                : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                }`}
             >
               <div className="flex items-center justify-center gap-2">
                 {isSelected && (isYes ? <Check className="w-5 h-5" /> : <X className="w-5 h-5" />)}
@@ -93,7 +94,7 @@ const FormField = ({ field, value, error, onChange }: {
       case 'textarea':
         return (
           <textarea
-            value={value}
+            value={value as string | number | readonly string[] | undefined}
             onChange={(e) => onChange(e.target.value)}
             placeholder={field.placeholder || ''}
             className={`${baseInputClass} min-h-[120px] resize-y`}
@@ -102,17 +103,17 @@ const FormField = ({ field, value, error, onChange }: {
         );
 
       case 'select':
-        let options: any[] = [];
+        let options: { value: string; label: string }[] = [];
         try {
-          options = typeof field.options === 'string' 
-            ? JSON.parse(field.options) 
+          options = typeof field.options === 'string'
+            ? JSON.parse(field.options)
             : (field.options || []);
-        } catch (e) {
+        } catch {
           options = [];
         }
         return (
           <select
-            value={value}
+            value={value as string | number | readonly string[] | undefined}
             onChange={(e) => onChange(e.target.value)}
             className={`${baseInputClass} cursor-pointer`}
           >
@@ -149,7 +150,7 @@ const FormField = ({ field, value, error, onChange }: {
         return (
           <input
             type="number"
-            value={value}
+            value={value as string | number | readonly string[] | undefined}
             onChange={(e) => onChange(e.target.value)}
             placeholder={field.placeholder || ''}
             className={baseInputClass}
@@ -160,7 +161,7 @@ const FormField = ({ field, value, error, onChange }: {
         return (
           <input
             type="date"
-            value={value}
+            value={value as string | number | readonly string[] | undefined}
             onChange={(e) => onChange(e.target.value)}
             className={baseInputClass}
           />
@@ -170,7 +171,7 @@ const FormField = ({ field, value, error, onChange }: {
         return (
           <input
             type="email"
-            value={value}
+            value={value as string | number | readonly string[] | undefined}
             onChange={(e) => onChange(e.target.value)}
             placeholder={field.placeholder || 'example@email.com'}
             className={baseInputClass}
@@ -192,7 +193,7 @@ const FormField = ({ field, value, error, onChange }: {
         return (
           <input
             type="text"
-            value={value}
+            value={value as string | number | readonly string[] | undefined}
             onChange={(e) => onChange(e.target.value)}
             placeholder={field.placeholder || ''}
             className={baseInputClass}
@@ -208,9 +209,9 @@ const FormField = ({ field, value, error, onChange }: {
           {field.fieldLabel}
         </label>
       )}
-      
+
       {renderField()}
-      
+
       {error && (
         <div className="mt-2 p-2 bg-rose-50 rounded-lg border border-rose-200">
           <p className="text-sm text-rose-700 flex items-center gap-1.5">
@@ -219,7 +220,7 @@ const FormField = ({ field, value, error, onChange }: {
           </p>
         </div>
       )}
-      
+
       {!error && field.helpText && field.fieldType !== 'checkbox' && (
         <p className="mt-2 text-xs text-slate-500 flex items-start gap-1">
           <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
@@ -232,8 +233,8 @@ const FormField = ({ field, value, error, onChange }: {
 
 // Main DynamicForm Component
 export default function DynamicForm({ formId, formType }: { formId?: string; formType?: string }) {
-  const [form, setForm] = useState<any>(null);
-  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [form, setForm] = useState<IForm | null>(null);
+  const [formData, setFormData] = useState<Record<string, FormValue>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -241,42 +242,42 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
   const [submitError, setSubmitError] = useState('');
 
   useEffect(() => {
+    const fetchForm = async () => {
+      try {
+        setIsLoading(true);
+        const endpoint = formId ? `/api/forms/${formId}` : `/api/forms/by-type/${formType}`;
+        const res = await fetch(endpoint);
+        if (!res.ok) throw new Error('Failed to fetch form');
+        const response = await res.json();
+        const formData = response.data || response;
+        setForm(formData);
+        initializeFormData(formData.fields);
+      } catch {
+        setSubmitError('Failed to load form');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     if (formId || formType) {
       fetchForm();
     }
   }, [formId, formType]);
 
-  const fetchForm = async () => {
-    try {
-      setIsLoading(true);
-      const endpoint = formId ? `/api/forms/${formId}` : `/api/forms/by-type/${formType}`;
-      const res = await fetch(endpoint);
-      if (!res.ok) throw new Error('Failed to fetch form');
-      const response = await res.json();
-      const formData = response.data || response;
-      setForm(formData);
-      initializeFormData(formData.fields);
-    } catch (error) {
-      setSubmitError('Failed to load form');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const initializeFormData = (fields: any[]) => {
-    const initial: Record<string, any> = {};
+  const initializeFormData = (fields: IFormField[]) => {
+    const initial: Record<string, FormValue> = {};
     fields.forEach(field => {
       initial[field.fieldName] = '';
     });
     setFormData(initial);
   };
 
-  const handleInputChange = (fieldName: string, value: any) => {
+  const handleInputChange = (fieldName: string, value: FormValue) => {
     setFormData(prev => ({
       ...prev,
       [fieldName]: value
     }));
-    
+
     if (errors[fieldName]) {
       setErrors(prev => ({
         ...prev,
@@ -287,8 +288,8 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
-    form?.fields.forEach((field: any) => {
+
+    form?.fields.forEach((field: IFormField) => {
       if (field.isRequired && !formData[field.fieldName]) {
         newErrors[field.fieldName] = `${field.fieldLabel} is required`;
       }
@@ -296,7 +297,7 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
       // Email validation
       if (field.fieldType === 'email' && formData[field.fieldName]) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(formData[field.fieldName])) {
+        if (!emailRegex.test(String(formData[field.fieldName]))) {
           newErrors[field.fieldName] = 'Invalid email format';
         }
       }
@@ -307,23 +308,24 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
           const rule = typeof field.validationRule === 'string'
             ? JSON.parse(field.validationRule)
             : field.validationRule;
-          if (rule.minLength && formData[field.fieldName].length < rule.minLength) {
+          const valueStr = String(formData[field.fieldName] || '');
+          if (rule.minLength && valueStr.length < rule.minLength) {
             newErrors[field.fieldName] = `Minimum ${rule.minLength} characters required`;
           }
-          if (rule.maxLength && formData[field.fieldName].length > rule.maxLength) {
+          if (rule.maxLength && valueStr.length > rule.maxLength) {
             newErrors[field.fieldName] = `Maximum ${rule.maxLength} characters allowed`;
           }
         } catch { }
       }
     });
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    
+
     if (!validateForm()) {
       setSubmitError('براہ کرم تمام ضروری فیلڈز پُر کریں / Please fill all required fields');
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -347,13 +349,15 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
 
       if (!res.ok) throw new Error('Failed to submit form');
 
-      const result = await res.json();
+      if (!res.ok) throw new Error('Failed to submit form');
+
+      await res.json();
       setSubmitMessage('فارم کامیابی سے جمع ہو گیا! / Form submitted successfully!');
 
       setTimeout(() => {
         window.location.href = '/forms';
       }, 2000);
-    } catch (error) {
+    } catch {
       setSubmitError('Failed to submit form. Please try again.');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
@@ -365,7 +369,7 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
     setIsSubmitting(true);
     setSubmitError('');
     setSubmitMessage('');
-    
+
     try {
       const res = await fetch('/api/submissions', {
         method: 'POST',
@@ -379,9 +383,9 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
 
       if (!res.ok) throw new Error('Failed to save draft');
       setSubmitMessage('ڈرافٹ محفوظ ہو گیا / Draft saved successfully!');
-      
+
       setTimeout(() => setSubmitMessage(''), 3000);
-    } catch (error) {
+    } catch {
       setSubmitError('Failed to save draft');
     } finally {
       setIsSubmitting(false);
@@ -409,7 +413,7 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
           <AlertCircle className="w-10 h-10 text-rose-600" />
         </div>
         <p className="text-rose-600 text-xl font-bold mb-2">Form not found</p>
-        <p className="text-slate-500">The form you're looking for doesn't exist or has been removed.</p>
+        <p className="text-slate-500">The form you&apos;re looking for doesn&apos;t exist or has been removed.</p>
       </div>
     );
   }
@@ -454,7 +458,7 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
           </span>
         </div>
         <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
-          <div 
+          <div
             className="bg-gradient-to-r from-[#038DCD] to-[#0369A1] h-3 rounded-full transition-all duration-500 ease-out relative overflow-hidden"
             style={{ width: `${progress}%` }}
           >
@@ -470,8 +474,8 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
       <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm border-2 border-slate-200">
         <div className="grid grid-cols-12 gap-6">
           {form.fields
-            .sort((a: any, b: any) => a.fieldOrder - b.fieldOrder)
-            .map((field: any, index: number) => (
+            .sort((a: { fieldOrder: number }, b: { fieldOrder: number }) => a.fieldOrder - b.fieldOrder)
+            .map((field: IFormField, index: number) => (
               <div
                 key={field.id}
                 className="contents animate-in fade-in slide-in-from-bottom-4"
@@ -500,7 +504,7 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
             <Save className="w-5 h-5" />
             <span>Save Draft / ڈرافٹ محفوظ کریں</span>
           </button>
-          
+
           <button
             type="button"
             onClick={handleSubmit}

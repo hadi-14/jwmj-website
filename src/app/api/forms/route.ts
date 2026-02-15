@@ -8,14 +8,23 @@ import { ZodError } from "zod";
  * Parses JSON strings for options and validationRule back into objects
  * IMPORTANT: Also includes pdfFileName and pdfFileUrl from the form
  */
-function transformFormData(form: any) {
+interface FormWithFields {
+  pdfFileName: string | null;
+  pdfFileUrl: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fields: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
+function transformFormData(form: FormWithFields) {
   console.log("Transforming form data:", form);
   return {
     ...form,
     // Keep the PDF file fields at the form level
     pdfFileName: form.pdfFileName,
     pdfFileUrl: form.pdfFileUrl,
-    fields: form.fields.map((field: any) => ({
+    fields: form.fields.map((field) => ({
       ...field,
       options: field.options ? JSON.parse(field.options) : null,
       validationRule: field.validationRule ? JSON.parse(field.validationRule) : null,
@@ -26,7 +35,7 @@ function transformFormData(form: any) {
 /**
  * Helper to ensure a value is stringified if it's not already a string
  */
-function ensureString(value: any): string | null {
+function ensureString(value: unknown): string | null {
   if (value === null || value === undefined) return null;
   if (typeof value === 'string') return value;
   return JSON.stringify(value);
@@ -53,7 +62,7 @@ export async function GET(req: NextRequest) {
 
     const skip = (pagination.page - 1) * pagination.limit;
 
-    const where: any = {};
+    const where: { formType?: string; isActive?: boolean } = {};
     if (searchParams.has("formType")) {
       where.formType = searchParams.get("formType");
     }

@@ -1,5 +1,5 @@
 // app/api/member/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
@@ -31,7 +31,7 @@ function bufferToBase64Image(buffer: Buffer | null | undefined): string | null {
   if (!buffer || buffer.length === 0) {
     return null;
   }
-  
+
   try {
     const base64 = buffer.toString('base64');
     // Assume JPEG format - adjust if your images are different
@@ -42,7 +42,7 @@ function bufferToBase64Image(buffer: Buffer | null | undefined): string | null {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Verify authentication
     const cookieStore = await cookies();
@@ -60,14 +60,14 @@ export async function GET(request: NextRequest) {
       console.error('JWT verification failed:', jwtError);
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
-    
+
     if (payload.role !== 'MEMBER') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     // Get member computer ID from payload
-    const memberComputerId = await getMemberIdFromPayload(payload);
-    
+    const memberComputerId = await getMemberIdFromPayload(payload as { memberData?: { MemComputerID?: string | number }, email?: string });
+
     if (!memberComputerId) {
       return NextResponse.json({ error: 'Member data not found' }, { status: 404 });
     }
@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
 
     // Parallel fetch for better performance
     const [surname, gender, area, country] = await Promise.all([
-      member.MemSurNameCode 
+      member.MemSurNameCode
         ? prisma.surName_L.findUnique({ where: { SurCode: member.MemSurNameCode } })
         : Promise.resolve(null),
       member.MemGenderCode
@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Convert profile picture to base64 if available
-    const profileImage = bufferToBase64Image(member.Mem_Pic);
+    const profileImage = bufferToBase64Image(member.Mem_Pic ? Buffer.from(member.Mem_Pic) : null);
 
     // Format member data
     const memberData = {
@@ -151,35 +151,35 @@ export async function GET(request: NextRequest) {
       MemName: trimStr(member.MemName),
       MemFatherName: trimStr(member.MemFatherName),
       MemMotherName: trimStr(member.MemMotherName),
-      
+
       // Identification
       MemCNIC: toStr(member.MemCNIC),
       MemDOB: member.MemDOB?.toISOString() || null,
       MemRegistrationDate: member.MemRegistrationDate?.toISOString() || null,
       MemComputerDate: member.MemComputerDate?.toISOString() || null,
-      
+
       // Contact Information
       MemPostalAddress: trimStr(member.MemPostalAddress),
       email: member.emails[0]?.MEM_Emailid?.trim() || (typeof payload.email === 'string' ? payload.email : null),
       cellNumbers: member.cellNumbers.map(cell => toStr(cell.MCL_CellNumber)).filter(Boolean) as string[],
-      
+
       // Profile Image
       profileImage: profileImage,
       hasProfileImage: profileImage !== null,
-      
+
       // Lookup Values
       surname: trimStr(surname?.surName),
       surnameNick: trimStr(surname?.surNick),
       gender: trimStr(gender?.GndName),
       area: trimStr(area?.AreName),
       country: trimStr(country?.CtrName),
-      
+
       // Current Status Information
       maritalStatus: trimStr(member.maritalStatus[0]?.maritalStatus?.MrtName),
       occupation: trimStr(member.occupations[0]?.occupation?.OccName),
       qualification: trimStr(member.qualifications[0]?.qualification?.QuaName),
       memberStatus: trimStr(member.statuses[0]?.status?.Sts_Name),
-      
+
       // Additional Information
       remarks: trimStr(member.Remarks),
       isDeceased: member.Mem_DeceasedDate !== null,
@@ -188,7 +188,7 @@ export async function GET(request: NextRequest) {
       isDeActive: member.Mem_DeActive || false,
       deActiveDate: member.Mem_DeActive_Date?.toISOString() || null,
       deActiveDetails: trimStr(member.Mem_DeActive_Details),
-      
+
       // Flags
       deathCertificateRequired: member.Mem_Dth_Cert_Req === 1,
     };
@@ -196,7 +196,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(memberData);
   } catch (error) {
     console.error('Member info error:', error);
-    
+
     if (error instanceof Error) {
       if (error.message.includes('verification')) {
         return NextResponse.json(
@@ -204,15 +204,15 @@ export async function GET(request: NextRequest) {
           { status: 401 }
         );
       }
-      
+
       console.error('Error details:', {
         message: error.message,
         stack: error.stack,
       });
     }
-    
+
     return NextResponse.json(
-      { error: 'An error occurred while fetching member information' },
+      { error: 'An error occurred while searching members' },
       { status: 500 }
     );
   }

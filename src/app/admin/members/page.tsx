@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Users,
   Search,
@@ -62,7 +62,7 @@ export default function AdminMembersPage() {
     filterMembers();
   }, [searchQuery, statusFilter, members]);
 
-  const fetchMembers = async () => {
+  const fetchMembers = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetch('/api/users?limit=1000');
@@ -76,9 +76,9 @@ export default function AdminMembersPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const filterMembers = () => {
+  const filterMembers = useCallback(() => {
     let filtered = [...members];
 
     if (searchQuery) {
@@ -95,7 +95,7 @@ export default function AdminMembersPage() {
     }
 
     setFilteredMembers(filtered);
-  };
+  }, [members, searchQuery, statusFilter]);
 
   const showNotification = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
@@ -111,7 +111,7 @@ export default function AdminMembersPage() {
         showNotification('success', 'User deleted successfully');
         fetchMembers();
       }
-    } catch (error) {
+    } catch {
       showNotification('error', 'Failed to delete user');
     }
   };
@@ -134,13 +134,13 @@ export default function AdminMembersPage() {
 
     setIsSaving(true);
     try {
-      const url = showEditModal && selectedMember 
-        ? `/api/users/${selectedMember.id}` 
+      const url = showEditModal && selectedMember
+        ? `/api/users/${selectedMember.id}`
         : '/api/users';
-      
+
       const method = showEditModal ? 'PUT' : 'POST';
-      
-      const payload: any = {
+
+      const payload: Record<string, unknown> = {
         name: formData.name || null,
         email: formData.email,
         role: formData.role,
@@ -149,7 +149,7 @@ export default function AdminMembersPage() {
       if (formData.password) {
         payload.password = formData.password;
       }
-      
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -168,8 +168,12 @@ export default function AdminMembersPage() {
       setFormData({ name: '', email: '', password: '', role: 'MEMBER' });
       setSelectedMember(null);
       fetchMembers();
-    } catch (error: any) {
-      showNotification('error', error.message || 'Operation failed');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        showNotification('error', error.message || 'Operation failed');
+      } else {
+        showNotification('error', 'Operation failed');
+      }
     } finally {
       setIsSaving(false);
     }
@@ -254,15 +258,13 @@ export default function AdminMembersPage() {
 
       {notification && (
         <div
-          className={`p-4 rounded-xl border-2 ${
-            notification.type === 'success' ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200'
-          }`}
+          className={`p-4 rounded-xl border-2 ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200'
+            }`}
         >
           <div className="flex items-center gap-3">
             <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                notification.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'
-              }`}
+              className={`w-10 h-10 rounded-full flex items-center justify-center ${notification.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'
+                }`}
             >
               {notification.type === 'success' ? (
                 <CheckCircle className="w-6 h-6 text-white" />
@@ -271,9 +273,8 @@ export default function AdminMembersPage() {
               )}
             </div>
             <p
-              className={`font-semibold ${
-                notification.type === 'success' ? 'text-emerald-800' : 'text-rose-800'
-              }`}
+              className={`font-semibold ${notification.type === 'success' ? 'text-emerald-800' : 'text-rose-800'
+                }`}
             >
               {notification.message}
             </p>
@@ -421,13 +422,12 @@ export default function AdminMembersPage() {
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-                          member.role === 'ADMIN'
-                            ? 'bg-purple-100 text-purple-700'
-                            : member.role === 'MEMBER'
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${member.role === 'ADMIN'
+                          ? 'bg-purple-100 text-purple-700'
+                          : member.role === 'MEMBER'
                             ? 'bg-emerald-100 text-emerald-700'
                             : 'bg-blue-100 text-blue-700'
-                        }`}
+                          }`}
                       >
                         {member.role === 'ADMIN' && <Shield className="w-3.5 h-3.5" />}
                         {member.role === 'MEMBER' && <UserCheck className="w-3.5 h-3.5" />}
@@ -647,13 +647,12 @@ export default function AdminMembersPage() {
                     <p className="text-sm font-semibold text-slate-500">Role</p>
                   </div>
                   <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold ${
-                      selectedMember.role === 'ADMIN'
-                        ? 'bg-purple-100 text-purple-700'
-                        : selectedMember.role === 'MEMBER'
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold ${selectedMember.role === 'ADMIN'
+                      ? 'bg-purple-100 text-purple-700'
+                      : selectedMember.role === 'MEMBER'
                         ? 'bg-emerald-100 text-emerald-700'
                         : 'bg-blue-100 text-blue-700'
-                    }`}
+                      }`}
                   >
                     {selectedMember.role}
                   </span>

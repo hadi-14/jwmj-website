@@ -83,7 +83,7 @@ export default function FormBuilder() {
       setIsLoading(true);
       const res = await fetch('/api/forms');
       if (!res.ok) throw new Error('Failed to fetch forms');
-      
+
       const response = await res.json();
       const formsData = response.data || [];
       setForms(formsData);
@@ -110,19 +110,19 @@ export default function FormBuilder() {
 
   const filterForms = () => {
     let filtered = [...forms];
-    
+
     if (searchQuery) {
-      filtered = filtered.filter(form => 
+      filtered = filtered.filter(form =>
         form.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         form.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         form.formType.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     if (filterType !== 'all') {
       filtered = filtered.filter(form => form.formType === filterType);
     }
-    
+
     setFilteredForms(filtered);
   };
 
@@ -204,9 +204,13 @@ export default function FormBuilder() {
       setShowTemplateSelection(false);
       setShowBuilder(true);
       showNotification('success', `PDF processed successfully! ${result.data.fields.length} fields extracted.`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('PDF upload error:', error);
-      showNotification('error', error.message || 'Failed to process PDF');
+      if (error instanceof Error) {
+        showNotification('error', error.message || 'Failed to process PDF');
+      } else {
+        showNotification('error', 'Failed to process PDF');
+      }
     } finally {
       setIsUploadingPdf(false);
       // Reset file input
@@ -217,9 +221,9 @@ export default function FormBuilder() {
   const downloadFormPdf = async (formId: string) => {
     try {
       showNotification('success', 'Generating PDF...');
-      
+
       const res = await fetch(`/api/forms/generate-pdf/${formId}`);
-      
+
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || 'Failed to generate PDF');
@@ -234,11 +238,15 @@ export default function FormBuilder() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
+
       showNotification('success', 'PDF downloaded successfully');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('PDF download error:', error);
-      showNotification('error', error.message || 'Failed to download PDF');
+      if (error instanceof Error) {
+        showNotification('error', error.message || 'Failed to download PDF');
+      } else {
+        showNotification('error', 'Failed to download PDF');
+      }
     }
   };
 
@@ -250,16 +258,16 @@ export default function FormBuilder() {
 
     setFormConfig(prev => {
       const newFields = [...prev.fields];
-      
+
       if (editingFieldIndex !== null) {
         newFields[editingFieldIndex] = { ...currentField, fieldOrder: editingFieldIndex } as Field;
       } else {
         newFields.push({ ...currentField, fieldOrder: prev.fields.length } as Field);
       }
-      
+
       return { ...prev, fields: newFields };
     });
-    
+
     setCurrentField({ columnWidth: 'full', isRequired: false });
     setEditingFieldIndex(null);
     showNotification('success', editingFieldIndex !== null ? 'Field updated' : 'Field added');
@@ -287,7 +295,7 @@ export default function FormBuilder() {
     delete fieldToDuplicate.id;
     fieldToDuplicate.fieldName = `${fieldToDuplicate.fieldName}_copy`;
     fieldToDuplicate.fieldLabel = `${fieldToDuplicate.fieldLabel} (Copy)`;
-    
+
     setFormConfig(prev => ({
       ...prev,
       fields: [...prev.fields, { ...fieldToDuplicate, fieldOrder: prev.fields.length }]
@@ -316,10 +324,10 @@ export default function FormBuilder() {
         fields: formConfig.fields.map(field => ({
           ...field,
           // Only stringify if not already a string (handles PDF upload case)
-          options: field.options 
+          options: field.options
             ? (typeof field.options === 'string' ? field.options : JSON.stringify(field.options))
             : null,
-          validationRule: field.validationRule 
+          validationRule: field.validationRule
             ? (typeof field.validationRule === 'string' ? field.validationRule : JSON.stringify(field.validationRule))
             : null
         })),
@@ -343,9 +351,13 @@ export default function FormBuilder() {
       showNotification('success', 'Form created successfully!');
       resetForm();
       await fetchForms();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Save error:', error);
-      showNotification('error', error.message || 'Failed to save form');
+      if (error instanceof Error) {
+        showNotification('error', error.message || 'Failed to save form');
+      } else {
+        showNotification('error', 'Failed to save form');
+      }
     } finally {
       setIsSaving(false);
     }
@@ -389,7 +401,7 @@ export default function FormBuilder() {
       fields: parsedFields,
       pdfFile: undefined
     });
-    
+
     setShowTemplateSelection(false);
     setShowBuilder(true);
     setCurrentField({ columnWidth: 'full', isRequired: false });
@@ -426,7 +438,7 @@ export default function FormBuilder() {
       link.download = `${form.formType}_${new Date().getTime()}.json`;
       link.click();
       URL.revokeObjectURL(url);
-      
+
       showNotification('success', 'Form exported successfully');
     } catch (error) {
       showNotification('error', 'Failed to export form');
@@ -478,13 +490,11 @@ export default function FormBuilder() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Notification */}
         {notification && (
-          <div className={`mb-6 p-4 rounded-xl border-2 animate-in fade-in slide-in-from-top-4 ${
-            notification.type === 'success' ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200'
-          }`}>
+          <div className={`mb-6 p-4 rounded-xl border-2 animate-in fade-in slide-in-from-top-4 ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200'
+            }`}>
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                notification.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'
-              }`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${notification.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'
+                }`}>
                 {notification.type === 'success' ? <CheckCircle2 className="w-6 h-6 text-white" /> : <AlertCircle className="w-6 h-6 text-white" />}
               </div>
               <p className={`font-semibold ${notification.type === 'success' ? 'text-emerald-800' : 'text-rose-800'}`}>
@@ -516,7 +526,7 @@ export default function FormBuilder() {
                 <div className="flex-1">
                   <h3 className="text-lg font-bold text-slate-900 mb-2">Upload PDF Form</h3>
                   <p className="text-sm text-slate-600 mb-4">
-                    Upload an existing PDF form and we'll automatically extract fields. The PDF will be saved and attached to your form.
+                    Upload an existing PDF form and we&apos;ll automatically extract fields. The PDF will be saved and attached to your form.
                   </p>
                   <label className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold cursor-pointer transition-all">
                     <FileUp className="w-5 h-5" />
@@ -661,7 +671,7 @@ export default function FormBuilder() {
                 </div>
               </div>
             )}
-            
+
             {/* Form Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 bg-slate-50 rounded-xl border-2 border-slate-200">
               <div>
@@ -739,7 +749,7 @@ export default function FormBuilder() {
                     </label>
                     <select
                       value={currentField.fieldType || ''}
-                      onChange={(e) => setCurrentField(prev => ({ ...prev, fieldType: e.target.value as any }))}
+                      onChange={(e) => setCurrentField(prev => ({ ...prev, fieldType: e.target.value as Field['fieldType'] }))}
                       className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10 transition-all text-sm cursor-pointer"
                     >
                       <option value="">Select Type</option>
@@ -770,7 +780,7 @@ export default function FormBuilder() {
                     <label className="text-sm font-bold text-slate-700 mb-2 block">Column Width</label>
                     <select
                       value={currentField.columnWidth || 'full'}
-                      onChange={(e) => setCurrentField(prev => ({ ...prev, columnWidth: e.target.value as any }))}
+                      onChange={(e) => setCurrentField(prev => ({ ...prev, columnWidth: e.target.value as Field['columnWidth'] }))}
                       className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10 transition-all text-sm cursor-pointer"
                     >
                       <option value="full">Full Width</option>
@@ -837,7 +847,7 @@ export default function FormBuilder() {
                           {field.placeholder && (
                             <>
                               {' • '}
-                              <span className="italic">"{field.placeholder}"</span>
+                              <span className="italic">&quot;{field.placeholder}&quot;</span>
                             </>
                           )}
                         </p>
@@ -994,7 +1004,7 @@ export default function FormBuilder() {
                       <p className="text-sm text-slate-600 line-clamp-2">{form.description || 'No description provided'}</p>
                     </div>
                   </div>
-                  
+
                   {/* PDF indicator if form has source PDF */}
                   {form.pdfFile && (
                     <div className="mb-3 p-2 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2">
@@ -1013,7 +1023,7 @@ export default function FormBuilder() {
                       </a>
                     </div>
                   )}
-                  
+
                   <div className="space-y-2 mb-4 pb-4 border-b border-slate-200">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold text-slate-500">Type:</span>
@@ -1075,8 +1085,8 @@ export default function FormBuilder() {
                   {searchQuery || filterType !== 'all' ? 'No forms match your filters' : 'No forms created yet'}
                 </p>
                 <p className="text-slate-500 mb-6">
-                  {searchQuery || filterType !== 'all' 
-                    ? 'Try adjusting your search or filter criteria' 
+                  {searchQuery || filterType !== 'all'
+                    ? 'Try adjusting your search or filter criteria'
                     : 'Get started by creating your first form'}
                 </p>
                 {!searchQuery && filterType === 'all' && (

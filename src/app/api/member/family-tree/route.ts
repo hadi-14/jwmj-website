@@ -1,5 +1,5 @@
 // app/api/member/family-tree/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
@@ -38,7 +38,27 @@ interface FamilyTreeResponse {
 /**
  * Helper to convert member data to MemberNode
  */
-function toMemberNode(member: any, relation?: string, isRegistered: boolean = true): MemberNode {
+function toMemberNode(member: {
+  MemComputerID?: Decimal | string;
+  id?: string;
+  MemName?: string | null;
+  name?: string | null;
+  MemMembershipNo?: string | null;
+  membershipNo?: string | null;
+  MemDOB?: Date | null;
+  dob?: Date | null;
+  MemCNIC?: Decimal | string | null;
+  cnic?: string | null;
+  MemGenderCode?: Decimal | number | string | null;
+  genderCode?: string | null;
+  MemFatherName?: string | null;
+  fatherName?: string | null;
+  MemMotherName?: string | null;
+  motherName?: string | null;
+  Mem_DeceasedDate?: Date | null;
+  deceasedDate?: Date | null;
+  isDeceased?: boolean;
+}, relation?: string, isRegistered: boolean = true): MemberNode {
   return {
     id: member.MemComputerID?.toString() || member.id || 'unknown',
     name: member.MemName?.trim() || member.name || null,
@@ -366,14 +386,20 @@ async function getSiblings(memberId: Decimal, parentIds: Decimal[]): Promise<Mem
 
   const siblings = await prisma.children_List.findMany({
     where: {
-      OR: [
-        { Chd_MotherMemberID: { in: parentIds } },
-        { Chd_FatherMemberID: { in: parentIds } }
-      ],
-      Chd_memberId: { not: memberId },
-      OR: [
-        { Chd_deactive: null },
-        { Chd_deactive: 0 }
+      AND: [
+        {
+          OR: [
+            { Chd_MotherMemberID: { in: parentIds } },
+            { Chd_FatherMemberID: { in: parentIds } }
+          ]
+        },
+        { Chd_memberId: { not: memberId } },
+        {
+          OR: [
+            { Chd_deactive: null },
+            { Chd_deactive: 0 }
+          ]
+        }
       ]
     },
     include: {
@@ -405,13 +431,19 @@ async function getGrandchildren(childrenIds: Decimal[]): Promise<MemberNode[]> {
 
   const grandchildren = await prisma.children_List.findMany({
     where: {
-      OR: [
-        { Chd_MotherMemberID: { in: childrenIds } },
-        { Chd_FatherMemberID: { in: childrenIds } }
-      ],
-      OR: [
-        { Chd_deactive: null },
-        { Chd_deactive: 0 }
+      AND: [
+        {
+          OR: [
+            { Chd_MotherMemberID: { in: childrenIds } },
+            { Chd_FatherMemberID: { in: childrenIds } }
+          ]
+        },
+        {
+          OR: [
+            { Chd_deactive: null },
+            { Chd_deactive: 0 }
+          ]
+        }
       ]
     },
     include: {
@@ -511,7 +543,7 @@ async function getGrandparents(parentIds: Decimal[], parents: MemberNode[]): Pro
   return grandparents;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Verify authentication
     const cookieStore = await cookies();
@@ -528,7 +560,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get member computer ID from payload
-    const memberComputerId = await getMemberIdFromPayload(payload);
+    const memberComputerId = await getMemberIdFromPayload(payload as { memberData?: { MemComputerID?: string | number }, email?: string });
 
     if (!memberComputerId) {
       return NextResponse.json({ error: 'Member data not found' }, { status: 404 });

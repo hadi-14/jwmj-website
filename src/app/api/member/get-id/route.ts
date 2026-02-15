@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = memberVerificationSchema.parse(body);
 
-    const { verificationMethod, membershipNo, cnic, email, phone } = validatedData;
+    const { verificationMethod, membershipNo, cnic, email } = validatedData;
 
     let member = null;
 
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
     };
 
     return NextResponse.json(response);
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof ZodError) {
       const formattedErrors = error.issues.reduce((acc, err) => {
         const path = err.path.join('.');

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FileText, ChevronRight, Loader, Search, Filter, CheckCircle, Clock, AlertCircle, Calendar, Users, TrendingUp, Download, LogIn, FileDown, ArrowRight, Sparkles, Lock, Unlock, ExternalLink } from 'lucide-react';
+import { FileText, ChevronRight, Search, Filter, CheckCircle, AlertCircle, Download, LogIn, FileDown, ArrowRight, Sparkles, Lock, Unlock, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
 interface FormData {
@@ -9,7 +9,7 @@ interface FormData {
     name: string;
     description: string;
     formType: string;
-    fields: any[];
+    fields: Record<string, unknown>[];
     isActive: boolean;
     createdAt?: string;
     updatedAt?: string;
@@ -34,13 +34,14 @@ export default function FormsPage() {
 
     useEffect(() => {
         filterForms();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchTerm, selectedCategory, forms]);
 
     const checkAuthStatus = async () => {
         try {
             const response = await fetch('/api/member');
             setIsAuthenticated(response.ok);
-        } catch (error) {
+        } catch {
             setIsAuthenticated(false);
         }
     };
@@ -89,7 +90,7 @@ export default function FormsPage() {
         setFilteredForms(filtered);
     };
 
-    const getFormIcon = (formType: string) => {
+    const getFormIcon = () => {
         return FileText;
     };
 
@@ -116,7 +117,7 @@ export default function FormsPage() {
                         <div className="absolute inset-0 border-4 border-[#038DCD]/20 rounded-full"></div>
                         <div className="absolute inset-0 border-4 border-[#038DCD] border-t-transparent rounded-full animate-spin"></div>
                     </div>
-                    <p className="text-slate-600 font-medium">Loading forms...</p>
+                    <p className="text-slate-500">You haven&apos;t created any draft forms yet.</p>
                 </div>
             </div>
         );
@@ -131,7 +132,7 @@ export default function FormsPage() {
                     <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
                     <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
                 </div>
-                
+
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
                     <div className="text-center">
                         <div className="inline-flex items-center justify-center w-20 h-20 bg-white/10 backdrop-blur-sm rounded-3xl mb-6 shadow-lg">
@@ -143,7 +144,7 @@ export default function FormsPage() {
                         <p className="text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
                             Submit your applications online or download PDF forms for offline completion
                         </p>
-                        
+
                         {/* Auth Status Banner */}
                         {!isAuthenticated && (
                             <div className="mt-8 max-w-2xl mx-auto">
@@ -175,7 +176,7 @@ export default function FormsPage() {
                                 <div className="bg-emerald-500/20 backdrop-blur-md border-2 border-emerald-400/30 rounded-2xl p-4">
                                     <div className="flex items-center justify-center gap-2">
                                         <Unlock className="w-5 h-5 text-emerald-300" />
-                                        <p className="font-bold text-white">You're logged in - Submit forms online instantly!</p>
+                                        <p className="font-bold text-white">You&apos;re logged in - Submit forms online instantly!</p>
                                     </div>
                                 </div>
                             </div>
@@ -294,8 +295,8 @@ export default function FormsPage() {
                             {searchTerm || selectedCategory !== 'all' ? 'No forms match your search' : 'No Forms Available'}
                         </h3>
                         <p className="text-slate-600 mb-4">
-                            {searchTerm || selectedCategory !== 'all' 
-                                ? 'Try adjusting your search or filters' 
+                            {searchTerm || selectedCategory !== 'all'
+                                ? 'Try adjusting your search or filters'
                                 : 'Check back later for available forms.'}
                         </p>
                         {(searchTerm || selectedCategory !== 'all') && (
@@ -313,20 +314,20 @@ export default function FormsPage() {
                 ) : (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
                         {filteredForms.map((form) => {
-                            const FormIcon = getFormIcon(form.formType);
+                            const FormIcon = getFormIcon();
                             const colorGradient = getFormColor(form.formType);
                             const hasPDF = !!form.pdfFileUrl;
-                            
+
                             // Debug log for each form
                             console.log(`Form: ${form.name}, hasPDF: ${hasPDF}, pdfFileUrl: ${form.pdfFileUrl}`);
-                            
+
                             return (
                                 <div key={form.id} className="bg-white rounded-2xl shadow-sm border-2 border-slate-200 hover:shadow-2xl hover:border-[#038DCD] transition-all duration-300 hover:-translate-y-1 overflow-hidden group">
                                     {/* Card Header with Gradient */}
                                     <div className={`bg-gradient-to-r ${colorGradient} p-6 relative overflow-hidden`}>
                                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
                                         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
-                                        
+
                                         <div className="relative">
                                             <div className="flex items-start justify-between mb-4">
                                                 <div className="inline-flex items-center justify-center w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl">
@@ -340,11 +341,11 @@ export default function FormsPage() {
                                                     </div>
                                                 )}
                                             </div>
-                                            
+
                                             <h2 className="text-2xl font-bold text-white mb-2 line-clamp-2">
                                                 {form.name}
                                             </h2>
-                                            
+
                                             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full">
                                                 <span className="text-xs font-semibold text-white">
                                                     {form.formType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
@@ -446,8 +447,8 @@ export default function FormsPage() {
                         </div>
                         <h3 className="text-2xl font-bold text-slate-900 mb-3">Need Help?</h3>
                         <p className="text-slate-600 mb-6">
-                            If you have any questions about filling out these forms or need assistance, 
-                            please don't hesitate to contact our support team.
+                            If you have any questions about filling out these forms or need assistance,
+                            please don&apos;t hesitate to contact our support team.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <Link
@@ -499,7 +500,7 @@ export default function FormsPage() {
 
                         <div className="mt-6 pt-6 border-t border-slate-200 text-center">
                             <p className="text-sm text-slate-600">
-                                Don't have an account?{' '}
+                                Don&apos;t have an account?{' '}
                                 <Link href="/member" className="text-[#038DCD] hover:text-[#0369A1] font-semibold">
                                     Register here
                                 </Link>

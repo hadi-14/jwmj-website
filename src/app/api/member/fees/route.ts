@@ -1,5 +1,5 @@
 // app/api/member/fees/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
@@ -9,7 +9,7 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'your-secret-key-change-in-production'
 );
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Verify authentication
     const cookieStore = await cookies();
@@ -20,14 +20,14 @@ export async function GET(request: NextRequest) {
     }
 
     const { payload } = await jwtVerify(token.value, JWT_SECRET);
-    
+
     if (payload.role !== 'MEMBER') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     // Get member computer ID from payload (checks both memberData and email)
-    const memberComputerId = await getMemberIdFromPayload(payload);
-    
+    const memberComputerId = await getMemberIdFromPayload(payload as { memberData?: { MemComputerID?: string | number }, email?: string });
+
     if (!memberComputerId) {
       return NextResponse.json({ error: 'Member data not found' }, { status: 404 });
     }
@@ -60,38 +60,38 @@ export async function GET(request: NextRequest) {
     });
 
     // Calculate totals
-    const totalDue = annualFees.reduce((sum, fee) => 
+    const totalDue = annualFees.reduce((sum, fee) =>
       sum + (fee.RFE_Fee ? Number(fee.RFE_Fee) : 0), 0
     );
-    
-    const totalPaid = feeReceipts.reduce((sum, receipt) => 
+
+    const totalPaid = feeReceipts.reduce((sum, receipt) =>
       sum + (receipt.ARM_Amount ? Number(receipt.ARM_Amount) : 0), 0
     );
-    
-    const totalDiscount = feeReceipts.reduce((sum, receipt) => 
+
+    const totalDiscount = feeReceipts.reduce((sum, receipt) =>
       sum + (receipt.ARM_Disc ? Number(receipt.ARM_Disc) : 0), 0
     );
-    
+
     const balance = totalDue - totalPaid - totalDiscount;
 
     // Get fiscal year breakdown
     const yearlyBreakdown = annualFees.map(fee => {
       const year = fee.RFE_FiscalYear?.toString() || 'Unknown';
       const feeAmount = Number(fee.RFE_Fee || 0);
-      
+
       // Find payments for this invoice
       const relatedPayments = receiptDetails.filter(
         d => d.AFD_Invoice_No === fee.Rfe_Invoice_No.trim()
       );
-      
+
       const paidAmount = relatedPayments.reduce(
         (sum, d) => sum + Number(d.AFD_Rec_Amount || 0), 0
       );
-      
+
       const discountAmount = relatedPayments.reduce(
         (sum, d) => sum + Number(d.AFD_Disc_Amount || 0), 0
       );
-      
+
       return {
         fiscalYear: year,
         invoiceNo: fee.Rfe_Invoice_No,
@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
         balance,
         status: balance <= 0 ? 'Paid' : balance > 0 ? 'Pending' : 'Overpaid',
       },
-      yearlyBreakdown: yearlyBreakdown.sort((a, b) => 
+      yearlyBreakdown: yearlyBreakdown.sort((a, b) =>
         (b.fiscalYear || '').localeCompare(a.fiscalYear || '')
       ),
       annualFees: annualFees.map(fee => ({
@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
         const details = receiptDetails.filter(
           d => d.AFD_ARM_VoucherNo === receipt.ARM_VoucherNo
         );
-        
+
         return {
           voucherNo: receipt.ARM_VoucherNo,
           receiveDate: receipt.ARM_Receive_Date,

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useMemberAuth } from './layout';
+import { useMemberAuth } from '@/contexts/MemberAuthContext';
+import Image from "next/image";
 
 interface MemberInfo {
   MemComputerID: string;
@@ -61,11 +61,18 @@ interface FeeData {
   }>;
 }
 
+interface FamilyMember {
+  name?: string;
+  membershipNo?: string;
+  dob?: string;
+  [key: string]: unknown;
+}
+
 interface FamilyTree {
-  self: any;
-  spouse: any[];
-  children: any[];
-  parents: any[];
+  self: FamilyMember;
+  spouse: FamilyMember[];
+  children: FamilyMember[];
+  parents: FamilyMember[];
 }
 
 interface Application {
@@ -98,7 +105,7 @@ export default function MemberDashboard() {
     } else if (activeTab === 'applications' && applications.length === 0) {
       fetchApplications();
     }
-  }, [activeTab]);
+  }, [activeTab, applications.length, familyTree, feeData]);
 
   const fetchMemberInfo = async () => {
     try {
@@ -182,16 +189,13 @@ export default function MemberDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header - matching main page style */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      {/* <header className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-[#03BDCD] to-[#F9D98F] rounded-2xl flex items-center justify-center shadow-md">
-                <span className="text-white font-bold text-xl">JWMJ</span>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 italic">Member Portal</h1>
-                <p className="text-sm text-gray-600 font-medium">Welcome back, {member?.MemName?.split(' ')[0]}</p>
+              <div className="pl-35">
+                <h1 className="text-xl font-bold text-gray-900 italic">Member Portal</h1>
+                <p className="text-xs text-gray-600 font-medium">Welcome back, {member?.MemName?.split(' ')[0]}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
@@ -210,21 +214,23 @@ export default function MemberDashboard() {
             </div>
           </div>
         </div>
-      </header>
+      </header> */}
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        
+
         {/* Profile Header Card - inspired by main page president section */}
         <div className="bg-gradient-to-br from-[#038DCD]/5 to-[#F9D98F]/5 rounded-3xl border border-gray-200 shadow-lg p-8 mb-8">
           <div className="flex flex-col md:flex-row md:items-start gap-8">
-            
+
             {/* Profile Image */}
             <div className="flex-shrink-0">
               {member?.profileImage ? (
-                <img
+                <Image
                   src={member.profileImage}
                   alt={member?.MemName || 'Profile'}
+                  width={160}
+                  height={160}
                   className="w-32 h-32 md:w-40 md:h-40 rounded-2xl object-cover border-4 border-white shadow-lg"
                 />
               ) : (
@@ -246,7 +252,7 @@ export default function MemberDashboard() {
                   </span>
                 )}
               </div>
-              
+
               <p className="text-gray-600 font-medium mb-6">Member ID: {member?.MemMembershipNo || 'N/A'}</p>
 
               {/* Info Grid */}
@@ -262,7 +268,7 @@ export default function MemberDashboard() {
                 <div className="flex items-start gap-2">
                   <div className="w-1.5 h-1.5 bg-[#F9C856] rounded-full mt-2"></div>
                   <div>
-                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Father's Name</p>
+                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Father&apos;s Name</p>
                     <p className="font-semibold text-gray-900">{member?.MemFatherName || 'N/A'}</p>
                   </div>
                 </div>
@@ -350,11 +356,10 @@ export default function MemberDashboard() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-4 font-bold text-sm tracking-wide rounded-xl transition-all duration-200 ${
-                    activeTab === tab.id
-                      ? `bg-gradient-to-r ${tab.gradient} text-white shadow-md`
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
+                  className={`py-4 px-4 font-bold text-sm tracking-wide rounded-xl transition-all duration-200 ${activeTab === tab.id
+                    ? `bg-gradient-to-r ${tab.gradient} text-white shadow-md`
+                    : 'text-gray-600 hover:bg-gray-100'
+                    }`}
                 >
                   {tab.name}
                 </button>
@@ -372,15 +377,25 @@ export default function MemberDashboard() {
         </div>
 
       </main>
+
+      {/* Floating Logout Button */}
+      <button
+        onClick={logout}
+        className="fixed bottom-8 right-8 px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 z-100"
+      >
+        <span>🚪</span>
+        LOGOUT
+      </button>
     </div>
+
   );
 }
 
-function OverviewTab({ feeData, familyTree, applications }: any) {
+function OverviewTab({ feeData, familyTree, applications }: { feeData: FeeData | null, familyTree: FamilyTree | null, applications: Application[] }) {
   return (
     <div>
       <h3 className="text-2xl font-bold text-gray-900 mb-6">Dashboard Overview</h3>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Family Members Card */}
         <div className="relative overflow-hidden rounded-2xl border-2 border-gray-200 p-6 bg-gradient-to-br from-white to-gray-50 hover:shadow-lg transition-shadow duration-300">
@@ -424,7 +439,7 @@ function OverviewTab({ feeData, familyTree, applications }: any) {
             <p className="text-sm text-gray-600 font-semibold uppercase tracking-wide mb-1">Applications</p>
             <p className="text-4xl font-bold text-[#038DCD] mb-2">{applications?.length || 0}</p>
             <p className="text-sm text-gray-600">
-              {applications?.filter((a: any) => a.status === 'pending').length || 0} pending review
+              {applications?.filter((a: Application) => a.status === 'pending').length || 0} pending review
             </p>
           </div>
         </div>
@@ -441,7 +456,7 @@ function OverviewTab({ feeData, familyTree, applications }: any) {
               </div>
               <span className="font-bold text-gray-700 group-hover:text-[#038DCD] transition-colors">Submit New Application</span>
             </div>
-            <span className="text-gray-400 group-hover:text-[#038DCD] transition-colors">→</span>
+            <span className="text-gray-400 group-hover:text-[#038DCD] transition-colors">&rarr;</span>
           </button>
 
           <button className="flex items-center justify-between p-4 rounded-xl border-2 border-gray-200 hover:border-[#F9C856] transition-all duration-200 group">
@@ -451,7 +466,7 @@ function OverviewTab({ feeData, familyTree, applications }: any) {
               </div>
               <span className="font-bold text-gray-700 group-hover:text-[#F9C856] transition-colors">Pay Annual Fees</span>
             </div>
-            <span className="text-gray-400 group-hover:text-[#F9C856] transition-colors">→</span>
+            <span className="text-gray-400 group-hover:text-[#F9C856] transition-colors">&rarr;</span>
           </button>
         </div>
       </div>
@@ -469,9 +484,9 @@ function FamilyTreeTab({ familyTree }: { familyTree: FamilyTree | null }) {
     );
   }
 
-  const FamilyMemberCard = ({ member, relationship }: any) => {
-    const initials = member.name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2) || '?';
-    const colors: any = {
+  const FamilyMemberCard = ({ member, relationship }: { member: FamilyMember, relationship: string }) => {
+    const initials = (member.name as string)?.split(' ').map((n: string) => n[0]).join('').slice(0, 2) || '?';
+    const colors: Record<string, { bg: string, border: string, accent: string }> = {
       parent: { bg: 'from-purple-500 to-purple-600', border: 'border-purple-200', accent: 'bg-purple-100' },
       spouse: { bg: 'from-pink-500 to-rose-600', border: 'border-pink-200', accent: 'bg-pink-100' },
       child: { bg: 'from-[#038DCD] to-[#03BDCD]', border: 'border-blue-200', accent: 'bg-blue-100' },
@@ -528,7 +543,7 @@ function FamilyTreeTab({ familyTree }: { familyTree: FamilyTree | null }) {
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {familyTree.parents.map((parent: any, idx: number) => (
+            {familyTree.parents.map((parent: FamilyMember, idx: number) => (
               <FamilyMemberCard key={idx} member={parent} relationship="parent" />
             ))}
           </div>
@@ -547,7 +562,7 @@ function FamilyTreeTab({ familyTree }: { familyTree: FamilyTree | null }) {
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {familyTree.spouse.map((spouse: any, idx: number) => (
+            {familyTree.spouse.map((spouse: FamilyMember, idx: number) => (
               <FamilyMemberCard key={idx} member={spouse} relationship="spouse" />
             ))}
           </div>
@@ -566,7 +581,7 @@ function FamilyTreeTab({ familyTree }: { familyTree: FamilyTree | null }) {
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {familyTree.children.map((child: any, idx: number) => (
+            {familyTree.children.map((child: FamilyMember, idx: number) => (
               <FamilyMemberCard key={idx} member={child} relationship="child" />
             ))}
           </div>
@@ -610,30 +625,27 @@ function FeeStatusTab({ feeData }: { feeData: FeeData | null }) {
           <p className="text-sm text-blue-700 font-bold uppercase tracking-wide mb-2">Total Due</p>
           <p className="text-3xl font-bold text-blue-900">PKR {feeData.summary.totalDue.toLocaleString()}</p>
         </div>
-        
+
         <div className="bg-gradient-to-br from-green-50 to-green-100/50 rounded-2xl p-6 border-2 border-green-200">
           <p className="text-sm text-green-700 font-bold uppercase tracking-wide mb-2">Total Paid</p>
           <p className="text-3xl font-bold text-green-900">PKR {feeData.summary.totalPaid.toLocaleString()}</p>
         </div>
-        
+
         <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-2xl p-6 border-2 border-purple-200">
           <p className="text-sm text-purple-700 font-bold uppercase tracking-wide mb-2">Discount</p>
           <p className="text-3xl font-bold text-purple-900">PKR {feeData.summary.totalDiscount.toLocaleString()}</p>
         </div>
-        
-        <div className={`bg-gradient-to-br rounded-2xl p-6 border-2 ${
-          feeData.summary.balance > 0
-            ? 'from-red-50 to-red-100/50 border-red-200'
-            : 'from-gray-50 to-gray-100/50 border-gray-200'
-        }`}>
-          <p className={`text-sm font-bold uppercase tracking-wide mb-2 ${
-            feeData.summary.balance > 0 ? 'text-red-700' : 'text-gray-700'
+
+        <div className={`bg-gradient-to-br rounded-2xl p-6 border-2 ${feeData.summary.balance > 0
+          ? 'from-red-50 to-red-100/50 border-red-200'
+          : 'from-gray-50 to-gray-100/50 border-gray-200'
           }`}>
+          <p className={`text-sm font-bold uppercase tracking-wide mb-2 ${feeData.summary.balance > 0 ? 'text-red-700' : 'text-gray-700'
+            }`}>
             Balance
           </p>
-          <p className={`text-3xl font-bold ${
-            feeData.summary.balance > 0 ? 'text-red-900' : 'text-gray-900'
-          }`}>
+          <p className={`text-3xl font-bold ${feeData.summary.balance > 0 ? 'text-red-900' : 'text-gray-900'
+            }`}>
             PKR {feeData.summary.balance.toLocaleString()}
           </p>
         </div>
@@ -661,11 +673,10 @@ function FeeStatusTab({ feeData }: { feeData: FeeData | null }) {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold mb-3 ${
-                      year.status === 'Paid'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-yellow-100 text-yellow-700'
-                    }`}>
+                    <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold mb-3 ${year.status === 'Paid'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-yellow-100 text-yellow-700'
+                      }`}>
                       {year.status.toUpperCase()}
                     </span>
                     <p className="text-2xl font-bold text-gray-900">PKR {year.balance.toLocaleString()}</p>
@@ -754,7 +765,7 @@ function ApplicationsTab({ applications }: { applications: Application[] }) {
       <div className="text-center py-16">
         <div className="text-6xl mb-4">📝</div>
         <h3 className="text-2xl font-bold text-gray-900 mb-2">No Applications Yet</h3>
-        <p className="text-gray-600 mb-8">You haven't submitted any applications to the Jamat.</p>
+        <p className="text-slate-500">You haven&apos;t submitted any applications yet.</p>
         <button className="px-8 py-3 bg-gradient-to-r from-[#038DCD] to-[#03BDCD] hover:opacity-90 text-white font-bold rounded-full transition-all duration-200 shadow-lg">
           Submit New Application
         </button>
@@ -799,7 +810,7 @@ function ApplicationsTab({ applications }: { applications: Application[] }) {
                 {app.status.toUpperCase()}
               </span>
             </div>
-            
+
             <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
               <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
               <span className="font-semibold">Submitted:</span>

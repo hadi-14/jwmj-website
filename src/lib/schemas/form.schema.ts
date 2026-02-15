@@ -89,22 +89,22 @@ export const FormFieldWithParsedDataSchema = FormFieldSchema.transform((field) =
   validationRule:
     typeof field.validationRule === "string" && field.validationRule
       ? (() => {
-          try {
-            return JSON.parse(field.validationRule);
-          } catch {
-            return null;
-          }
-        })()
+        try {
+          return JSON.parse(field.validationRule);
+        } catch {
+          return null;
+        }
+      })()
       : field.validationRule,
   options:
     typeof field.options === "string" && field.options
       ? (() => {
-          try {
-            return JSON.parse(field.options);
-          } catch {
-            return [];
-          }
-        })()
+        try {
+          return JSON.parse(field.options);
+        } catch {
+          return [];
+        }
+      })()
       : field.options,
 }));
 
@@ -145,6 +145,8 @@ export const UpdateFormSchema = z.object({
   description: z.string().optional().nullable(),
   isActive: z.boolean().optional(),
   fields: z.array(CreateFormFieldSchema).optional(),
+  pdfFileUrl: z.string().optional().nullable(),
+  pdfFileName: z.string().optional().nullable(),
 });
 
 export type UpdateForm = z.infer<typeof UpdateFormSchema>;

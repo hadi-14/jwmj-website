@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       success: true,
       data: users,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('GET /api/users/search error:', error);
     return NextResponse.json(
       { success: false, error: 'Search failed' },

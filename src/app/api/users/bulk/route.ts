@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcryptjs';
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       data: result,
       message: `Bulk ${action} completed successfully`,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('POST /api/users/bulk error:', error);
     return NextResponse.json(
       { success: false, error: 'Bulk operation failed' },

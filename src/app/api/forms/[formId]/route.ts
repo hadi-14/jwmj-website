@@ -1,18 +1,20 @@
 import { prisma } from "@/lib/prisma";
 import { Schemas } from "@/lib/schemas/form.schema";
 import { NextRequest, NextResponse } from "next/server";
-import z, { ZodError } from "zod";
+import { ZodError } from "zod";
 
 /**
  * GET /api/forms/[formId]
  * Fetch single form by ID
  */
 export async function GET(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ formId: string }> }
 ) {
   try {
     const { formId } = await params;
+    // Silence unused request warning
+    void request;
 
     const form = await prisma.form.findUnique({
       where: { id: formId },
@@ -37,7 +39,7 @@ export async function GET(
     // Transform fields to parse JSON strings
     const transformedForm = {
       ...form,
-      fields: form.fields.map((field: any) => ({
+      fields: form.fields.map((field) => ({
         ...field,
         options: field.options ? JSON.parse(field.options) : null,
         validationRule: field.validationRule ? JSON.parse(field.validationRule) : null,
@@ -85,15 +87,15 @@ export async function PUT(
     // Check if trying to remove PDF fields
     if (validatedData.pdfFileUrl === '' || validatedData.pdfFileName === '') {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: "PDF file is mandatory for all forms" 
+        {
+          success: false,
+          error: "PDF file is mandatory for all forms"
         },
         { status: 400 }
       );
     }
 
-    const form = await prisma.form.update({
+    await prisma.form.update({
       where: { id: formId },
       data: {
         ...(validatedData.name && { name: validatedData.name }),

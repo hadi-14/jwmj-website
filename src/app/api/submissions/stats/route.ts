@@ -2,41 +2,54 @@ import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET: Get submission statistics
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(request.url);
     const formId = searchParams.get('formId');
+    const memberId = searchParams.get('memberId');
 
-    const where: any = { isDeleted: false };
+    const where: { formId?: string; memberComputerId?: number } = {};
     if (formId) where.formId = formId;
+    if (memberId) where.memberComputerId = memberId ? Number(memberId) : undefined;
 
-    const stats = await prisma.formSubmission.groupBy({
+    // 1. Get total submissions count
+    const totalSubmissions = await prisma.formSubmission.count({ where });
+
+    // 2. Get status breakdown
+    const statusGroups = await prisma.formSubmission.groupBy({
       by: ['status'],
       where,
-      _count: true
+      _count: {
+        _all: true
+      }
     });
 
-    const total = await prisma.formSubmission.count({ where });
-
+    const byStatus = statusGroups.reduce((acc: Record<string, number>, curr) => {
+      acc[curr.status] = curr._count._all;
+      return acc;
+    }, {});
+    // 3. Get recent activity (last 5 submissions)
     const recentSubmissions = await prisma.formSubmission.findMany({
       where,
-      select: { id: true, submissionDate: true, status: true },
+      take: 5,
       orderBy: { submissionDate: 'desc' },
-      take: 10
+      select: {
+        id: true,
+        submissionDate: true,
+        status: true
+      }
     });
 
     return NextResponse.json({
       success: true,
       data: {
-        totalSubmissions: total,
-        byStatus: stats.reduce((acc, s) => {
-          acc[s.status] = s._count;
-          return acc;
-        }, {} as Record<string, number>),
+        totalSubmissions,
+        byStatus,
         recentSubmissions
       }
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error('Stats error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch statistics' },
       { status: 500 }

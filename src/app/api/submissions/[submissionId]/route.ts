@@ -5,8 +5,9 @@ import { Schemas } from '@/lib/schemas/form.schema';
 // GET: Fetch single submission
 export async function GET(
   req: NextRequest,
-  { params }: { params: { submissionId: string } }
+  props: { params: Promise<{ submissionId: string }> }
 ) {
+  const params = await props.params;
   try {
     const submission = await prisma.formSubmission.findUnique({
       where: { id: params.submissionId },
@@ -38,7 +39,7 @@ export async function GET(
       success: true,
       data: validatedSubmission
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('GET /api/submissions/[submissionId] error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch submission' },
@@ -50,16 +51,22 @@ export async function GET(
 // PATCH: Update submission (approve, reject, add notes)
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { submissionId: string } }
+  props: { params: Promise<{ submissionId: string }> }
 ) {
+  const params = await props.params;
   try {
     const body = await req.json();
     const { status, notes, approvedBy, fieldValues } = body;
 
     // Validate update data
-    const validatedUpdate = Schemas.UpdateFormSubmission.parse(body);
+    Schemas.UpdateFormSubmission.parse(body);
 
-    const updateData: any = {};
+    const updateData: {
+      status?: string;
+      notes?: string;
+      approvedBy?: string;
+      approvedDate?: Date | null;
+    } = {};
     if (status) updateData.status = status;
     if (notes) updateData.notes = notes;
     if (approvedBy) {
@@ -76,8 +83,8 @@ export async function PATCH(
             fields: { orderBy: { fieldOrder: 'asc' } }
           }
         },
-        fieldValues: { 
-          include: { field: true } 
+        fieldValues: {
+          include: { field: true }
         }
       }
     });
@@ -119,7 +126,7 @@ export async function PATCH(
           action: status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'updated',
           changedBy: approvedBy || req.headers.get('x-user-email') || 'anonymous',
           changes: JSON.stringify({ status, notes, updatedFields: fieldValues ? Object.keys(fieldValues) : [] }),
-          ipAddress: req.headers.get('x-forwarded-for') || req.ip || undefined
+          ipAddress: req.headers.get('x-forwarded-for') || undefined
         }
       });
     }
@@ -132,14 +139,14 @@ export async function PATCH(
       data: validatedSubmission,
       message: 'Submission updated successfully'
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('PATCH /api/submissions/[submissionId] error:', error);
-    
+
     // Return validation errors if applicable
     if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: 'Validation error',
           message: error.message
         },
@@ -157,8 +164,9 @@ export async function PATCH(
 // DELETE: Delete submission (soft delete)
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { submissionId: string } }
+  props: { params: Promise<{ submissionId: string }> }
 ) {
+  const params = await props.params;
   try {
     // Verify submission exists first
     const submission = await prisma.formSubmission.findUnique({
@@ -182,7 +190,7 @@ export async function DELETE(
         submissionId: params.submissionId,
         action: 'deleted',
         changedBy: req.headers.get('x-user-email') || 'anonymous',
-        ipAddress: req.headers.get('x-forwarded-for') || req.ip || undefined
+        ipAddress: req.headers.get('x-forwarded-for') || undefined
       }
     });
 
@@ -190,7 +198,7 @@ export async function DELETE(
       success: true,
       message: 'Submission deleted successfully'
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('DELETE /api/submissions/[submissionId] error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to delete submission' },

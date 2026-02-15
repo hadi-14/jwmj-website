@@ -2,15 +2,17 @@ import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET: Export submissions as CSV
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const formId = searchParams.get('formId');
+    const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
+    const formId = searchParams.get('formId');
+    const memberId = searchParams.get('memberId');
 
-    const where: any = { isDeleted: false };
+    const where: { isDeleted: boolean; formId?: string; status?: string; memberId?: string } = { isDeleted: false };
     if (formId) where.formId = formId;
     if (status) where.status = status;
+    if (memberId) where.memberId = memberId;
 
     const submissions = await prisma.formSubmission.findMany({
       where,
@@ -64,10 +66,8 @@ export async function GET(req: NextRequest) {
         'Content-Disposition': `attachment; filename="submissions_${Date.now()}.csv"`
       }
     });
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, error: 'Failed to export submissions' },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    console.error('Export error:', error);
+    return new NextResponse('Error exporting submissions', { status: 500 });
   }
 }

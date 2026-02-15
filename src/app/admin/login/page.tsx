@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useAuth } from '../_components/AdminLayout'; // Adjust path as needed
+import { useAuth } from '../AuthContext'; // Adjust path as needed
 import { Shield, Mail, Lock, AlertCircle, Eye, EyeOff, Loader } from 'lucide-react';
 
 export default function AdminLogin() {
@@ -19,8 +19,12 @@ export default function AdminLogin() {
 
     try {
       await login(email, password);
-    } catch (err: any) {
-      setError(err.message || 'Invalid email or password');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Invalid email or password');
+      } else {
+        setError('Invalid email or password');
+      }
     } finally {
       setIsLoading(false);
     }

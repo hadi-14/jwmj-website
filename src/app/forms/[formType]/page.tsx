@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ChevronLeft, Loader, FileText, Shield, Clock, AlertCircle } from 'lucide-react';
+import { ChevronLeft, FileText, Shield, Clock, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import DynamicForm from '@/components/form/DynamicForm';
 
@@ -11,20 +10,17 @@ interface FormData {
     name: string;
     description: string;
     formType: string;
-    fields: any[];
+    fields: Record<string, unknown>[];
 }
 
 export default function FormPage({ params }: { params: Promise<{ formType: string }> }) {
     const [form, setForm] = useState<FormData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
-    const [formType, setFormType] = useState<string | null>(null);
-    const router = useRouter();
 
     useEffect(() => {
         const unwrapParams = async () => {
             const { formType } = await params;
-            setFormType(formType);
             fetchForm(formType);
         };
         unwrapParams();
@@ -68,11 +64,11 @@ export default function FormPage({ params }: { params: Promise<{ formType: strin
                 {/* Header */}
                 <div className="bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                        <Link 
-                            href="/forms" 
+                        <Link
+                            href="/forms"
                             className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-4 font-medium group transition-all"
                         >
-                            <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" /> 
+                            <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                             <span>Back to Forms</span>
                         </Link>
                     </div>
@@ -103,11 +99,11 @@ export default function FormPage({ params }: { params: Promise<{ formType: strin
             {/* Header Section */}
             <div className="bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
-                    <Link 
-                        href="/forms" 
+                    <Link
+                        href="/forms"
                         className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 font-medium group transition-all"
                     >
-                        <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" /> 
+                        <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                         <span>Back to Forms</span>
                     </Link>
 

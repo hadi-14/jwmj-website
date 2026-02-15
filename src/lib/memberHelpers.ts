@@ -11,7 +11,7 @@ export async function getMemberIdByEmail(email: string): Promise<number | null> 
   try {
     // Trim the email and search
     const trimmedEmail = email.trim();
-    
+
     const memberEmail = await prisma.member_Emailid.findFirst({
       where: {
         MEM_Emailid: trimmedEmail
@@ -43,12 +43,7 @@ export async function getMemberIdByEmail(email: string): Promise<number | null> 
   }
 }
 
-/**
- * Convert Decimal to number safely
- */
-function toNumber(value: Decimal): number {
-  return Number(value.toString());
-}
+
 
 /**
  * Verify if member exists and is active
@@ -79,13 +74,13 @@ export async function verifyMemberExists(memberComputerId: number): Promise<bool
  * Extract member ID from JWT payload
  * Checks both memberData object and email fallback
  */
-export async function getMemberIdFromPayload(payload: any): Promise<number | null> {
+export async function getMemberIdFromPayload(payload: { memberData?: { MemComputerID?: string | number }, email?: string }): Promise<number | null> {
   // First check if memberData exists and has MemComputerID
   if (payload.memberData?.MemComputerID) {
     const memberId = typeof payload.memberData.MemComputerID === 'string'
       ? parseInt(payload.memberData.MemComputerID, 10)
       : payload.memberData.MemComputerID;
-    
+
     if (!isNaN(memberId) && memberId > 0) {
       return memberId;
     }
@@ -162,7 +157,7 @@ export async function getMemberBasicInfo(memberComputerId: number) {
 export async function emailExists(email: string): Promise<boolean> {
   try {
     const trimmedEmail = email.trim();
-    
+
     const count = await prisma.member_Emailid.count({
       where: {
         MEM_Emailid: trimmedEmail

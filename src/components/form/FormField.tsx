@@ -1,10 +1,13 @@
 import { IFormField } from "@/types/forms";
 
+// Define FormValue type locally if not available globally
+type FormValue = string | number | boolean | File | null | undefined;
+
 interface FormFieldProps {
   field: IFormField;
-  value: any;
+  value: FormValue;
   error?: string;
-  onChange: (value: any) => void;
+  onChange: (value: FormValue) => void;
 }
 
 export default function FormField({ field, value, error, onChange }: FormFieldProps) {
@@ -19,7 +22,7 @@ export default function FormField({ field, value, error, onChange }: FormFieldPr
         return (
           <input
             type={field.fieldType}
-            value={value}
+            value={value as string | number | readonly string[] | undefined}
             onChange={(e) => onChange(e.target.value)}
             placeholder={field.placeholder || ''}
             className={`${commonClasses} ${errorClasses}`}
@@ -30,7 +33,7 @@ export default function FormField({ field, value, error, onChange }: FormFieldPr
         return (
           <input
             type="date"
-            value={value}
+            value={value as string | number | readonly string[] | undefined}
             onChange={(e) => onChange(e.target.value)}
             className={`${commonClasses} ${errorClasses}`}
           />
@@ -39,7 +42,7 @@ export default function FormField({ field, value, error, onChange }: FormFieldPr
       case 'textarea':
         return (
           <textarea
-            value={value}
+            value={value as string | number | readonly string[] | undefined}
             onChange={(e) => onChange(e.target.value)}
             placeholder={field.placeholder || ''}
             rows={4}
@@ -53,13 +56,13 @@ export default function FormField({ field, value, error, onChange }: FormFieldPr
           : field.options ? JSON.parse(field.options) : [];
         return (
           <select
-            value={value}
+            value={value as string | number | readonly string[] | undefined}
             onChange={(e) => onChange(e.target.value)}
             className={`${commonClasses} ${errorClasses} bg-white`}
           >
             <option value="">Select an option</option>
-            {options.map((opt: any) => (
-              <option key={opt.value} value={opt.value}>
+            {options.map((opt: { value: string | number | readonly string[] | undefined; label: string }) => (
+              <option key={opt.value as string} value={opt.value}>
                 {opt.label}
               </option>
             ))}

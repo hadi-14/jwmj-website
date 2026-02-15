@@ -3,6 +3,7 @@
 
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { Decimal } from '@prisma/client/runtime/client';
 
 async function createMemberUser(
   email: string,
@@ -16,7 +17,7 @@ async function createMemberUser(
 
     // Check if member exists
     const member = await prisma.member_Information.findUnique({
-      where: { MemComputerID: BigInt(memberComputerId) },
+      where: { MemComputerID: new Decimal(memberComputerId) },
     });
 
     if (!member) {
@@ -44,14 +45,14 @@ async function createMemberUser(
 
     // Link email to member
     const existingEmail = await prisma.member_Emailid.findFirst({
-      where: { MEM_MemComputerID: BigInt(memberComputerId) },
+      where: { MEM_MemComputerID: new Decimal(memberComputerId) },
     });
 
     if (!existingEmail) {
       await prisma.member_Emailid.create({
         data: {
-          MEM_MemComputerID: BigInt(memberComputerId),
-          MEM_MemWehvariaNo: member.MemWehvariaNo || BigInt(0),
+          MEM_MemComputerID: new Decimal(memberComputerId),
+          MEM_MemWehvariaNo: member.MemWehvariaNo || new Decimal(0),
           MEM_Emailid: email,
         },
       });
@@ -61,7 +62,7 @@ async function createMemberUser(
     console.log(`Email: ${email}`);
     console.log(`Member ID: ${memberComputerId}`);
     console.log(`Name: ${user.name}`);
-    
+
     return user;
   } catch (error) {
     console.error('Error creating member user:', error);
@@ -151,7 +152,7 @@ export { createMemberUser, createUsersForAllMembers };
 // Run if called directly
 if (require.main === module) {
   const args = process.argv.slice(2);
-  
+
   if (args[0] === 'bulk') {
     createUsersForAllMembers();
   } else if (args.length >= 3) {

@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
     const skip = (pagination.page - 1) * pagination.limit;
 
-    const where: any = {
+    const where: { isDeleted: boolean; formId?: string; status?: string } = {
       isDeleted: false,
     };
 
@@ -45,9 +45,9 @@ export async function GET(req: NextRequest) {
           fieldValues: {
             include: {
               field: {
-                select: { 
+                select: {
                   id: true,
-                  fieldLabel: true, 
+                  fieldLabel: true,
                   fieldName: true,
                   fieldType: true,
                   fieldOrder: true,
@@ -75,31 +75,34 @@ export async function GET(req: NextRequest) {
     ]);
 
     // Transform the data to handle JSON parsing and null fields
-    const transformedSubmissions = submissions.map(submission => ({
+    const transformedSubmissions = submissions.map((submission: {
+      fieldValues: Array<{ field: { validationRule: string | object | null; options: string | object | null } | null }>;
+      [key: string]: unknown;
+    }) => ({
       ...submission,
       fieldValues: submission.fieldValues
-        .filter(fv => fv.field !== null) // Filter out orphaned field values
-        .map(fv => ({
+        .filter((fv: { field: unknown }) => fv.field !== null) // Filter out orphaned field values
+        .map((fv: { field: { validationRule: string | object | null; options: string | object | null } | null;[key: string]: unknown }) => ({
           ...fv,
           field: fv.field ? {
             ...fv.field,
             validationRule: typeof fv.field.validationRule === 'string' && fv.field.validationRule
               ? (() => {
-                  try {
-                    return JSON.parse(fv.field.validationRule);
-                  } catch {
-                    return null;
-                  }
-                })()
+                try {
+                  return JSON.parse(fv.field.validationRule);
+                } catch {
+                  return null;
+                }
+              })()
               : fv.field.validationRule,
             options: typeof fv.field.options === 'string' && fv.field.options
               ? (() => {
-                  try {
-                    return JSON.parse(fv.field.options);
-                  } catch {
-                    return [];
-                  }
-                })()
+                try {
+                  return JSON.parse(fv.field.options);
+                } catch {
+                  return [];
+                }
+              })()
               : fv.field.options,
           } : undefined
         }))
@@ -167,10 +170,10 @@ export async function POST(req: NextRequest) {
         formId: validatedData.formId,
         status: validatedData.status,
         memberComputerId: validatedData.memberComputerId
-          ? BigInt(validatedData.memberComputerId.toString())
+          ? Number(validatedData.memberComputerId)
           : null,
         submittedBy: validatedData.submittedBy || "anonymous",
-        ipAddress: req.headers.get("x-forwarded-for") || req.ip || "0.0.0.0",
+        ipAddress: req.headers.get("x-forwarded-for") || "0.0.0.0",
         userAgent: req.headers.get("user-agent") || undefined,
         fieldValues: {
           create: form.fields.map((field) => ({
@@ -197,21 +200,19 @@ export async function POST(req: NextRequest) {
         action:
           validatedData.status === "draft" ? "created_draft" : "submitted",
         changedBy: validatedData.submittedBy || "anonymous",
-        ipAddress: req.headers.get("x-forwarded-for") || req.ip || "0.0.0.0",
+        ipAddress: req.headers.get("x-forwarded-for") || "0.0.0.0",
       },
     });
 
     // Return without strict Zod validation
-    return NextResponse.json(
-      {
-        success: true,
-        data: submission,
-        message: "Submission created successfully",
-      },
-      { status: 201 }
-    );
-  } catch (error) {
-    console.error("POST /api/submissions error:", error);
+    const response = {
+      success: true,
+      data: submission,
+      message: "Submission created successfully",
+    };
+    return NextResponse.json(response, { status: 201 });
+  } catch (error: unknown) {
+    console.error('POST /api/submissions error:', error);
 
     if (error instanceof ZodError) {
       return NextResponse.json(

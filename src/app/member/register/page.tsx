@@ -2,8 +2,26 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
+interface MemberData {
+  MemName?: string;
+  MemMembershipNo?: string;
+  MemFatherName?: string;
+  MemCNIC?: string;
+  MemDOB?: string;
+  MemComputerID?: unknown; // Keeping unknown for ID to avoid bigint issues for now, or string/number
+}
+
+interface RegistrationFormData {
+  membershipNo: string;
+  cnic: string;
+  email: string;
+  phone: string;
+  memberData: MemberData | null;
+  emailVerified: boolean;
+}
+
 // Step 1: Initial verification with membership details
-function Step1_Verification({ onNext, formData, setFormData }) {
+function Step1_Verification({ onNext, formData, setFormData }: { onNext: () => void, formData: RegistrationFormData, setFormData: (data: RegistrationFormData) => void }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [verificationMethod, setVerificationMethod] = useState('membership');
@@ -39,13 +57,13 @@ function Step1_Verification({ onNext, formData, setFormData }) {
 
       if (response.ok) {
         const data = await response.json();
-        setFormData({ ...formData, memberData: data });
+        setFormData({ ...formData, memberData: data as MemberData });
         onNext();
       } else {
         const errorData = await response.json();
         setError(errorData.message || 'Verification failed. Please check your details.');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -60,7 +78,7 @@ function Step1_Verification({ onNext, formData, setFormData }) {
     <div className="space-y-5">
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Verify Your Membership</h2>
-        <p className="text-gray-600 text-sm">Confirm you're a registered member</p>
+        <p className="text-gray-600 text-sm">Confirm you&apos;re a registered member</p>
       </div>
 
       {/* Error Alert */}
@@ -81,22 +99,20 @@ function Step1_Verification({ onNext, formData, setFormData }) {
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={() => setVerificationMethod('membership')}
-            className={`p-3 border-2 rounded-xl font-bold text-xs transition-all duration-200 ${
-              verificationMethod === 'membership'
-                ? 'border-[#038DCD] bg-[#038DCD]/5 text-[#038DCD]'
-                : 'border-gray-300 text-gray-600 hover:border-gray-400'
-            }`}
+            className={`p-3 border-2 rounded-xl font-bold text-xs transition-all duration-200 ${verificationMethod === 'membership'
+              ? 'border-[#038DCD] bg-[#038DCD]/5 text-[#038DCD]'
+              : 'border-gray-300 text-gray-600 hover:border-gray-400'
+              }`}
           >
             <div className="text-xl mb-1">🎫</div>
             Membership
           </button>
           <button
             onClick={() => setVerificationMethod('cnic')}
-            className={`p-3 border-2 rounded-xl font-bold text-xs transition-all duration-200 ${
-              verificationMethod === 'cnic'
-                ? 'border-[#038DCD] bg-[#038DCD]/5 text-[#038DCD]'
-                : 'border-gray-300 text-gray-600 hover:border-gray-400'
-            }`}
+            className={`p-3 border-2 rounded-xl font-bold text-xs transition-all duration-200 ${verificationMethod === 'cnic'
+              ? 'border-[#038DCD] bg-[#038DCD]/5 text-[#038DCD]'
+              : 'border-gray-300 text-gray-600 hover:border-gray-400'
+              }`}
           >
             <div className="text-xl mb-1">🆔</div>
             CNIC
@@ -183,8 +199,8 @@ function Step1_Verification({ onNext, formData, setFormData }) {
 }
 
 // Step 2: Confirm member details
-function Step2_ConfirmDetails({ onNext, onBack, formData }) {
-  const memberData = formData.memberData || {};
+function Step2_ConfirmDetails({ onNext, onBack, formData }: { onNext: () => void, onBack: () => void, formData: RegistrationFormData }) {
+  const memberData = formData.memberData || {} as MemberData;
 
   return (
     <div className="space-y-5">
@@ -207,29 +223,29 @@ function Step2_ConfirmDetails({ onNext, onBack, formData }) {
           <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wide mb-1">Full Name</p>
           <p className="font-bold text-gray-900 text-sm">{memberData.MemName || 'N/A'}</p>
         </div>
-        
+
         <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
           <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wide mb-1">Membership No.</p>
           <p className="font-bold text-gray-900 text-sm">{memberData.MemMembershipNo || 'N/A'}</p>
         </div>
-        
+
         <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
-          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wide mb-1">Father's Name</p>
+          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wide mb-1">Father&apos;s Name</p>
           <p className="font-bold text-gray-900 text-sm">{memberData.MemFatherName || 'N/A'}</p>
         </div>
-        
+
         <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
           <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wide mb-1">CNIC</p>
           <p className="font-bold text-gray-900 text-sm">{memberData.MemCNIC || 'N/A'}</p>
         </div>
-        
+
         <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
           <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wide mb-1">Date of Birth</p>
           <p className="font-bold text-gray-900 text-sm">
             {memberData.MemDOB ? new Date(memberData.MemDOB).toLocaleDateString() : 'N/A'}
           </p>
         </div>
-        
+
         <div className="bg-gradient-to-br from-[#038DCD]/5 to-[#03BDCD]/5 rounded-xl p-3 border-2 border-[#038DCD]/30">
           <p className="text-[10px] text-[#038DCD] font-bold uppercase tracking-wide mb-1">Email (to be linked)</p>
           <p className="font-bold text-gray-900 text-sm">{formData.email}</p>
@@ -256,7 +272,7 @@ function Step2_ConfirmDetails({ onNext, onBack, formData }) {
 }
 
 // Step 3: Email verification
-function Step3_EmailVerification({ onNext, onBack, formData, setFormData }) {
+function Step3_EmailVerification({ onNext, onBack, formData, setFormData }: { onNext: () => void, onBack: () => void, formData: RegistrationFormData, setFormData: (data: RegistrationFormData) => void }) {
   const [verificationCode, setVerificationCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -289,7 +305,7 @@ function Step3_EmailVerification({ onNext, onBack, formData, setFormData }) {
       } else {
         setError('Failed to send verification code.');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -316,7 +332,7 @@ function Step3_EmailVerification({ onNext, onBack, formData, setFormData }) {
       } else {
         setError('Invalid verification code. Please try again.');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -327,7 +343,7 @@ function Step3_EmailVerification({ onNext, onBack, formData, setFormData }) {
     <div className="space-y-5">
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Verify Your Email</h2>
-        <p className="text-gray-600 text-sm">We'll send a code to <span className="font-bold text-[#038DCD]">{formData.email}</span></p>
+        <p className="text-gray-600 text-sm">We&apos;ll send a code to <span className="font-bold text-[#038DCD]">{formData.email}</span></p>
       </div>
 
       {!codeSent ? (
@@ -434,7 +450,7 @@ function Step3_EmailVerification({ onNext, onBack, formData, setFormData }) {
 }
 
 // Step 4: Create password
-function Step4_CreatePassword({ onNext, onBack, formData }) {
+function Step4_CreatePassword({ onNext, onBack, formData }: { onNext: () => void, onBack: () => void, formData: RegistrationFormData }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -452,7 +468,7 @@ function Step4_CreatePassword({ onNext, onBack, formData }) {
     const labels = ['Weak', 'Fair', 'Good', 'Strong'];
     const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-green-500'];
     const textColors = ['text-red-600', 'text-orange-600', 'text-yellow-600', 'text-green-600'];
-    
+
     return {
       strength,
       label: labels[strength - 1] || '',
@@ -481,7 +497,7 @@ function Step4_CreatePassword({ onNext, onBack, formData }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          memberComputerId: formData.memberData.MemComputerID,
+          memberComputerId: formData.memberData?.MemComputerID,
           email: formData.email,
           phone: formData.phone,
           password: password
@@ -494,7 +510,7 @@ function Step4_CreatePassword({ onNext, onBack, formData }) {
         const errorData = await response.json();
         setError(errorData.message || 'Registration failed');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -541,7 +557,7 @@ function Step4_CreatePassword({ onNext, onBack, formData }) {
             {showPassword ? '👁️' : '👁️‍🗨️'}
           </button>
         </div>
-        
+
         {/* Password Strength Indicator */}
         {password && (
           <div className="mt-2">
@@ -617,7 +633,7 @@ function Step5_Success() {
       <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
         <span className="text-5xl text-white">✓</span>
       </div>
-      
+
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           Registration Complete!
@@ -626,7 +642,7 @@ function Step5_Success() {
           Your account has been successfully created.
         </p>
       </div>
-      
+
       {/* Action Buttons */}
       <div className="space-y-3">
         <Link
@@ -670,7 +686,7 @@ export default function MemberRegistration() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-5 min-h-[600px]">
-          
+
           {/* Left Sidebar - Progress */}
           <div className="lg:col-span-2 bg-gradient-to-br from-[#038DCD] to-[#03BDCD] p-8 lg:p-10">
             {/* Logo and Header */}
@@ -693,13 +709,12 @@ export default function MemberRegistration() {
                   <div className="flex items-center gap-4">
                     {/* Step Circle */}
                     <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition-all shadow-lg ${
-                        s.number < step
-                          ? 'bg-white text-green-600'
-                          : s.number === step
-                            ? 'bg-white text-[#038DCD] scale-110'
-                            : 'bg-white/20 text-white/60'
-                      }`}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition-all shadow-lg ${s.number < step
+                        ? 'bg-white text-green-600'
+                        : s.number === step
+                          ? 'bg-white text-[#038DCD] scale-110'
+                          : 'bg-white/20 text-white/60'
+                        }`}
                     >
                       {s.number < step ? '✓' : s.icon}
                     </div>
@@ -707,16 +722,14 @@ export default function MemberRegistration() {
                     {/* Step Label */}
                     <div className="flex-1">
                       <p
-                        className={`font-bold text-sm uppercase tracking-wide ${
-                          s.number <= step ? 'text-white' : 'text-white/50'
-                        }`}
+                        className={`font-bold text-sm uppercase tracking-wide ${s.number <= step ? 'text-white' : 'text-white/50'
+                          }`}
                       >
                         {s.label}
                       </p>
                       <p
-                        className={`text-xs ${
-                          s.number === step ? 'text-white/90' : 'text-white/40'
-                        }`}
+                        className={`text-xs ${s.number === step ? 'text-white/90' : 'text-white/40'
+                          }`}
                       >
                         Step {s.number} of 5
                       </p>

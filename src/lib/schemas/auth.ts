@@ -37,9 +37,7 @@ export const verificationCodeSchema = z.string()
 
 // Member verification schemas
 export const memberVerificationSchema = z.object({
-  verificationMethod: z.enum(['membership', 'cnic'], {
-    required_error: 'Verification method is required'
-  }),
+  verificationMethod: z.enum(['membership', 'cnic']),
   membershipNo: membershipNoSchema.optional(),
   cnic: cnicSchema.optional(),
   email: emailSchema,

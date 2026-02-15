@@ -3,14 +3,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  LayoutDashboard, 
-  Users, 
-  FileText, 
-  Settings, 
-  LogOut, 
-  Menu, 
-  X, 
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  Settings,
+  LogOut,
+  Menu,
+  X,
   ChevronDown,
   Bell,
   Search,
@@ -21,8 +21,15 @@ import {
 
 // ==================== AUTH CONTEXT & PROVIDER ====================
 
+interface User {
+  name: string;
+  email: string;
+  role: string;
+  [key: string]: unknown;
+}
+
 interface AuthContextType {
-  user: any | null;
+  user: User | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   isLoading: boolean;
@@ -40,7 +47,7 @@ export const useAuth = () => {
 };
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
@@ -53,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await fetch('/api/auth/session', {
         credentials: 'include',
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -86,8 +93,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json();
       setUser(data.user);
       router.push('/admin');
-    } catch (error: any) {
-      throw error;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('An unknown error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -184,9 +194,8 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white border-r-2 border-slate-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white border-r-2 border-slate-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-6 border-b-2 border-slate-200">
@@ -219,17 +228,16 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
           {navigation.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
-            
+
             return (
               <Link
                 key={item.name}
                 href={item.href}
                 onClick={() => onClose()}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${
-                  isActive
-                    ? 'bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white shadow-lg'
-                    : 'text-slate-700 hover:bg-slate-100'
-                }`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${isActive
+                  ? 'bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white shadow-lg'
+                  : 'text-slate-700 hover:bg-slate-100'
+                  }`}
               >
                 <Icon className="w-5 h-5" />
                 <span>{item.name}</span>
@@ -361,10 +369,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <ProtectedRoute>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-amber-50/20">
           <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          
+
           <div className="lg:pl-64">
             <Header onMenuClick={() => setSidebarOpen(true)} />
-            
+
             <main className="p-4 sm:p-6 lg:p-8">
               {children}
             </main>
