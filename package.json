@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@prisma/adapter-mssql": "^7.2.0",
-    "@prisma/client": "^7.2.0",
+    "@prisma/client": "^6.19.2",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/pdfkit": "^0.17.4",
     "bcryptjs": "^3.0.3",
@@ -42,7 +42,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.4.4",
-    "prisma": "^7.2.0",
+    "prisma": "^6.19.2",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5.9.2"
