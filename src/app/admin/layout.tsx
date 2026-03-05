@@ -7,15 +7,9 @@ import {
   LayoutDashboard,
   Users,
   FileText,
-  Settings,
   LogOut,
-  Menu,
   X,
   ChevronDown,
-  Bell,
-  Search,
-  User,
-  Shield,
   Database,
   ChevronRight
 } from 'lucide-react';
@@ -59,6 +53,7 @@ const navigation = [
   { name: 'Members', href: '/admin/members', icon: Users },
   { name: 'Form Builder', href: '/admin/form-builder', icon: FileText },
   { name: 'Submissions', href: '/admin/submissions', icon: Database },
+  { name: 'Events', href: '/admin/events', icon: FileText },
   // { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 

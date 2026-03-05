@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Search, Calendar, CheckCircle, Clock, Trash2, Eye, Download,
   AlertCircle, X, FileText, User, Mail, Hash, SlidersHorizontal,
-  RefreshCw, ChevronLeft, ChevronRight, Filter
+  RefreshCw, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import {
   BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid,

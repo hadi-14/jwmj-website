@@ -130,13 +130,6 @@ export default function AdminLogin() {
             </button>
           </form>
         </div>
-
-        {/* Footer */}
-        <div className="mt-6 text-center">
-          <p className="text-sm text-slate-600">
-            © 2024 Jamat Welfare Memon Jamaat. All rights reserved.
-          </p>
-        </div>
       </div>
     </div>
   );

@@ -22,7 +22,7 @@ export default function Header() {
                         animationDelay: "0s"
                     }}
                 >
-                    Welcome to JWMJ! • Website Under Construction!
+                    Welcome to JWMJ! • Upcoming Eid Milan Party!
                 </span>
 
                 {/* Second animated text - offset by half the animation duration */}

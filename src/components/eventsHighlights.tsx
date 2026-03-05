@@ -4,28 +4,42 @@ import { formatDate } from '@/utils/general';
 
 export default function EventsHighlights() {
     const sliderRef = useRef<HTMLDivElement>(null);
-      const [Events, setEvents] = useState<{
-        id: number;
-        title: string;
-        desc: string;
-        date: string;
-        category: string;
-        img: string;
-        fb?: string;
-      }[]>([]);
-    
-      const getEvents = async () => {
+    const [Events, setEvents] = useState<{
+      id: string;
+      title: string;
+      desc: string;
+      date: string;
+      category: string;
+      img: string;
+      fb?: string;
+    }[]>([]);
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+  
+    const getEvents = async () => {
+      try {
+        setError(null);
         const res = await fetch("/api/events", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
+        
+        if (!res.ok) {
+          throw new Error('Failed to fetch events');
+        }
+        
         const data = await res.json();
         setEvents(data);
-      };
-    
-      useEffect(() => {
-        getEvents();
-      }, []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    useEffect(() => {
+      getEvents();
+    }, []);
     
 
     // Latest 8 events for slider (always newest)
@@ -54,6 +68,17 @@ export default function EventsHighlights() {
                 <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent ml-4"></div>
             </div>
 
+            {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-700 font-medium">{error}</p>
+                </div>
+            )}
+
+            {loading ? (
+                <div className="flex items-center justify-center p-12">
+                    <div className="text-gray-500">Loading events...</div>
+                </div>
+            ) : (
             <div className="relative rounded-3xl border border-gray-200 bg-jwmj-400 shadow-xl px-6 py-12 overflow-hidden">
                 {/* Decorative background elements */}
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
@@ -146,6 +171,7 @@ export default function EventsHighlights() {
                     ))}
                 </div>
             </div>
+            )}
         </section>
 
     );
