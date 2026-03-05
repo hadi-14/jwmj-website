@@ -18,7 +18,7 @@ interface FormWithFields {
 }
 
 function transformFormData(form: FormWithFields) {
-  console.log("Transforming form data:", form);
+  // console.log("Transforming form data:", form);
   return {
     ...form,
     // Keep the PDF file fields at the form level

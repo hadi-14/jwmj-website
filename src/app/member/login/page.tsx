@@ -33,20 +33,22 @@ export default function MemberLogin() {
       <div className="max-w-md w-full">
 
         {/* Header Section */}
-        <div className="text-center mb-8">
+        <div className="flex items-center justify-center text-center gap-4 mb-8">
           <Link href="/" className="inline-block mb-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-[#03BDCD] to-[#F9D98F] rounded-2xl flex items-center justify-center shadow-lg mx-auto">
+            <div className="w-25 h-25 rounded-2xl flex items-center justify-center mx-auto">
               <Image
                 src="/logo.png"
                 alt="JWMJ Logo"
-                width={120}
-                height={120}
+                width={100}
+                height={100}
                 className="object-contain"
               />
             </div>
           </Link>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2 italic">Member Portal</h1>
-          <p className="text-gray-600 font-medium">Sign in to access your account</p>
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2 italic">Member Portal</h1>
+            <p className="text-gray-600 font-medium">Sign in to access your account</p>
+          </div>
         </div>
 
         {/* Login Card */}

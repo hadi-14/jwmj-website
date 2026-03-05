@@ -9,73 +9,73 @@ datasource db {
 
 model SurName_L {
   SurCode   Decimal @id @db.Decimal(18, 0)
-  surName   String  @db.Char(100)
-  surNick   String  @default("'-'") @db.Char(5)
+  surName   String  @db.VarChar(100)
+  surNick   String  @db.VarChar(5)
   surActive Decimal @default(1) @db.Decimal(18, 0)
 }
 
 model Gender_L {
   GndCode   Decimal  @id @db.Decimal(18, 0)
-  GndName   String?  @db.Char(30)
-  Gndnick   String?  @default("'-'") @db.Char(5)
+  GndName   String?  @db.VarChar(30)
+  Gndnick   String?  @db.VarChar(5)
   GndActive Decimal? @default(1) @db.Decimal(18, 0)
 }
 
 model Area_L {
   AreCode   Decimal @id @db.Decimal(18, 0)
-  AreName   String? @db.Char(100)
-  AreNick   String? @default("'-'") @db.Char(5)
+  AreName   String? @db.VarChar(100)
+  AreNick   String? @db.VarChar(5)
   Areactive Decimal @default(1) @db.Decimal(18, 0)
 }
 
 model Country_L {
   CtrCode   Decimal  @id @db.Decimal(18, 0)
-  CtrName   String?  @db.Char(100)
-  CtrNick   String?  @default("'-'") @db.Char(5)
+  CtrName   String?  @db.VarChar(100)
+  CtrNick   String?  @db.VarChar(5)
   CtrActive Decimal? @default(1) @db.Decimal(18, 0)
 }
 
 model Community_L {
   CMMCode   Decimal  @id @db.Decimal(18, 0)
-  CMMName   String?  @db.Char(100)
-  CMMNick   String?  @default("'-'") @db.Char(5)
+  CMMName   String?  @db.VarChar(100)
+  CMMNick   String?  @db.VarChar(5)
   CMMActive Decimal? @default(1) @db.Decimal(18, 0)
 }
 
 model Status_L {
   Sts_Code       Decimal         @id @db.Decimal(18, 0)
-  Sts_Name       String?         @db.Char(100)
+  Sts_Name       String?         @db.VarChar(100)
   memberStatuses Member_Status[]
 }
 
 model Marital_L {
   MrtCode               Decimal                @id @db.Decimal(18, 0)
-  MrtName               String                 @db.Char(100)
-  MrtNick               String                 @default("'-'") @db.Char(5)
+  MrtName               String                 @db.VarChar(100)
+  MrtNick               String                 @db.VarChar(5)
   MrtActive             Decimal                @default(1) @db.Decimal(18, 0)
   memberMaritalStatuses Member_MaritalStatus[]
 }
 
 model Occupation_L {
   OccCode           Decimal             @id @db.Decimal(18, 0)
-  OccName           String              @db.Char(100)
-  OccNick           String              @default("'-'") @db.Char(5)
+  OccName           String              @db.VarChar(100)
+  OccNick           String              @db.VarChar(5)
   OccActive         Decimal             @default(1) @db.Decimal(18, 0)
   memberOccupations Member_Occupation[]
 }
 
 model Qualification_L {
   QuaCode              Decimal                @id @db.Decimal(18, 0)
-  QuaName              String?                @db.Char(100)
-  QuaNick              String?                @default("'-'") @db.Char(5)
-  QuaActive            String?                @default("1") @db.Char(10)
+  QuaName              String?                @db.VarChar(100)
+  QuaNick              String?                @db.VarChar(5)
+  QuaActive            String?                @default("1") @db.VarChar(10)
   memberQualifications Member_Qualification[]
 }
 
 model GraveYard_L {
   GVY_Code                Decimal                    @id @db.Decimal(18, 0)
-  GVY_Name                String?                    @db.Char(100)
-  GVY_Nick                String?                    @default("'-'") @db.Char(5)
+  GVY_Name                String?                    @db.VarChar(100)
+  GVY_Nick                String?                    @db.VarChar(5)
   GVY_Active              Decimal?                   @default(1) @db.Decimal(18, 0)
   memberDeathCertificates Member_Death_Certificate[]
 }
@@ -93,23 +93,23 @@ model Donation_For_List {
 
 model Donation_Status_L {
   DSL_Auto_Code Decimal @id @db.Decimal(18, 0)
-  DSL_Name      String  @db.Char(100)
+  DSL_Name      String  @db.VarChar(100)
   DSL_Active    Boolean @default(true)
 }
 
 model Donation_Type_L {
   DTY_Code         Int      @id
-  DTY_Name         String?  @db.Char(100)
+  DTY_Name         String?  @db.VarChar(100)
   DTY_Active       Boolean?
   DTY_Account_Head String?  @db.Char(50)
 }
 
 model Listof_MasterTable {
   Lst_code         Decimal @id @db.Decimal(18, 0)
-  Lst_TableCaption String? @db.Char(100)
-  Lst_TableName    String  @db.Char(100)
+  Lst_TableCaption String? @db.VarChar(100)
+  Lst_TableName    String  @db.VarChar(100)
   Lst_FieldName    String? @db.VarChar(150)
-  Lst_FieldCode    String? @db.Char(100)
+  Lst_FieldCode    String? @db.VarChar(100)
 }
 
 model Member_Information {
@@ -117,19 +117,19 @@ model Member_Information {
   MemComputerDate      DateTime?                  @db.DateTime(0)
   MemWehvariaNo        Decimal?                   @db.Decimal(18, 0)
   MemRegistrationDate  DateTime?                  @db.DateTime(0)
-  MemMembershipNo      String?                    @db.Char(50)
-  MemName              String?                    @db.Char(100)
+  MemMembershipNo      String?                    @db.VarChar(50)
+  MemName              String?                    @db.VarChar(100)
   MemSurNameCode       Decimal?                   @db.Decimal(18, 0)
   MemCNIC              Decimal?                   @db.Decimal(18, 0)
   MemDOB               DateTime?                  @db.DateTime(0)
   MemGenderCode        Decimal?                   @db.Decimal(18, 0)
-  MemFatherName        String?                    @db.Char(100)
-  MemMotherName        String?                    @db.Char(100)
-  MemPostalAddress     String?                    @db.Char(200)
+  MemFatherName        String?                    @db.VarChar(100)
+  MemMotherName        String?                    @db.VarChar(100)
+  MemPostalAddress     String?                    @db.VarChar(200)
   MemAreaCode          Decimal?                   @db.Decimal(18, 0)
   MemCountryCode       Decimal?                   @db.Decimal(18, 0)
   Remarks              String?                    @db.VarChar(300)
-  Mem_Pic              Bytes?                     @db.Blob
+  Mem_Pic              Bytes?
   Mem_DeceasedDate     DateTime?                  @db.DateTime(0)
   Mem_DeceasedDetails  String?                    @db.Char(250)
   CorrectCompid        Decimal?                   @db.Decimal(18, 0)
@@ -199,7 +199,7 @@ model DOJ {
   DOJ_Cell            String?   @db.VarChar(100)
   DOJ_Email           String?   @db.VarChar(70)
   DOJ_Remarks         String?   @db.VarChar(200)
-  DOJ_Pic             Bytes?    @db.Blob
+  DOJ_Pic             Bytes?
   DOJ_DeceasedDate    DateTime? @db.DateTime(0)
   DOJ_DeceasedDetails String?   @db.VarChar(250)
   Doj_Linked_Member   Decimal?  @db.Decimal(18, 0)
@@ -252,11 +252,12 @@ model Children_List {
   Chd_FatherMemberID   Decimal            @db.Decimal(18, 0)
   Chd_motherWehvariaNo Decimal?           @db.Decimal(18, 0)
   Chd_FatherWehvariaNo Decimal?           @db.Decimal(18, 0)
-  father               Member_Information @relation("FatherRelation", fields: [Chd_FatherMemberID], references: [MemComputerID], onDelete: NoAction, onUpdate: NoAction, map: "fk_children_father")
-  member               Member_Information @relation("MemberChildren", fields: [Chd_memberId], references: [MemComputerID], onDelete: NoAction, onUpdate: NoAction, map: "fk_children_member")
-  mother               Member_Information @relation("MotherRelation", fields: [Chd_MotherMemberID], references: [MemComputerID], onDelete: NoAction, onUpdate: NoAction, map: "fk_children_mother")
+  father               Member_Information @relation("FatherRelation", fields: [Chd_FatherMemberID], references: [MemComputerID], onUpdate: Restrict, map: "fk_children_father")
+  member               Member_Information @relation("MemberChildren", fields: [Chd_memberId], references: [MemComputerID], onUpdate: Restrict, map: "fk_children_member")
+  mother               Member_Information @relation("MotherRelation", fields: [Chd_MotherMemberID], references: [MemComputerID], onUpdate: Restrict, map: "fk_children_mother")
 
   @@index([Chd_memberId], map: "IX_Children_List")
+  @@index([Chd_WehvariaNo], map: "IX_Children_List_1")
   @@index([Chd_FatherMemberID], map: "fk_children_father")
   @@index([Chd_MotherMemberID], map: "fk_children_mother")
 }
@@ -270,7 +271,7 @@ model Spouse_List {
   Spu_Details          String?            @db.VarChar(300)
   Spu_ParentMemberID   Decimal?           @db.Decimal(18, 0)
   Spu_ParentWehvariano Decimal?           @db.Decimal(18, 0)
-  member               Member_Information @relation(fields: [Spu_MemberId], references: [MemComputerID], onUpdate: Restrict, map: "fk_spouse_member")
+  member               Member_Information @relation(fields: [Spu_MemberId], references: [MemComputerID], map: "fk_spouse_member")
 
   @@index([Spu_MemberId], map: "IX_Spouse_List")
   @@index([Spu_WehvariaNo], map: "IX_Spouse_List_1")
@@ -283,8 +284,8 @@ model Parents_List {
   Par_Deactive     Decimal?           @default(0) @db.Decimal(18, 0)
   Par_DeactiveDate DateTime?          @db.DateTime(0)
   Par_Details      String?            @db.VarChar(300)
-  member           Member_Information @relation("MemberAsParent", fields: [Par_MemberID], references: [MemComputerID], onDelete: NoAction, onUpdate: NoAction, map: "fk_parents_member")
-  parent           Member_Information @relation("ParentOfMember", fields: [Par_WehvariaNo], references: [MemComputerID], onDelete: NoAction, onUpdate: NoAction, map: "fk_parents_parent")
+  member           Member_Information @relation("MemberAsParent", fields: [Par_MemberID], references: [MemComputerID], onUpdate: Restrict, map: "fk_parents_member")
+  parent           Member_Information @relation("ParentOfMember", fields: [Par_WehvariaNo], references: [MemComputerID], onUpdate: Restrict, map: "fk_parents_parent")
 
   @@index([Par_MemberID], map: "IX_Parents_List")
   @@index([Par_WehvariaNo], map: "IX_Parents_List_1")
@@ -295,11 +296,11 @@ model Member_MaritalStatus {
   MMr_MemWehvariaNo Decimal?           @db.Decimal(18, 0)
   MMr_MaritalCode   Decimal            @db.Decimal(18, 0)
   MMr_StatusDate    DateTime           @db.DateTime(0)
-  maritalStatus     Marital_L          @relation(fields: [MMr_MaritalCode], references: [MrtCode], onUpdate: Restrict, map: "fk_mms_marital")
-  member            Member_Information @relation(fields: [MMr_MemComputerID], references: [MemComputerID], onUpdate: Restrict, map: "fk_mms_member")
+  maritalStatus     Marital_L          @relation(fields: [MMr_MaritalCode], references: [MrtCode], map: "fk_mms_marital")
+  member            Member_Information @relation(fields: [MMr_MemComputerID], references: [MemComputerID], map: "fk_mms_member")
 
   @@id([MMr_MemComputerID, MMr_MaritalCode, MMr_StatusDate])
-  @@index([MMr_MemComputerID], map: "MMr_MemComputerID")
+  @@index([MMr_MemComputerID])
   @@index([MMr_MaritalCode], map: "fk_mms_marital")
 }
 
@@ -308,11 +309,11 @@ model Member_Occupation {
   MOc_MemWehvariaNo  Decimal?           @db.Decimal(18, 0)
   MOc_OccupationCode Decimal            @db.Decimal(18, 0)
   MOc_statusDate     DateTime           @db.Date
-  member             Member_Information @relation(fields: [MOc_MemComputerID], references: [MemComputerID], onUpdate: Restrict, map: "fk_mocc_member")
-  occupation         Occupation_L       @relation(fields: [MOc_OccupationCode], references: [OccCode], onUpdate: Restrict, map: "fk_mocc_occ")
+  member             Member_Information @relation(fields: [MOc_MemComputerID], references: [MemComputerID], map: "fk_mocc_member")
+  occupation         Occupation_L       @relation(fields: [MOc_OccupationCode], references: [OccCode], map: "fk_mocc_occ")
 
   @@id([MOc_MemComputerID, MOc_OccupationCode, MOc_statusDate])
-  @@index([MOc_MemComputerID], map: "MOc_MemComputerID")
+  @@index([MOc_MemComputerID])
   @@index([MOc_OccupationCode], map: "fk_mocc_occ")
 }
 
@@ -321,11 +322,11 @@ model Member_Qualification {
   MQu_MemWehvariaNo     Decimal?           @db.Decimal(18, 0)
   MQu_QualificationCode Decimal            @db.Decimal(18, 0)
   MQu_StatusDate        DateTime           @db.DateTime(0)
-  member                Member_Information @relation(fields: [MQu_MemComputerID], references: [MemComputerID], onUpdate: Restrict, map: "fk_mqual_member")
-  qualification         Qualification_L    @relation(fields: [MQu_QualificationCode], references: [QuaCode], onUpdate: Restrict, map: "fk_mqual_qual")
+  member                Member_Information @relation(fields: [MQu_MemComputerID], references: [MemComputerID], map: "fk_mqual_member")
+  qualification         Qualification_L    @relation(fields: [MQu_QualificationCode], references: [QuaCode], map: "fk_mqual_qual")
 
   @@id([MQu_MemComputerID, MQu_QualificationCode, MQu_StatusDate])
-  @@index([MQu_MemComputerID], map: "MQu_MemComputerID")
+  @@index([MQu_MemComputerID])
   @@index([MQu_QualificationCode], map: "fk_mqual_qual")
 }
 
@@ -335,11 +336,11 @@ model Member_Status {
   Mst_StatusCode   Decimal            @db.Decimal(18, 0)
   Mst_CreationDate DateTime           @db.Date
   Mst_DeactiveDate DateTime           @db.Date
-  member           Member_Information @relation(fields: [Mst_Memberid], references: [MemComputerID], onUpdate: Restrict, map: "fk_msts_member")
-  status           Status_L           @relation(fields: [Mst_StatusCode], references: [Sts_Code], onUpdate: Restrict, map: "fk_msts_status")
+  member           Member_Information @relation(fields: [Mst_Memberid], references: [MemComputerID], map: "fk_msts_member")
+  status           Status_L           @relation(fields: [Mst_StatusCode], references: [Sts_Code], map: "fk_msts_status")
 
   @@id([Mst_Memberid, Mst_CreationDate])
-  @@index([Mst_Memberid], map: "Mst_Memberid")
+  @@index([Mst_Memberid])
   @@index([Mst_StatusCode], map: "fk_msts_status")
 }
 
@@ -347,20 +348,20 @@ model Member_CellNumber {
   MCL_MemComputerid Decimal            @db.Decimal(18, 0)
   MCL_MemWehvariaNo Decimal            @db.Decimal(18, 0)
   MCL_CellNumber    Decimal            @db.Decimal(18, 0)
-  member            Member_Information @relation(fields: [MCL_MemComputerid], references: [MemComputerID], onUpdate: Restrict, map: "fk_mcell_member")
+  member            Member_Information @relation(fields: [MCL_MemComputerid], references: [MemComputerID], map: "fk_mcell_member")
 
   @@id([MCL_MemComputerid, MCL_CellNumber])
-  @@index([MCL_MemComputerid], map: "MCL_MemComputerid")
+  @@index([MCL_MemComputerid])
 }
 
 model Member_Emailid {
   MEM_MemComputerID Decimal            @db.Decimal(18, 0)
   MEM_MemWehvariaNo Decimal            @db.Decimal(18, 0)
   MEM_Emailid       String             @db.VarChar(100)
-  member            Member_Information @relation(fields: [MEM_MemComputerID], references: [MemComputerID], onUpdate: Restrict, map: "fk_memail_member")
+  member            Member_Information @relation(fields: [MEM_MemComputerID], references: [MemComputerID], map: "fk_memail_member")
 
   @@id([MEM_MemComputerID, MEM_Emailid])
-  @@index([MEM_MemComputerID], map: "MEM_MemComputerID")
+  @@index([MEM_MemComputerID])
 }
 
 model Member_Tree {
@@ -385,9 +386,9 @@ model Amount_Receive {
   CPY_CardIssued     Decimal?           @default(0) @db.Decimal(18, 0)
   CPY_FeeFor         String?            @db.Char(250)
   CPY_Member_Type    Int?
-  member             Member_Information @relation(fields: [CPY_Membershipid], references: [MemComputerID], onUpdate: Restrict, map: "fk_amtrec_member")
+  member             Member_Information @relation(fields: [CPY_Membershipid], references: [MemComputerID], map: "fk_amtrec_member")
 
-  @@index([CPY_Membershipid], map: "CPY_Membershipid")
+  @@index([CPY_Membershipid])
 }
 
 model Member_AnnualFee {
@@ -398,9 +399,9 @@ model Member_AnnualFee {
   RFE_Fee          Decimal?           @db.Decimal(18, 0)
   RFE_Details      String?            @db.Char(250)
   RFE_Acc_Voucher  String?            @db.VarChar(30)
-  member           Member_Information @relation(fields: [RFE_MemberID], references: [MemComputerID], onUpdate: Restrict, map: "fk_maf_member")
+  member           Member_Information @relation(fields: [RFE_MemberID], references: [MemComputerID], map: "fk_maf_member")
 
-  @@index([RFE_MemberID], map: "RFE_MemberID")
+  @@index([RFE_MemberID])
 }
 
 model Annual_Fee_OB {
@@ -432,9 +433,9 @@ model Annual_Fee_Receive_M {
   ARM_MemberID      Decimal            @db.Decimal(18, 0)
   ARM_Bank_HeadCode String?            @db.VarChar(30)
   ARM_Fee_HeadCode  String?            @db.VarChar(30)
-  member            Member_Information @relation(fields: [ARM_MemberID], references: [MemComputerID], onUpdate: Restrict, map: "fk_afrm_member")
+  member            Member_Information @relation(fields: [ARM_MemberID], references: [MemComputerID], map: "fk_afrm_member")
 
-  @@index([ARM_MemberID], map: "ARM_MemberID")
+  @@index([ARM_MemberID])
 }
 
 model Annual_Fee_Receive_D {
@@ -460,7 +461,6 @@ model abc_tmp {
 }
 
 model aft_vouchers {
-  tmp             Decimal   @id @db.Decimal(18, 0)
   vocno           String    @db.Char(40)
   vocdate         DateTime  @db.DateTime(0)
   vochead         String    @db.Char(50)
@@ -468,7 +468,7 @@ model aft_vouchers {
   voccr           Float?
   vocagains       String?   @db.Char(50)
   voccheque       String?   @db.Char(50)
-  vocdescription  String?   @db.VarChar(500)
+  vocdescription  String?   @db.Text
   vocSRNO         Float?
   VocNumber       Float?
   VocRefNo        String?   @db.Char(50)
@@ -483,11 +483,12 @@ model aft_vouchers {
   vocConvRate     Float?
   VocCurrencyDR   Float?
   VocCurrencyCR   Float?
-  Vocdescription2 String?   @db.VarChar(500)
+  Vocdescription2 String?   @db.Text
   VocNTNNo        String?   @db.Char(50)
   VocNICNo        String?   @db.Char(50)
   VocEmpName      String?   @db.Char(150)
   VocEmpCode      String?   @db.Char(50)
+  tmp             Decimal   @id @db.Decimal(18, 0)
 }
 
 model Donation_Application {
@@ -532,11 +533,11 @@ model Member_Death_Certificate {
   Dth_outsider              Int?               @default(0) @db.SmallInt
   Dth_Time                  DateTime?          @db.DateTime(0)
   Dth_DeathDate             DateTime?          @db.DateTime(0)
-  graveYard                 GraveYard_L?       @relation(fields: [Dth_GraveYard_Code], references: [GVY_Code], onDelete: Restrict, onUpdate: Restrict, map: "fk_dth_graveyard")
-  member                    Member_Information @relation(fields: [Dth_MemComputerID], references: [MemComputerID], onUpdate: Restrict, map: "fk_dth_member")
+  graveYard                 GraveYard_L?       @relation(fields: [Dth_GraveYard_Code], references: [GVY_Code], map: "fk_dth_graveyard")
+  member                    Member_Information @relation(fields: [Dth_MemComputerID], references: [MemComputerID], map: "fk_dth_member")
 
-  @@index([Dth_GraveYard_Code], map: "Dth_GraveYard_Code")
-  @@index([Dth_MemComputerID], map: "Dth_MemComputerID")
+  @@index([Dth_GraveYard_Code])
+  @@index([Dth_MemComputerID])
 }
 
 model EmployeeInfo {
@@ -555,16 +556,16 @@ model UserInfo {
 }
 
 model Tmp_Annual_FeeReceipt {
-  Voc_No          String   @id @db.VarChar(50)
   MemberID        Decimal  @db.Decimal(18, 0)
+  Voc_No          String   @id @db.VarChar(50)
   Date            DateTime @db.Date
   Fee             Decimal? @db.Decimal(18, 0)
   MemMembershipNo String?  @db.VarChar(50)
   MemName         String?  @db.VarChar(100)
   MemCNIC         Decimal? @db.Decimal(18, 0)
-  Mem_Pic         Bytes?   @db.Blob
+  Mem_Pic         Bytes?
   arm_disc        Decimal? @db.Decimal(18, 0)
-  SurName         String?  @db.Char(100)
+  SurName         String?  @db.VarChar(100)
   memcellno       Decimal? @db.Decimal(18, 0)
 }
 
@@ -585,12 +586,12 @@ model tmp_auto_Desc {
 }
 
 model tmp_deathcert_List {
-  Dth_Auto_Id               BigInt    @id
   MemName                   String?   @db.VarChar(100)
   surname                   String    @db.VarChar(100)
   gndname                   String?   @db.VarChar(30)
   Mem_DeceasedDate          DateTime? @db.DateTime(0)
   GVY_Name                  String?   @db.VarChar(100)
+  Dth_Auto_Id               BigInt    @id
   Dth_Age                   String?   @db.VarChar(50)
   Dth_Grave_No              Int?
   Dth_Burial_Date           DateTime? @db.DateTime(0)
@@ -637,7 +638,7 @@ model Tmp_MemberShip_Form {
   MemAreaCode          Decimal?  @db.Decimal(18, 0)
   MemCountryCode       Decimal?  @db.Decimal(18, 0)
   Remarks              String?   @db.VarChar(300)
-  Mem_Pic              Bytes?    @db.Blob
+  Mem_Pic              Bytes?
   Mem_DeceasedDate     DateTime? @db.DateTime(0)
   Mem_DeceasedDetails  String?   @db.Char(250)
   CorrectCompid        Decimal?  @db.Decimal(18, 0)
@@ -647,10 +648,10 @@ model Tmp_MemberShip_Form {
   Mem_DeActive_Date    DateTime? @db.DateTime(0)
   Mem_DeActive_Details String?   @db.Char(250)
   Mem_Dth_Cert_Req     Int?      @db.SmallInt
-  Surname              String?   @db.Char(100)
-  genderNAME           String?   @db.Char(30)
-  AREANAME             String?   @db.Char(100)
-  COUNTRYNAME          String?   @db.Char(100)
+  Surname              String?   @db.VarChar(100)
+  genderNAME           String?   @db.VarChar(30)
+  AREANAME             String?   @db.VarChar(100)
+  COUNTRYNAME          String?   @db.VarChar(100)
   MarriedstatusName    String?   @db.VarChar(100)
   occupation           String?   @db.VarChar(100)
   qualification        String?   @db.VarChar(100)
@@ -660,8 +661,8 @@ model Tmp_MemberShip_Form {
 }
 
 model Tmp_MemberShip_Form_DOJ {
-  DOJ_RegDate         DateTime  @db.DateTime(0)
   DOJ_Daughter_Code   Decimal   @default(0) @db.Decimal(18, 0)
+  DOJ_RegDate         DateTime  @db.DateTime(0)
   DOJ_DOB             DateTime? @db.DateTime(0)
   DOJ_CNIC            String?   @db.Char(30)
   DOJ_Name            String?   @db.VarChar(70)
@@ -675,7 +676,7 @@ model Tmp_MemberShip_Form_DOJ {
   DOJ_Cell            String?   @db.VarChar(100)
   DOJ_Email           String?   @db.VarChar(70)
   DOJ_Remarks         String?   @db.VarChar(200)
-  DOJ_Pic             Bytes?    @db.Blob
+  DOJ_Pic             Bytes?
   DOJ_DeceasedDate    DateTime? @db.DateTime(0)
   DOJ_DeceasedDetails String?   @db.VarChar(250)
   Doj_Linked_Member   Decimal?  @db.Decimal(18, 0)
@@ -684,9 +685,9 @@ model Tmp_MemberShip_Form_DOJ {
   Doj_Husband_SurName Decimal?  @db.Decimal(18, 0)
   Doj_Husband_Cell    String?   @db.Char(70)
   Doj_Community       Decimal?  @db.Decimal(18, 0)
-  Surname             String?   @db.Char(100)
-  AREANAME            String?   @db.Char(100)
-  COUNTRYNAME         String?   @db.Char(100)
+  Surname             String?   @db.VarChar(100)
+  AREANAME            String?   @db.VarChar(100)
+  COUNTRYNAME         String?   @db.VarChar(100)
 
   @@id([DOJ_RegDate, DOJ_Daughter_Code])
 }
@@ -697,15 +698,15 @@ model TmpAllMemberList {
   MemMembershipNo     String?   @db.VarChar(50)
   MemName             String?   @db.VarChar(100)
   Mem_DECEASEDDAte    DateTime? @db.DateTime(0)
-  Surname             String?   @db.Char(100)
+  Surname             String?   @db.VarChar(100)
   MemCNIC             Decimal?  @db.Decimal(18, 0)
   MemDOB              DateTime? @db.DateTime(0)
-  genderNAME          String?   @db.Char(30)
+  genderNAME          String?   @db.VarChar(30)
   MemFatherName       String?   @db.VarChar(100)
   MemMotherName       String?   @db.VarChar(100)
   MemPostalAddress    String?   @db.VarChar(200)
-  AREANAME            String?   @db.Char(100)
-  COUNTRYNAME         String?   @db.Char(100)
+  AREANAME            String?   @db.VarChar(100)
+  COUNTRYNAME         String?   @db.VarChar(100)
   Remarks             String?   @db.VarChar(300)
   MemStatus           String?   @db.VarChar(30)
   MarriedstatusName   String?   @db.VarChar(100)
@@ -745,12 +746,12 @@ model tmpMotherdetails {
 
 model tmpstatusChild {
   MemMembershipNo  String    @db.VarChar(50)
-  chd_StatusDate   DateTime  @db.DateTime(0)
   MemName          String?   @db.VarChar(100)
   MemCNIC          Decimal?  @db.Decimal(18, 0)
   MemDOB           DateTime? @db.DateTime(0)
-  Gender           String?   @db.Char(30)
-  SurName          String?   @db.Char(100)
+  chd_StatusDate   DateTime  @db.DateTime(0)
+  Gender           String?   @db.VarChar(30)
+  SurName          String?   @db.VarChar(100)
   Father_memberNo  String?   @db.VarChar(50)
   FaTHER_Name      String?   @db.VarChar(100)
   mother_memberNo  String?   @db.VarChar(50)
@@ -767,18 +768,18 @@ model tmpstatusheadoffamily {
   MemCNIC         Decimal?  @db.Decimal(18, 0)
   MemDOB          DateTime? @db.DateTime(0)
   Par_StatusDate  DateTime? @db.DateTime(0)
-  Gender          String?   @db.Char(30)
-  SurName         String?   @db.Char(100)
+  Gender          String?   @db.VarChar(30)
+  SurName         String?   @db.VarChar(100)
 }
 
 model tmpstatusSpouse {
   MemMembershipNo  String    @db.VarChar(50)
-  Spu_StatusDate   DateTime  @db.DateTime(0)
   MemName          String?   @db.VarChar(100)
   MemCNIC          Decimal?  @db.Decimal(18, 0)
   MemDOB           DateTime? @db.DateTime(0)
-  Gender           String?   @db.Char(30)
-  SurName          String?   @db.Char(100)
+  Spu_StatusDate   DateTime  @db.DateTime(0)
+  Gender           String?   @db.VarChar(30)
+  SurName          String?   @db.VarChar(100)
   PARENT_memberNo  String?   @db.VarChar(50)
   PARENT_Name      String?   @db.VarChar(100)
   Spu_DeactiveDate DateTime? @db.DateTime(0)
@@ -817,55 +818,55 @@ model rptfeeslip {
 }
 
 model sysdiagrams {
-  name         String @db.Char(128)
+  name         String @db.VarChar(128)
   principal_id Int
   diagram_id   Int    @id @default(autoincrement())
   version      Int?
-  definition   Bytes? @db.Blob
+  definition   Bytes?
 
-  @@unique([principal_id, name], map: "uq_sysdiagrams")
+  @@unique([principal_id, name], map: "UK_principal_name")
 }
 
 model Form {
   id          String           @id @default(cuid()) @db.VarChar(255)
-  name        String           @db.Char(255)
+  name        String           @db.VarChar(255)
   description String?          @db.VarChar(500)
   formType    String           @db.VarChar(100)
   version     Int              @default(1)
   isActive    Boolean          @default(true)
-  pdfFileUrl  String           @db.VarChar(500)
-  pdfFileName String           @db.Char(255)
   createdAt   DateTime         @default(now()) @db.DateTime(0)
-  updatedAt   DateTime         @default(now()) @updatedAt @db.DateTime(0)
+  updatedAt   DateTime         @updatedAt @db.DateTime(0)
+  pdfFileName String           @db.VarChar(255)
+  pdfFileUrl  String           @db.VarChar(500)
   fields      FormField[]
   submissions FormSubmission[]
 
-  @@index([formType], map: "formType")
-  @@index([isActive], map: "isActive")
+  @@index([formType])
+  @@index([isActive])
 }
 
 model FormField {
   id             String           @id @default(cuid()) @db.VarChar(255)
   formId         String           @db.VarChar(255)
-  fieldName      String           @db.Char(255)
-  fieldLabel     String           @db.Char(255)
-  fieldType      String           @db.Char(50)
+  fieldName      String           @db.VarChar(255)
+  fieldLabel     String           @db.VarChar(255)
+  fieldType      String           @db.VarChar(50)
   fieldOrder     Int
   isRequired     Boolean          @default(false)
   isHidden       Boolean          @default(false)
-  placeholder    String?          @db.Char(255)
+  placeholder    String?          @db.VarChar(255)
   helpText       String?          @db.VarChar(500)
   defaultValue   String?          @db.VarChar(500)
-  validationRule String?          @db.VarChar(1000)
-  options        String?          @db.Text
-  columnWidth    String           @default("full") @db.VarChar(50)
+  validationRule String?          @db.VarChar(255)
+  options        String?          @db.LongText
+  columnWidth    String           @default("full") @db.VarChar(255)
   createdAt      DateTime         @default(now()) @db.DateTime(0)
-  updatedAt      DateTime         @default(now()) @updatedAt @db.DateTime(0)
+  updatedAt      DateTime         @updatedAt @db.DateTime(0)
   form           Form             @relation(fields: [formId], references: [id], onDelete: Cascade, map: "fk_formfield_form")
   fieldValues    FormFieldValue[]
 
-  @@unique([formId, fieldName], map: "uq_formfield_name")
-  @@index([formId], map: "formId")
+  @@unique([formId, fieldName])
+  @@index([formId])
 }
 
 model FormSubmission {
@@ -873,79 +874,223 @@ model FormSubmission {
   formId           String           @db.VarChar(255)
   memberComputerId Decimal?         @db.Decimal(18, 0)
   submissionDate   DateTime         @default(now()) @db.DateTime(0)
-  status           String           @default("draft") @db.Char(50)
-  submittedBy      String?          @db.Char(255)
-  approvedBy       String?          @db.Char(255)
+  status           String           @default("draft") @db.VarChar(50)
+  submittedBy      String?          @db.VarChar(255)
+  approvedBy       String?          @db.VarChar(255)
   approvedDate     DateTime?        @db.DateTime(0)
-  notes            String?          @db.VarChar(1000)
-  ipAddress        String?          @db.Char(50)
+  notes            String?          @db.VarChar(255)
+  ipAddress        String?          @db.VarChar(50)
   userAgent        String?          @db.VarChar(500)
   isDeleted        Boolean          @default(false)
   createdAt        DateTime         @default(now()) @db.DateTime(0)
-  updatedAt        DateTime         @default(now()) @updatedAt @db.DateTime(0)
+  updatedAt        DateTime         @updatedAt @db.DateTime(0)
   auditLogs        FormAuditLog[]
   fieldValues      FormFieldValue[]
   form             Form             @relation(fields: [formId], references: [id], onDelete: Cascade, map: "fk_formsub_form")
 
-  @@index([formId], map: "formId")
-  @@index([memberComputerId], map: "memberComputerId")
-  @@index([status], map: "status")
-  @@index([submissionDate], map: "submissionDate")
+  @@index([formId])
+  @@index([memberComputerId])
+  @@index([status])
+  @@index([submissionDate])
 }
 
 model FormFieldValue {
   id           String         @id @default(cuid()) @db.VarChar(255)
   submissionId String         @db.VarChar(255)
   fieldId      String         @db.VarChar(255)
-  value        String?        @db.Text
+  value        String?        @db.LongText
   fileUrl      String?        @db.VarChar(500)
-  fileName     String?        @db.Char(255)
+  fileName     String?        @db.VarChar(255)
   fileSize     Int?
   createdAt    DateTime       @default(now()) @db.DateTime(0)
-  updatedAt    DateTime       @default(now()) @updatedAt @db.DateTime(0)
-  field        FormField      @relation(fields: [fieldId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ffv_field")
+  updatedAt    DateTime       @updatedAt @db.DateTime(0)
+  field        FormField      @relation(fields: [fieldId], references: [id], onUpdate: Restrict, map: "fk_ffv_field")
   submission   FormSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade, map: "fk_ffv_submission")
 
-  @@unique([submissionId, fieldId], map: "uq_ffv")
-  @@index([fieldId], map: "fieldId")
-  @@index([submissionId], map: "submissionId")
+  @@unique([submissionId, fieldId])
+  @@index([fieldId])
+  @@index([submissionId])
 }
 
 model FormAuditLog {
   id           String         @id @default(cuid()) @db.VarChar(255)
   submissionId String         @db.VarChar(255)
-  action       String         @db.Char(100)
-  changedBy    String         @db.Char(255)
-  changes      String?        @db.Text
+  action       String         @db.VarChar(100)
+  changedBy    String         @db.VarChar(255)
+  changes      String?        @db.LongText
   timestamp    DateTime       @default(now()) @db.DateTime(0)
-  ipAddress    String?        @db.Char(50)
+  ipAddress    String?        @db.VarChar(50)
   submission   FormSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade, map: "fk_fal_submission")
 
-  @@index([submissionId], map: "submissionId")
-  @@index([timestamp], map: "timestamp")
+  @@index([submissionId])
+  @@index([timestamp])
 }
 
 model User {
   id        String   @id @default(cuid()) @db.VarChar(255)
-  email     String   @unique(map: "uq_user_email") @db.VarChar(255)
+  email     String   @unique @db.VarChar(255)
   name      String?  @db.VarChar(255)
   password  String   @db.VarChar(255)
-  role      String   @default("USER") @db.Char(20)
+  role      String   @default("USER") @db.VarChar(20)
   createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.DateTime(0)
+  updatedAt DateTime @updatedAt @db.DateTime(0)
 }
 
 model VerificationCode {
   id                   String   @id @default(cuid()) @db.VarChar(255)
-  email                String   @unique(map: "uq_vercode_email") @db.VarChar(255)
+  email                String   @unique @db.VarChar(255)
   code                 String   @db.VarChar(255)
   expiresAt            DateTime @db.DateTime(0)
   attempts             Int      @default(0)
   verificationAttempts Int      @default(0)
   lastAttempt          DateTime @default(now()) @db.DateTime(0)
   createdAt            DateTime @default(now()) @db.DateTime(0)
-  updatedAt            DateTime @default(now()) @updatedAt @db.DateTime(0)
+  updatedAt            DateTime @updatedAt @db.DateTime(0)
 
-  @@index([email], map: "email")
-  @@index([expiresAt], map: "expiresAt")
+  @@index([email])
+  @@index([expiresAt])
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model testtable {
+  testtime Bytes? @db.VarBinary(50)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tmp_Don_App {
+  DAP_Member_ID          Int?
+  DAP_TypeWise_SrNo      Int?
+  DAP_Date               DateTime  @db.Date
+  Donation_For           String?   @db.VarChar(210)
+  Donation_Type          String?   @db.VarChar(210)
+  Expect_Rs              Decimal?  @db.Decimal(18, 0)
+  Expect_Date            DateTime? @db.Date
+  Details                String?   @db.VarChar(100)
+  Submit_by_Relation     String?   @db.VarChar(210)
+  DAP_Submitted_By_MEMID Int?
+  Surname                String?   @db.VarChar(100)
+  Cell_No                Decimal?  @db.Decimal(18, 0)
+  MemMembershipNo        String?   @db.VarChar(50)
+  MemName                String?   @db.VarChar(100)
+  MemFatherName          String?   @db.VarChar(100)
+  MemMotherName          String?   @db.VarChar(100)
+  Spouse_Name            String?   @db.VarChar(100)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tmp_doj_list {
+  DOJ_Daughter_Code   Decimal   @db.Decimal(18, 0)
+  DOJ_RegDate         DateTime  @default(now()) @db.DateTime(0)
+  DOJ_DOB             DateTime? @db.DateTime(0)
+  DOJ_CNIC            String?   @db.Char(30)
+  DOJ_Name            String?   @db.VarChar(70)
+  SurName             String?   @db.VarChar(100)
+  DOJ_HusbandName     String?   @db.VarChar(70)
+  DOJ_FatherName      String?   @db.VarChar(70)
+  DOJ_MotherName      String?   @db.VarChar(70)
+  DOJ_PostalAddress   String?   @db.VarChar(150)
+  AREA                String?   @db.VarChar(100)
+  country             String?   @db.VarChar(100)
+  DOJ_Cell            String?   @db.VarChar(100)
+  DOJ_Email           String?   @db.VarChar(70)
+  DOJ_DeceasedDate    DateTime? @db.DateTime(0)
+  DOJ_DeceasedDetails String?   @db.VarChar(250)
+  LinkMember          String?   @db.VarChar(100)
+  DOBChild            DateTime? @db.DateTime(0)
+  ChildName           String?   @db.VarChar(70)
+  Child_Gender        String?   @db.VarChar(30)
+  doj_relation        String?   @db.VarChar(100)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tmp_fee_generate {
+  RFE_Acc_Voucher  String?   @db.VarChar(30)
+  RFE_INVOICE_dATE DateTime? @db.Date
+  Fee              Decimal?  @db.Decimal(38, 0)
+  RFE_FiscalYear   Decimal?  @db.Decimal(18, 0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tmp_member_tree_final {
+  MemComputerID        Decimal   @db.Decimal(18, 0)
+  MemComputerDate      DateTime? @db.DateTime(0)
+  MemWehvariaNo        Decimal?  @db.Decimal(18, 0)
+  MemRegistrationDate  DateTime? @db.DateTime(0)
+  MemMembershipNo      String?   @db.VarChar(50)
+  MemName              String?   @db.VarChar(100)
+  MemSurNameCode       Decimal?  @db.Decimal(18, 0)
+  MemCNIC              Decimal?  @db.Decimal(18, 0)
+  MemDOB               DateTime? @db.DateTime(0)
+  MemGenderCode        Decimal?  @db.Decimal(18, 0)
+  MemFatherName        String?   @db.VarChar(100)
+  MemMotherName        String?   @db.VarChar(100)
+  MemPostalAddress     String?   @db.VarChar(200)
+  MemAreaCode          Decimal?  @db.Decimal(18, 0)
+  MemCountryCode       Decimal?  @db.Decimal(18, 0)
+  Remarks              String?   @db.VarChar(300)
+  Mem_Pic              Bytes?
+  Mem_DeceasedDate     DateTime? @db.DateTime(0)
+  Mem_DeceasedDetails  String?   @db.Char(250)
+  CorrectCompid        Decimal?  @db.Decimal(18, 0)
+  auto_backtick        Decimal   @db.Decimal(18, 0)
+  MemComputerID_Bkup   Decimal?  @db.Decimal(18, 0)
+  Mem_DeActive         Boolean?
+  Mem_DeActive_Date    DateTime? @db.DateTime(0)
+  Mem_DeActive_Details String?   @db.Char(250)
+  Mem_Dth_Cert_Req     Int?      @db.SmallInt
+  Spu_ParentMemberID   Decimal?  @db.Decimal(18, 0)
+  Spu_memberID         Decimal?  @db.Decimal(18, 0)
+  spouse_membership_no String?   @db.VarChar(50)
+  spouse_name          String?   @db.VarChar(100)
+  Spu_DeactiveDate     DateTime? @db.DateTime(0)
+  child_id             Decimal?  @db.Decimal(18, 0)
+  Chd_DeactiveDate     DateTime? @db.DateTime(0)
+  Chd_MotherMemberID   Decimal?  @db.Decimal(18, 0)
+  Chd_FatherMemberID   Decimal?  @db.Decimal(18, 0)
+  child_name           String?   @db.VarChar(100)
+  CHILD_MEMBERSHIP_NO  String?   @db.VarChar(50)
+
+  @@ignore
+}
+
+model tmp_member_tree_spouse {
+  MemComputerID        Decimal   @id @db.Decimal(18, 0)
+  MemComputerDate      DateTime? @db.DateTime(0)
+  MemWehvariaNo        Decimal?  @db.Decimal(18, 0)
+  MemRegistrationDate  DateTime? @db.DateTime(0)
+  MemMembershipNo      String?   @db.VarChar(50)
+  MemName              String?   @db.VarChar(100)
+  MemSurNameCode       Decimal?  @db.Decimal(18, 0)
+  MemCNIC              Decimal?  @db.Decimal(18, 0)
+  MemDOB               DateTime? @db.DateTime(0)
+  MemGenderCode        Decimal?  @db.Decimal(18, 0)
+  MemFatherName        String?   @db.VarChar(100)
+  MemMotherName        String?   @db.VarChar(100)
+  MemPostalAddress     String?   @db.VarChar(200)
+  MemAreaCode          Decimal?  @db.Decimal(18, 0)
+  MemCountryCode       Decimal?  @db.Decimal(18, 0)
+  Remarks              String?   @db.VarChar(300)
+  Mem_Pic              Bytes?
+  Mem_DeceasedDate     DateTime? @db.DateTime(0)
+  Mem_DeceasedDetails  String?   @db.Char(250)
+  CorrectCompid        Decimal?  @db.Decimal(18, 0)
+  auto_backtick        Decimal   @db.Decimal(18, 0)
+  MemComputerID_Bkup   Decimal?  @db.Decimal(18, 0)
+  Mem_DeActive         Boolean?
+  Mem_DeActive_Date    DateTime? @db.DateTime(0)
+  Mem_DeActive_Details String?   @db.Char(250)
+  Mem_Dth_Cert_Req     Int?      @db.SmallInt
+  Spu_ParentMemberID   Decimal?  @db.Decimal(18, 0)
+  Spu_memberID         Decimal?  @db.Decimal(18, 0)
+  spouse_membership_no String?   @db.VarChar(50)
+  spouse_name          String?   @db.VarChar(100)
+  Spu_DeactiveDate     DateTime? @db.DateTime(0)
 }

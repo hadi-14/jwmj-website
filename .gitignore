@@ -42,3 +42,13 @@ next-env.d.ts
 test.html
 
 public/uploads/pdfs/*
+
+sync/mysql_sync.build
+sync/mysql_sync.dist
+sync/mysql_sync.onefile-build
+sync/nuitka-crash-report.xml
+sync/venv
+
+sync/sync_log.txt
+sync/sync_log.log
+sync/sync_config.json

@@ -1,27 +1,24 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, Calendar, CheckCircle, Clock, Trash2, Eye, Download, AlertCircle, X, FileText, User, Mail, Hash, SlidersHorizontal, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Search, Calendar, CheckCircle, Clock, Trash2, Eye, Download,
+  AlertCircle, X, FileText, User, Mail, Hash, SlidersHorizontal,
+  RefreshCw, ChevronLeft, ChevronRight, Filter
+} from 'lucide-react';
+import {
+  BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer
+} from 'recharts';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-interface FormField {
-  fieldLabel: string;
-  fieldName: string;
-}
+// ─── Types ────────────────────────────────────────────────────────────────────
 
-interface FieldValue {
-  fieldId: string;
-  value: string | null;
-  field: FormField;
-}
-
+interface FormField { fieldLabel: string; fieldName: string; }
+interface FieldValue { fieldId: string; value: string | null; field: FormField; }
 interface FormSubmission {
-  id: string;
-  formId: string;
-  form: {
-    name: string;
-    formType: string;
-  };
+  id: string; formId: string;
+  form: { name: string; formType: string; };
   memberComputerId: bigint | null;
   submissionDate: string;
   status: 'draft' | 'pending' | 'approved' | 'rejected';
@@ -31,29 +28,52 @@ interface FormSubmission {
   notes: string | null;
   fieldValues: FieldValue[];
 }
-
-interface PaginationData {
-  page: number;
-  limit: number;
-  total: number;
-  pages: number;
-}
-
-interface SubmissionsResponse {
-  success: boolean;
-  data: FormSubmission[];
-  pagination: PaginationData;
-}
-
+interface PaginationData { page: number; limit: number; total: number; pages: number; }
+interface SubmissionsResponse { success: boolean; data: FormSubmission[]; pagination: PaginationData; }
 interface StatsData {
   totalSubmissions: number;
   byStatus: Record<string, number>;
-  recentSubmissions: Array<{
-    id: string;
-    submissionDate: string;
-    status: string;
-  }>;
+  recentSubmissions: Array<{ id: string; submissionDate: string; status: string; }>;
 }
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const STATUS_CONFIG: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
+  approved: { label: 'Approved', className: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: <CheckCircle className="w-3 h-3" /> },
+  pending:  { label: 'Pending',  className: 'bg-amber-50 text-amber-700 border-amber-200',     icon: <Clock className="w-3 h-3" /> },
+  submitted:{ label: 'Submitted',className: 'bg-amber-50 text-amber-700 border-amber-200',     icon: <Clock className="w-3 h-3" /> },
+  draft:    { label: 'Draft',    className: 'bg-slate-100 text-slate-600 border-slate-200',    icon: <FileText className="w-3 h-3" /> },
+  rejected: { label: 'Rejected', className: 'bg-rose-50 text-rose-700 border-rose-200',        icon: <AlertCircle className="w-3 h-3" /> },
+};
+
+function StatusBadge({ status }: { status: string }) {
+  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.draft;
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${cfg.className}`}>
+      {cfg.icon} {cfg.label}
+    </span>
+  );
+}
+
+function StatCard({ icon: Icon, label, value, accent }: { icon: React.ElementType; label: string; value: number; accent?: boolean }) {
+  return (
+    <div className={`rounded-xl border p-5 flex items-center gap-4 ${accent ? 'bg-[#038DCD] border-[#038DCD]' : 'bg-white border-slate-200'}`}>
+      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${accent ? 'bg-white/20' : 'bg-[#038DCD]/8'}`}>
+        <Icon className={`w-5 h-5 ${accent ? 'text-white' : 'text-[#038DCD]'}`} />
+      </div>
+      <div>
+        <p className={`text-xs font-semibold uppercase tracking-wider mb-0.5 ${accent ? 'text-white/70' : 'text-slate-500'}`}>{label}</p>
+        <p className={`text-2xl font-bold leading-none ${accent ? 'text-white' : 'text-slate-900'}`}>{value}</p>
+      </div>
+    </div>
+  );
+}
+
+function formatDate(d: string) {
+  return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function SubmissionsPage() {
   const router = useRouter();
@@ -63,148 +83,57 @@ export default function SubmissionsPage() {
   const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState(searchParams.get('status') || 'all');
   const [filterForm, setFilterForm] = useState(searchParams.get('formId') || 'all');
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1'));
-  const [limit] = useState(20);
+  const limit = 20;
   const [pagination, setPagination] = useState<PaginationData | null>(null);
-
-  const [selectedSubmission, setSelectedSubmission] = useState<FormSubmission | null>(null);
-  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selected, setSelected] = useState<FormSubmission | null>(null);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Fetch submissions
   const fetchSubmissions = useCallback(async () => {
     try {
-      setLoading(true);
-      setError(null);
-
+      setLoading(true); setError(null);
       const params = new URLSearchParams();
-      params.set('page', currentPage.toString());
-      params.set('limit', limit.toString());
-
-      if (filterStatus !== 'all') {
-        params.set('status', filterStatus);
-      }
-      if (filterForm !== 'all' && filterForm !== '') {
-        params.set('formId', filterForm);
-      }
-
-      const response = await fetch(`/api/submissions?${params.toString()}`);
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch submissions');
-      }
-
-      const data: SubmissionsResponse = await response.json();
-      setSubmissions(data.data);
-      setPagination(data.pagination);
-
-      // Update URL params
-      const newParams = new URLSearchParams();
-      newParams.set('page', currentPage.toString());
-      if (filterStatus !== 'all') newParams.set('status', filterStatus);
-      if (filterForm !== 'all' && filterForm !== '') newParams.set('formId', filterForm);
-      router.push(`?${newParams.toString()}`, { scroll: false });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-      console.error('Error fetching submissions:', err);
-    } finally {
-      setLoading(false);
-    }
+      params.set('page', currentPage.toString()); params.set('limit', limit.toString());
+      if (filterStatus !== 'all') params.set('status', filterStatus);
+      if (filterForm !== 'all' && filterForm !== '') params.set('formId', filterForm);
+      const res = await fetch(`/api/submissions?${params}`);
+      if (!res.ok) throw new Error('Failed to fetch submissions');
+      const data: SubmissionsResponse = await res.json();
+      setSubmissions(data.data); setPagination(data.pagination);
+      const np = new URLSearchParams();
+      np.set('page', currentPage.toString());
+      if (filterStatus !== 'all') np.set('status', filterStatus);
+      if (filterForm !== 'all' && filterForm !== '') np.set('formId', filterForm);
+      router.push(`?${np}`, { scroll: false });
+    } catch (e) { setError(e instanceof Error ? e.message : 'An error occurred'); }
+    finally { setLoading(false); }
   }, [currentPage, limit, filterStatus, filterForm, router]);
 
-  // Fetch stats
   const fetchStats = useCallback(async () => {
     try {
       const params = new URLSearchParams();
-      if (filterForm !== 'all' && filterForm !== '') {
-        params.set('formId', filterForm);
-      }
-
-      const response = await fetch(`/api/submissions/stats?${params.toString()}`);
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch statistics');
-      }
-
-      const data = await response.json();
+      if (filterForm !== 'all' && filterForm !== '') params.set('formId', filterForm);
+      const res = await fetch(`/api/submissions/stats?${params}`);
+      if (!res.ok) throw new Error('Failed to fetch stats');
+      const data = await res.json();
       setStats(data.data);
-    } catch (err) {
-      console.error('Error fetching stats:', err);
-    }
+    } catch { /* silent */ }
   }, [filterForm]);
 
-  // Initial load
-  useEffect(() => {
-    fetchSubmissions();
-    fetchStats();
-  }, [fetchSubmissions, fetchStats]);
-
-  const getStatusColor = (status: string): string => {
-    switch (status) {
-      case 'approved':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-      case 'pending':
-      case 'submitted':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
-      case 'draft':
-        return 'bg-slate-50 text-slate-700 border-slate-200';
-      case 'rejected':
-        return 'bg-rose-50 text-rose-700 border-rose-200';
-      default:
-        return 'bg-slate-50 text-slate-700 border-slate-200';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'approved':
-        return <CheckCircle className="w-4 h-4" />;
-      case 'pending':
-      case 'submitted':
-        return <Clock className="w-4 h-4" />;
-      case 'draft':
-        return <FileText className="w-4 h-4" />;
-      case 'rejected':
-        return <AlertCircle className="w-4 h-4" />;
-      default:
-        return null;
-    }
-  };
-
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  useEffect(() => { fetchSubmissions(); fetchStats(); }, [fetchSubmissions, fetchStats]);
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this submission?')) {
-      return;
-    }
-
+    if (!window.confirm('Delete this submission? This cannot be undone.')) return;
     try {
-      const response = await fetch(`/api/submissions/${id}`, {
-        method: 'DELETE'
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete submission');
-      }
-
-      setSubmissions(submissions.filter(s => s.id !== id));
-      alert('Submission deleted successfully');
+      const res = await fetch(`/api/submissions/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete');
+      setSubmissions(s => s.filter(x => x.id !== id));
+      if (selected?.id === id) setSelected(null);
       fetchStats();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to delete submission');
-    }
+    } catch (e) { alert(e instanceof Error ? e.message : 'Failed to delete'); }
   };
 
   const handleExport = async () => {
@@ -212,331 +141,221 @@ export default function SubmissionsPage() {
       const params = new URLSearchParams();
       if (filterStatus !== 'all') params.set('status', filterStatus);
       if (filterForm !== 'all' && filterForm !== '') params.set('formId', filterForm);
-
-      const response = await fetch(`/api/submissions/export?${params.toString()}`);
-
-      if (!response.ok) {
-        throw new Error('Failed to export submissions');
-      }
-
-      const csv = await response.text();
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      link.setAttribute('href', URL.createObjectURL(blob));
-      link.setAttribute('download', `submissions-${new Date().toISOString().split('T')[0]}.csv`);
-      link.click();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to export submissions');
-    }
+      const res = await fetch(`/api/submissions/export?${params}`);
+      if (!res.ok) throw new Error('Failed to export');
+      const csv = await res.text();
+      const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+      const a = document.createElement('a'); a.href = url;
+      a.download = `submissions-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click(); URL.revokeObjectURL(url);
+    } catch (e) { alert(e instanceof Error ? e.message : 'Failed to export'); }
   };
 
-  const resetFilters = () => {
-    setFilterStatus('all');
-    setFilterForm('all');
-    setSearchTerm('');
-    setCurrentPage(1);
-  };
-
-  const statCards = [
-    {
-      label: 'Total Submissions',
-      value: stats?.totalSubmissions || 0,
-      icon: FileText,
-      gradient: 'from-[#038DCD] to-[#0369A1]',
-      bgColor: 'bg-sky-50',
-      iconColor: 'text-sky-600'
-    },
-    {
-      label: 'Approved',
-      value: stats?.byStatus['approved'] || 0,
-      icon: CheckCircle,
-      gradient: 'from-emerald-500 to-emerald-600',
-      bgColor: 'bg-emerald-50',
-      iconColor: 'text-emerald-600'
-    },
-    {
-      label: 'Pending',
-      value: stats?.byStatus['pending'] || stats?.byStatus['submitted'] || 0,
-      icon: Clock,
-      gradient: 'from-amber-400 to-amber-500',
-      bgColor: 'bg-amber-50',
-      iconColor: 'text-amber-600'
-    },
-    {
-      label: 'Rejected',
-      value: stats?.byStatus['rejected'] || 0,
-      icon: AlertCircle,
-      gradient: 'from-rose-500 to-rose-600',
-      bgColor: 'bg-rose-50',
-      iconColor: 'text-rose-600'
-    }
-  ];
-
-  const filteredSubmissions = submissions.filter(submission => {
+  const filtered = submissions.filter(s => {
     if (!searchTerm) return true;
-    const search = searchTerm.toLowerCase();
-    return (
-      submission.form.name.toLowerCase().includes(search) ||
-      submission.submittedBy?.toLowerCase().includes(search) ||
-      submission.memberComputerId?.toString().includes(search) ||
-      submission.id.toLowerCase().includes(search)
-    );
+    const q = searchTerm.toLowerCase();
+    return s.form.name.toLowerCase().includes(q) ||
+      s.submittedBy?.toLowerCase().includes(q) ||
+      s.memberComputerId?.toString().includes(q) ||
+      s.id.toLowerCase().includes(q);
   });
 
-  if (loading && submissions.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-amber-50/20 flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative w-16 h-16 mx-auto mb-6">
-            <div className="absolute inset-0 border-4 border-[#038DCD]/20 rounded-full"></div>
-            <div className="absolute inset-0 border-4 border-[#038DCD] border-t-transparent rounded-full animate-spin"></div>
-          </div>
-          <p className="text-slate-600 font-medium">Loading submissions...</p>
+  const chartData = Object.entries(stats?.byStatus || {}).map(([status, count]) => ({
+    name: status.charAt(0).toUpperCase() + status.slice(1), count
+  }));
+
+  const PIE_COLORS = ['#038DCD', '#0260a8', '#10b981', '#f59e0b', '#ef4444'];
+
+  if (loading && submissions.length === 0) return (
+    <div className="min-h-[50vh] flex items-center justify-center">
+      <div className="text-center">
+        <div className="relative w-10 h-10 mx-auto mb-3">
+          <div className="absolute inset-0 border-2 border-[#038DCD]/20 rounded-full" />
+          <div className="absolute inset-0 border-2 border-[#038DCD] border-t-transparent rounded-full animate-spin" />
         </div>
+        <p className="text-sm text-slate-500 font-medium">Loading submissions...</p>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-amber-50/20">
-      {/* Header Section */}
-      <div className="bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">Form Submissions</h1>
-              <p className="text-blue-100">Manage and review all member submissions</p>
-            </div>
-            <div className="hidden md:flex items-center gap-3">
-              <button
-                onClick={handleExport}
-                className="px-5 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-xl flex items-center gap-2 transition-all duration-200 hover:scale-105"
-              >
-                <Download className="w-4 h-4" />
-                <span className="font-medium">Export</span>
-              </button>
-              <button
-                onClick={fetchSubmissions}
-                disabled={loading}
-                className="px-5 py-2.5 bg-white text-[#038DCD] hover:bg-blue-50 rounded-xl flex items-center gap-2 transition-all duration-200 hover:scale-105 font-semibold disabled:opacity-50"
-              >
-                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                <span>Refresh</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-slate-50/60 pb-16">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Error Alert */}
-        {error && (
-          <div className="mb-6 bg-rose-50 border-l-4 border-rose-500 rounded-lg p-4">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-rose-500 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="font-semibold text-rose-900">Error loading submissions</p>
-                <p className="text-rose-700 text-sm mt-1">{error}</p>
-              </div>
-              <button
-                onClick={() => setError(null)}
-                className="ml-auto text-rose-500 hover:text-rose-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
+      {/* ── Toast error ── */}
+      {error && (
+        <div className="fixed top-5 right-5 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl text-sm font-medium bg-white border border-red-200 text-red-800"
+          style={{ animation: 'slideIn 0.2s ease' }}>
+          <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+          {error}
+          <button onClick={() => setError(null)} className="ml-1 text-red-400 hover:text-red-600"><X className="w-3.5 h-3.5" /></button>
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto px-6 space-y-8">
+
+        {/* ── Stats ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard icon={FileText}     label="Total"    value={stats?.totalSubmissions || 0} accent />
+          <StatCard icon={CheckCircle}  label="Approved" value={stats?.byStatus['approved'] || 0} />
+          <StatCard icon={Clock}        label="Pending"  value={stats?.byStatus['pending'] || stats?.byStatus['submitted'] || 0} />
+          <StatCard icon={AlertCircle}  label="Rejected" value={stats?.byStatus['rejected'] || 0} />
+        </div>
+
+        {/* ── Charts ── */}
+        {stats && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="bg-white rounded-2xl border border-slate-200 p-6">
+              <p className="text-sm font-bold text-slate-900 mb-5">Status Distribution</p>
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis dataKey="name" fontSize={11} tick={{ fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis fontSize={11} tick={{ fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
+                  <Bar dataKey="count" fill="#038DCD" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="bg-white rounded-2xl border border-slate-200 p-6">
+              <p className="text-sm font-bold text-slate-900 mb-5">Status Breakdown</p>
+              <ResponsiveContainer width="100%" height={180}>
+                <PieChart>
+                  <Pie data={chartData} cx="50%" cy="50%" innerRadius={50} outerRadius={75} dataKey="count" paddingAngle={3}>
+                    {chartData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
           </div>
         )}
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {statCards.map((stat, idx) => {
-            const IconComponent = stat.icon;
-            return (
-              <div
-                key={idx}
-                className={`${stat.bgColor} rounded-2xl border-2 border-transparent hover:border-current p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer group`}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`p-3 ${stat.bgColor} rounded-xl ${stat.iconColor} group-hover:scale-110 transition-transform`}>
-                    <IconComponent className="w-6 h-6" />
-                  </div>
-                  <div className="text-right">
-                    <p className={`text-3xl font-bold ${stat.iconColor}`}>{stat.value}</p>
-                  </div>
-                </div>
-                <p className="text-slate-600 font-medium">{stat.label}</p>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Search and Filters */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
-          {/* Search Bar */}
-          <div className="relative mb-4">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+        {/* ── Search + Filters ── */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Search by Member ID, Name, Form, or Submission ID..."
+              placeholder="Search by member ID, name, form, or submission ID…"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-xl focus:border-[#038DCD] focus:ring-4 focus:ring-[#038DCD]/10 outline-none transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm
+                focus:outline-none focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10 transition-all"
             />
           </div>
-
-          {/* Filter Toggle Button (Mobile) */}
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="md:hidden w-full px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center gap-2 transition-colors font-medium mb-4"
-          >
-            <SlidersHorizontal className="w-4 h-4" />
-            {showFilters ? 'Hide Filters' : 'Show Filters'}
+          <button onClick={() => setShowFilters(f => !f)}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-colors
+              ${showFilters ? 'bg-[#038DCD]/10 border-[#038DCD]/30 text-[#038DCD]' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+            <SlidersHorizontal className="w-4 h-4" /> Filters
           </button>
-
-          {/* Filters */}
-          <div className={`grid grid-cols-1 md:grid-cols-4 gap-4 ${showFilters ? 'block' : 'hidden md:grid'}`}>
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Status</label>
-              <select
-                value={filterStatus}
-                onChange={(e) => {
-                  setFilterStatus(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-full px-3 py-2.5 border-2 border-slate-200 rounded-xl focus:border-[#038DCD] focus:ring-4 focus:ring-[#038DCD]/10 outline-none bg-white transition-all"
-              >
-                <option value="all">All Statuses</option>
-                <option value="draft">Draft</option>
-                <option value="submitted">Submitted</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Form ID</label>
-              <input
-                type="text"
-                placeholder="Enter Form ID"
-                value={filterForm}
-                onChange={(e) => {
-                  setFilterForm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-full px-3 py-2.5 border-2 border-slate-200 rounded-xl focus:border-[#038DCD] focus:ring-4 focus:ring-[#038DCD]/10 outline-none transition-all"
-              />
-            </div>
-
-            <div className="flex items-end">
-              <button
-                onClick={resetFilters}
-                className="w-full px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl flex items-center justify-center gap-2 transition-colors font-medium"
-              >
-                <X className="w-4 h-4" />
-                Reset Filters
-              </button>
-            </div>
-
-            <div className="flex items-end md:hidden">
-              <button
-                onClick={handleExport}
-                className="w-full px-4 py-2.5 bg-[#038DCD] hover:bg-[#0369A1] text-white rounded-xl flex items-center justify-center gap-2 transition-colors font-medium"
-              >
-                <Download className="w-4 h-4" />
-                Export CSV
-              </button>
-            </div>
-          </div>
+          <button onClick={handleExport}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+            <Download className="w-4 h-4" /> Export
+          </button>
+          <button onClick={fetchSubmissions} disabled={loading}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50">
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+          </button>
         </div>
 
-        {/* Results Table */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          {filteredSubmissions.length === 0 ? (
-            <div className="p-12 text-center">
-              <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FileText className="w-10 h-10 text-slate-400" />
+        {/* Filter panel */}
+        {showFilters && (
+          <div className="bg-white rounded-2xl border border-slate-200 p-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Status</label>
+                <select value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }}
+                  className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10 transition-all cursor-pointer">
+                  <option value="all">All Statuses</option>
+                  <option value="draft">Draft</option>
+                  <option value="submitted">Submitted</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
               </div>
-              <p className="text-slate-900 text-lg font-semibold mb-2">No submissions found</p>
-              <p className="text-slate-500">Try adjusting your search or filters</p>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Form ID</label>
+                <input type="text" placeholder="Enter Form ID" value={filterForm === 'all' ? '' : filterForm}
+                  onChange={(e) => { setFilterForm(e.target.value || 'all'); setCurrentPage(1); }}
+                  className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10 transition-all" />
+              </div>
+              <div className="flex items-end">
+                <button onClick={() => { setFilterStatus('all'); setFilterForm('all'); setSearchTerm(''); setCurrentPage(1); }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg text-sm font-semibold transition-colors">
+                  <X className="w-4 h-4" /> Reset Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Table ── */}
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          {filtered.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                <FileText className="w-6 h-6 text-slate-400" />
+              </div>
+              <p className="font-semibold text-slate-700 mb-1">No submissions found</p>
+              <p className="text-sm text-slate-500">Try adjusting your search or filters</p>
             </div>
           ) : (
             <>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-slate-50 border-b-2 border-slate-200">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Form</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Member ID</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Submitted By</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Date</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Actions</th>
+                  <thead>
+                    <tr className="border-b border-slate-100 bg-slate-50/80">
+                      {['Form', 'Member ID', 'Submitted By', 'Date', 'Status', 'Actions'].map(h => (
+                        <th key={h} className="px-5 py-3.5 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider">{h}</th>
+                      ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200">
-                    {filteredSubmissions.map((submission) => (
-                      <tr key={submission.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-[#038DCD]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <tbody className="divide-y divide-slate-100">
+                    {filtered.map((s) => (
+                      <tr key={s.id} className="hover:bg-slate-50/60 transition-colors group">
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-[#038DCD]/8 flex items-center justify-center shrink-0">
                               <FileText className="w-4 h-4 text-[#038DCD]" />
                             </div>
-                            <span className="text-sm font-semibold text-slate-900 line-clamp-2">{submission.form.name}</span>
+                            <span className="text-sm font-semibold text-slate-900 line-clamp-1">{s.form.name}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <Hash className="w-4 h-4 text-slate-400" />
-                            <span className="text-sm text-slate-600 font-mono">{submission.memberComputerId ? submission.memberComputerId.toString() : 'N/A'}</span>
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-1.5">
+                            <Hash className="w-3.5 h-3.5 text-slate-400" />
+                            <span className="text-sm text-slate-600 font-mono">
+                              {s.memberComputerId ? s.memberComputerId.toString() : '—'}
+                            </span>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            {submission.submittedBy ? (
-                              <>
-                                <Mail className="w-4 h-4 text-slate-400" />
-                                <span className="text-sm text-slate-600">{submission.submittedBy}</span>
-                              </>
-                            ) : (
-                              <>
-                                <User className="w-4 h-4 text-slate-400" />
-                                <span className="text-sm text-slate-400 italic">Anonymous</span>
-                              </>
-                            )}
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-1.5">
+                            {s.submittedBy
+                              ? <><Mail className="w-3.5 h-3.5 text-slate-400" /><span className="text-sm text-slate-600">{s.submittedBy}</span></>
+                              : <><User className="w-3.5 h-3.5 text-slate-300" /><span className="text-sm text-slate-400 italic">Anonymous</span></>
+                            }
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2 text-sm text-slate-600">
-                            <Calendar className="w-4 h-4 text-slate-400" />
-                            {formatDate(submission.submissionDate)}
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                            {formatDate(s.submissionDate)}
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border-2 ${getStatusColor(submission.status)}`}>
-                            {getStatusIcon(submission.status)}
-                            {submission.status.charAt(0).toUpperCase() + submission.status.slice(1)}
-                          </span>
+                        <td className="px-5 py-3.5">
+                          <StatusBadge status={s.status} />
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => {
-                                setSelectedSubmission(submission);
-                                setShowDetailModal(true);
-                              }}
-                              className="p-2 hover:bg-[#038DCD]/10 rounded-lg text-[#038DCD] transition-colors group"
-                              title="View details"
-                            >
-                              <Eye className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-1">
+                            <button onClick={() => setSelected(s)}
+                              className="p-2 hover:bg-[#038DCD]/10 rounded-lg text-slate-400 hover:text-[#038DCD] transition-colors" title="View details">
+                              <Eye className="w-4 h-4" />
                             </button>
-                            <button
-                              onClick={() => handleDelete(submission.id)}
-                              className="p-2 hover:bg-rose-50 rounded-lg text-rose-600 transition-colors group"
-                              title="Delete submission"
-                            >
-                              <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                            <button onClick={() => handleDelete(s.id)}
+                              className="p-2 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-500 transition-colors" title="Delete">
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </td>
@@ -548,56 +367,37 @@ export default function SubmissionsPage() {
 
               {/* Pagination */}
               {pagination && pagination.pages > 1 && (
-                <div className="bg-slate-50 border-t-2 border-slate-200 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <span className="text-sm text-slate-600">
-                    Showing <span className="font-semibold">{((currentPage - 1) * limit) + 1}</span> to{' '}
-                    <span className="font-semibold">{Math.min(currentPage * limit, pagination.total)}</span> of{' '}
-                    <span className="font-semibold">{pagination.total}</span> submissions
+                <div className="border-t border-slate-100 bg-slate-50/60 px-5 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <span className="text-xs text-slate-500">
+                    Showing <span className="font-semibold text-slate-700">{((currentPage - 1) * limit) + 1}</span>–<span className="font-semibold text-slate-700">{Math.min(currentPage * limit, pagination.total)}</span> of <span className="font-semibold text-slate-700">{pagination.total}</span>
                   </span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                      className="px-4 py-2 border-2 border-slate-200 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors flex items-center gap-2"
-                    >
+                  <div className="flex items-center gap-1.5">
+                    <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+                      className="p-2 rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                       <ChevronLeft className="w-4 h-4" />
-                      Previous
                     </button>
                     <div className="hidden sm:flex items-center gap-1">
                       {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
-                        let pageNum;
-                        if (pagination.pages <= 5) {
-                          pageNum = i + 1;
-                        } else if (currentPage <= 3) {
-                          pageNum = i + 1;
-                        } else if (currentPage >= pagination.pages - 2) {
-                          pageNum = pagination.pages - 4 + i;
-                        } else {
-                          pageNum = currentPage - 2 + i;
+                        let p = i + 1;
+                        if (pagination.pages > 5) {
+                          if (currentPage <= 3) p = i + 1;
+                          else if (currentPage >= pagination.pages - 2) p = pagination.pages - 4 + i;
+                          else p = currentPage - 2 + i;
                         }
                         return (
-                          <button
-                            key={pageNum}
-                            onClick={() => setCurrentPage(pageNum)}
-                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${currentPage === pageNum
-                              ? 'bg-[#038DCD] text-white'
-                              : 'hover:bg-slate-100 text-slate-700'
-                              }`}
-                          >
-                            {pageNum}
+                          <button key={p} onClick={() => setCurrentPage(p)}
+                            className={`w-8 h-8 rounded-lg text-sm font-semibold transition-colors
+                              ${currentPage === p ? 'bg-[#038DCD] text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+                            {p}
                           </button>
                         );
                       })}
                     </div>
-                    <span className="sm:hidden px-3 py-1.5 text-sm text-slate-600 font-medium">
-                      Page {currentPage} of {pagination.pages}
+                    <span className="sm:hidden text-sm text-slate-600 font-medium px-2">
+                      {currentPage} / {pagination.pages}
                     </span>
-                    <button
-                      onClick={() => setCurrentPage(p => Math.min(pagination.pages, p + 1))}
-                      disabled={currentPage >= pagination.pages}
-                      className="px-4 py-2 border-2 border-slate-200 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors flex items-center gap-2"
-                    >
-                      Next
+                    <button onClick={() => setCurrentPage(p => Math.min(pagination.pages, p + 1))} disabled={currentPage >= pagination.pages}
+                      className="p-2 rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -608,84 +408,66 @@ export default function SubmissionsPage() {
         </div>
       </div>
 
-      {/* Detail Modal */}
-      {showDetailModal && selectedSubmission && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-            {/* Modal Header */}
-            <div className="bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white p-6 flex justify-between items-start">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <FileText className="w-6 h-6" />
-                  <h2 className="text-2xl font-bold">{selectedSubmission.form.name}</h2>
+      {/* ══════════════════════════════════════════════════════════
+          DETAIL MODAL
+      ══════════════════════════════════════════════════════════ */}
+      {selected && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          style={{ animation: 'fadeIn 0.15s ease' }}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#038DCD]/10 flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-[#038DCD]" />
                 </div>
-                <p className="text-blue-100 text-sm">Submission Details</p>
+                <div>
+                  <p className="font-bold text-slate-900 text-sm">{selected.form.name}</p>
+                  <p className="text-xs text-slate-500 font-mono">{selected.id}</p>
+                </div>
               </div>
-              <button
-                onClick={() => setShowDetailModal(false)}
-                className="text-white/70 hover:text-white hover:bg-white/10 rounded-lg p-2 transition-colors"
-              >
-                <X className="w-6 h-6" />
-              </button>
+              <div className="flex items-center gap-2">
+                <StatusBadge status={selected.status} />
+                <button onClick={() => setSelected(null)} className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 transition-colors ml-1">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
-            {/* Modal Body */}
-            <div className="overflow-y-auto flex-1 p-6">
-              {/* Submission Info */}
-              <div className="bg-slate-50 rounded-xl p-6 mb-6 border-2 border-slate-200">
-                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <div className="w-1 h-6 bg-[#038DCD] rounded-full"></div>
-                  Submission Information
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Submission ID</p>
-                    <p className="text-slate-900 font-mono text-sm bg-white px-3 py-2 rounded-lg border border-slate-200">{selectedSubmission.id}</p>
+            {/* Body */}
+            <div className="overflow-y-auto flex-1 p-6 space-y-6">
+
+              {/* Meta grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {[
+                  { label: 'Member ID', value: selected.memberComputerId?.toString() || '—', mono: true },
+                  { label: 'Submitted By', value: selected.submittedBy || 'Anonymous' },
+                  { label: 'Date', value: formatDate(selected.submissionDate) },
+                  ...(selected.approvedBy ? [{ label: 'Approved By', value: selected.approvedBy }] : []),
+                  ...(selected.approvedDate ? [{ label: 'Approved Date', value: formatDate(selected.approvedDate) }] : []),
+                ].map(({ label, value, mono }) => (
+                  <div key={label} className="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">{label}</p>
+                    <p className={`text-sm font-semibold text-slate-900 truncate ${mono ? 'font-mono' : ''}`}>{value}</p>
                   </div>
-                  <div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Member ID</p>
-                    <p className="text-slate-900 font-semibold text-sm bg-white px-3 py-2 rounded-lg border border-slate-200">
-                      {selectedSubmission.memberComputerId ? selectedSubmission.memberComputerId.toString() : 'N/A'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Submitted By</p>
-                    <p className="text-slate-900 font-semibold text-sm bg-white px-3 py-2 rounded-lg border border-slate-200">{selectedSubmission.submittedBy || 'Anonymous'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Status</p>
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border-2 ${getStatusColor(selectedSubmission.status)}`}>
-                      {getStatusIcon(selectedSubmission.status)}
-                      {selectedSubmission.status.charAt(0).toUpperCase() + selectedSubmission.status.slice(1)}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Submission Date</p>
-                    <p className="text-slate-900 font-semibold text-sm bg-white px-3 py-2 rounded-lg border border-slate-200">{formatDate(selectedSubmission.submissionDate)}</p>
-                  </div>
-                  {selectedSubmission.approvedBy && (
-                    <div>
-                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Approved By</p>
-                      <p className="text-slate-900 font-semibold text-sm bg-white px-3 py-2 rounded-lg border border-slate-200">{selectedSubmission.approvedBy}</p>
-                    </div>
-                  )}
-                </div>
+                ))}
               </div>
-              {/* Field Values */}
-              {selectedSubmission.fieldValues.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    <div className="w-1 h-6 bg-[#F9C856] rounded-full"></div>
-                    Form Data
-                  </h3>
-                  <div className="space-y-3">
-                    {selectedSubmission.fieldValues.map((fv, idx) => (
-                      <div key={fv.fieldId} className="bg-white p-4 rounded-xl border-2 border-slate-200 hover:border-[#038DCD] transition-colors">
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">{fv.field.fieldLabel}</p>
-                          <span className="text-xs text-slate-400 font-mono">#{idx + 1}</span>
+
+              {/* Field values */}
+              {selected.fieldValues.length > 0 && (
+                <div>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Form Data</p>
+                  <div className="space-y-2">
+                    {selected.fieldValues.map((fv, idx) => (
+                      <div key={fv.fieldId} className="bg-white rounded-xl border border-slate-200 hover:border-[#038DCD]/30 transition-colors p-4">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{fv.field.fieldLabel}</p>
+                          <span className="text-[10px] text-slate-300 font-mono">#{idx + 1}</span>
                         </div>
-                        <p className="text-slate-900 break-words">{fv.value || <span className="text-slate-400 italic">(empty)</span>}</p>
+                        <p className="text-sm text-slate-900">
+                          {fv.value || <span className="text-slate-400 italic text-xs">Empty</span>}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -693,33 +475,33 @@ export default function SubmissionsPage() {
               )}
 
               {/* Notes */}
-              {selectedSubmission.notes && (
-                <div className="bg-amber-50 border-2 border-amber-200 p-4 rounded-xl">
-                  <p className="text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">Notes</p>
-                  <p className="text-slate-900 text-sm">{selectedSubmission.notes}</p>
+              {selected.notes && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                  <p className="text-[11px] font-bold text-amber-700 uppercase tracking-wider mb-2">Notes</p>
+                  <p className="text-sm text-slate-800">{selected.notes}</p>
                 </div>
               )}
             </div>
 
-            {/* Modal Footer */}
-            <div className="bg-slate-50 border-t-2 border-slate-200 p-6 flex justify-end gap-3">
-              <button
-                onClick={() => setShowDetailModal(false)}
-                className="px-6 py-2.5 bg-white hover:bg-slate-100 text-slate-700 rounded-xl font-semibold transition-colors border-2 border-slate-200"
-              >
-                Close
+            {/* Footer */}
+            <div className="border-t border-slate-100 bg-slate-50/60 px-6 py-4 flex items-center justify-between">
+              <button onClick={() => handleDelete(selected.id)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-sm font-semibold transition-colors">
+                <Trash2 className="w-3.5 h-3.5" /> Delete
               </button>
-              <button
-                onClick={() => handleDelete(selectedSubmission.id)}
-                className="px-6 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-semibold transition-colors flex items-center gap-2"
-              >
-                <Trash2 className="w-4 h-4" />
-                Delete
+              <button onClick={() => setSelected(null)}
+                className="px-5 py-2 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-sm font-semibold border border-slate-200 transition-colors">
+                Close
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* <style jsx>{`
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+      `}</style> */}
     </div>
   );
 }

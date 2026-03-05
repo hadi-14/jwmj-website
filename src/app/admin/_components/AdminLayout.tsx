@@ -187,14 +187,14 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
           onClick={onClose}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white border-r-2 border-slate-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] w-64 bg-white border-r-2 border-slate-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:top-0 lg:h-full ${isOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
         {/* Logo */}
@@ -268,7 +268,7 @@ function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   return (
-    <header className="h-16 bg-white border-b-2 border-slate-200 sticky top-0 z-30">
+    <header className="h-16 bg-white border-b-2 border-slate-200 sticky top-0 z-50">
       <div className="h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Left side */}
         <div className="flex items-center gap-4">
@@ -367,13 +367,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <AuthProvider>
       <ProtectedRoute>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-amber-50/20">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-amber-50/20 flex flex-col lg:flex-row">
           <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-          <div className="lg:pl-64">
+          <div className="flex-1 flex flex-col">
             <Header onMenuClick={() => setSidebarOpen(true)} />
 
-            <main className="p-4 sm:p-6 lg:p-8">
+            <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
               {children}
             </main>
           </div>

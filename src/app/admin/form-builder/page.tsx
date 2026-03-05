@@ -1,10 +1,18 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Eye, Download, X, GripVertical, Save, Edit, Copy, AlertCircle, CheckCircle2, FileText, Clock, Users, Settings, ArrowLeft, Loader, Search, Filter, Upload, FileUp, ExternalLink, FilePlus } from 'lucide-react';
+import {
+  Plus, Trash2, Eye, Download, X, GripVertical, Save, Edit, Copy,
+  AlertCircle, CheckCircle2, FileText, Users, Settings, ArrowLeft,
+  Loader, Search, Filter, Upload, FileUp, ExternalLink, FilePlus,
+  Sparkles, FolderOpen,
+  ChevronRight
+} from 'lucide-react';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { IForm, IFormField } from '@/types/forms';
 import DynamicForm from '@/components/form/DynamicForm';
 
-// Local component types for form building
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 interface Field {
   id?: string;
   fieldName: string;
@@ -39,6 +47,67 @@ interface FormData {
   pdfFile?: PdfFile;
 }
 
+// ─── Small reusable pieces ────────────────────────────────────────────────────
+
+function Label({ children, required }: { children: React.ReactNode; required?: boolean }) {
+  return (
+    <label className="block text-xs font-semibold text-slate-600 mb-1.5 tracking-wide uppercase">
+      {children}{required && <span className="text-[#038DCD] ml-0.5">*</span>}
+    </label>
+  );
+}
+
+function Input({ className = '', ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input
+      {...props}
+      className={`w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-900
+        placeholder:text-slate-400 focus:outline-none focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10
+        transition-all duration-150 ${className}`}
+    />
+  );
+}
+
+function Select({ className = '', children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
+  return (
+    <select
+      {...props}
+      className={`w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-900
+        focus:outline-none focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10
+        transition-all duration-150 cursor-pointer ${className}`}
+    >
+      {children}
+    </select>
+  );
+}
+
+function Textarea({ className = '', ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return (
+    <textarea
+      {...props}
+      className={`w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-900
+        placeholder:text-slate-400 focus:outline-none focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10
+        transition-all duration-150 resize-none ${className}`}
+    />
+  );
+}
+
+function StatCard({ icon: Icon, label, value, accent }: { icon: React.ElementType; label: string; value: string | number; accent?: boolean }) {
+  return (
+    <div className={`rounded-xl border p-5 flex items-center gap-4 ${accent ? 'bg-[#038DCD] border-[#038DCD] text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
+      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${accent ? 'bg-white/20' : 'bg-[#038DCD]/8'}`}>
+        <Icon className={`w-5 h-5 ${accent ? 'text-white' : 'text-[#038DCD]'}`} />
+      </div>
+      <div>
+        <p className={`text-xs font-semibold uppercase tracking-wider mb-0.5 ${accent ? 'text-white/70' : 'text-slate-500'}`}>{label}</p>
+        <p className={`text-2xl font-bold leading-none ${accent ? 'text-white' : 'text-slate-900'}`}>{value}</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 export default function FormBuilder() {
   const [forms, setForms] = useState<FormData[]>([]);
   const [filteredForms, setFilteredForms] = useState<FormData[]>([]);
@@ -49,16 +118,9 @@ export default function FormBuilder() {
   const [showPreview, setShowPreview] = useState(false);
   const [previewForm, setPreviewForm] = useState<FormData | null>(null);
   const [formConfig, setFormConfig] = useState({
-    name: '',
-    description: '',
-    formType: '',
-    fields: [] as Field[],
-    pdfFile: undefined as PdfFile | undefined
+    name: '', description: '', formType: '', fields: [] as Field[], pdfFile: undefined as PdfFile | undefined
   });
-  const [currentField, setCurrentField] = useState<Partial<Field>>({
-    columnWidth: 'full',
-    isRequired: false
-  });
+  const [currentField, setCurrentField] = useState<Partial<Field>>({ columnWidth: 'full', isRequired: false });
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -67,63 +129,22 @@ export default function FormBuilder() {
   const [isUploadingPdf, setIsUploadingPdf] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState('');
 
-  // Fetch all forms on component mount
-  useEffect(() => {
-    fetchForms();
-    fetchTemplates();
-  }, []);
-
-  // Filter forms whenever search or filter changes
-  useEffect(() => {
-    filterForms();
-  }, [searchQuery, filterType, forms]);
-
   const fetchForms = async () => {
     try {
       setIsLoading(true);
       const res = await fetch('/api/forms');
       if (!res.ok) throw new Error('Failed to fetch forms');
-
       const response = await res.json();
-      const formsData = response.data || [];
-      setForms(formsData);
-    } catch (error) {
-      console.error('Error fetching forms:', error);
-      showNotification('error', 'Failed to load forms');
-    } finally {
-      setIsLoading(false);
-    }
+      setForms(response.data || []);
+    } catch { showNotification('error', 'Failed to load forms'); }
+    finally { setIsLoading(false); }
   };
 
   const fetchTemplates = async () => {
     try {
       const res = await fetch('/api/forms/templates');
-      if (res.ok) {
-        const response = await res.json();
-        const templatesData: IForm[] = response.data || [];
-        setTemplates(templatesData);
-      }
-    } catch (error) {
-      console.error('Error fetching templates:', error);
-    }
-  };
-
-  const filterForms = () => {
-    let filtered = [...forms];
-
-    if (searchQuery) {
-      filtered = filtered.filter(form =>
-        form.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        form.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        form.formType.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    if (filterType !== 'all') {
-      filtered = filtered.filter(form => form.formType === filterType);
-    }
-
-    setFilteredForms(filtered);
+      if (res.ok) { const r = await res.json(); setTemplates(r.data || []); }
+    } catch { /* silent */ }
   };
 
   const showNotification = (type: 'success' | 'error', message: string) => {
@@ -131,1040 +152,648 @@ export default function FormBuilder() {
     setTimeout(() => setNotification(null), 4000);
   };
 
-  const parseFieldOptions = (options: string | null): { value: string; label: string }[] | undefined => {
+  useEffect(() => { fetchForms(); fetchTemplates(); }, []);
+
+  useEffect(() => {
+    let filtered = [...forms];
+    if (searchQuery) filtered = filtered.filter(f =>
+      f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      f.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      f.formType.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    if (filterType !== 'all') filtered = filtered.filter(f => f.formType === filterType);
+    setFilteredForms(filtered);
+  }, [searchQuery, filterType, forms]);
+
+  const parseFieldOptions = (options: string | null) => {
     if (!options) return undefined;
-    try {
-      return typeof options === 'string' ? JSON.parse(options) : options;
-    } catch {
-      return undefined;
-    }
+    try { return typeof options === 'string' ? JSON.parse(options) : options; } catch { return undefined; }
   };
-
-  const parseValidationRule = (rule: string | null): { minLength?: number; maxLength?: number } | undefined => {
+  const parseValidationRule = (rule: string | null) => {
     if (!rule) return undefined;
-    try {
-      return typeof rule === 'string' ? JSON.parse(rule) : rule;
-    } catch {
-      return undefined;
-    }
+    try { return typeof rule === 'string' ? JSON.parse(rule) : rule; } catch { return undefined; }
   };
-
-  const convertTemplateFieldToLocal = (field: IFormField): Field => {
-    return {
-      id: field.id,
-      fieldName: field.fieldName,
-      fieldLabel: field.fieldLabel,
-      fieldType: field.fieldType as Field['fieldType'],
-      isRequired: field.isRequired,
-      placeholder: field.placeholder || undefined,
-      helpText: field.helpText || undefined,
-      options: parseFieldOptions(field.options),
-      validationRule: parseValidationRule(field.validationRule),
-      columnWidth: (field.columnWidth as Field['columnWidth']) || 'full',
-      fieldOrder: field.fieldOrder,
-    };
-  };
+  const convertTemplateFieldToLocal = (field: IFormField): Field => ({
+    id: field.id, fieldName: field.fieldName, fieldLabel: field.fieldLabel,
+    fieldType: field.fieldType as Field['fieldType'], isRequired: field.isRequired,
+    placeholder: field.placeholder || undefined, helpText: field.helpText || undefined,
+    options: parseFieldOptions(field.options), validationRule: parseValidationRule(field.validationRule),
+    columnWidth: (field.columnWidth as Field['columnWidth']) || 'full', fieldOrder: field.fieldOrder,
+  });
 
   const handlePdfUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
-    if (file.type !== 'application/pdf') {
-      showNotification('error', 'Please upload a PDF file');
-      return;
-    }
-
-    setIsUploadingPdf(true);
-    setUploadedFileName(file.name);
-
+    if (file.type !== 'application/pdf') { showNotification('error', 'Please upload a PDF file'); return; }
+    setIsUploadingPdf(true); setUploadedFileName(file.name);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const res = await fetch('/api/forms/upload-pdf', {
-        method: 'POST',
-        body: formData
-      });
-
+      const fd = new FormData(); fd.append('file', file);
+      const res = await fetch('/api/forms/upload-pdf', { method: 'POST', body: fd });
       const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result.error || 'Failed to process PDF');
-      }
-
-      // Populate form with extracted data
-      setFormConfig({
-        name: result.data.formName,
-        description: result.data.description,
-        formType: result.data.formType,
-        fields: result.data.fields,
-        pdfFile: result.data.pdfFile
-      });
-
-      setShowTemplateSelection(false);
-      setShowBuilder(true);
-      showNotification('success', `PDF processed successfully! ${result.data.fields.length} fields extracted.`);
-    } catch (error: unknown) {
-      console.error('PDF upload error:', error);
-      if (error instanceof Error) {
-        showNotification('error', error.message || 'Failed to process PDF');
-      } else {
-        showNotification('error', 'Failed to process PDF');
-      }
-    } finally {
-      setIsUploadingPdf(false);
-      // Reset file input
-      event.target.value = '';
-    }
+      if (!res.ok) throw new Error(result.error || 'Failed to process PDF');
+      setFormConfig({ name: result.data.formName, description: result.data.description, formType: result.data.formType, fields: result.data.fields, pdfFile: result.data.pdfFile });
+      setShowTemplateSelection(false); setShowBuilder(true);
+      showNotification('success', `${result.data.fields.length} fields extracted from PDF`);
+    } catch (e: unknown) { showNotification('error', e instanceof Error ? e.message : 'Failed to process PDF'); }
+    finally { setIsUploadingPdf(false); event.target.value = ''; }
   };
 
   const downloadFormPdf = async (formId: string) => {
     try {
       showNotification('success', 'Generating PDF...');
-
       const res = await fetch(`/api/forms/generate-pdf/${formId}`);
-
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || 'Failed to generate PDF');
-      }
-
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `form_${formId}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-
-      showNotification('success', 'PDF downloaded successfully');
-    } catch (error: unknown) {
-      console.error('PDF download error:', error);
-      if (error instanceof Error) {
-        showNotification('error', error.message || 'Failed to download PDF');
-      } else {
-        showNotification('error', 'Failed to download PDF');
-      }
-    }
+      if (!res.ok) throw new Error((await res.json()).error || 'Failed');
+      const blob = await res.blob(); const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = `form_${formId}.pdf`;
+      document.body.appendChild(a); a.click(); URL.revokeObjectURL(url); a.remove();
+      showNotification('success', 'PDF downloaded');
+    } catch (e: unknown) { showNotification('error', e instanceof Error ? e.message : 'Failed'); }
   };
 
   const addOrUpdateField = () => {
     if (!currentField.fieldName || !currentField.fieldLabel || !currentField.fieldType) {
-      showNotification('error', 'Field name, label, and type are required');
-      return;
+      showNotification('error', 'Field name, label, and type are required'); return;
     }
-
     setFormConfig(prev => {
       const newFields = [...prev.fields];
-
-      if (editingFieldIndex !== null) {
-        newFields[editingFieldIndex] = { ...currentField, fieldOrder: editingFieldIndex } as Field;
-      } else {
-        newFields.push({ ...currentField, fieldOrder: prev.fields.length } as Field);
-      }
-
+      if (editingFieldIndex !== null) newFields[editingFieldIndex] = { ...currentField, fieldOrder: editingFieldIndex } as Field;
+      else newFields.push({ ...currentField, fieldOrder: prev.fields.length } as Field);
       return { ...prev, fields: newFields };
     });
-
-    setCurrentField({ columnWidth: 'full', isRequired: false });
-    setEditingFieldIndex(null);
+    setCurrentField({ columnWidth: 'full', isRequired: false }); setEditingFieldIndex(null);
     showNotification('success', editingFieldIndex !== null ? 'Field updated' : 'Field added');
   };
 
-  const editField = (index: number) => {
-    setCurrentField(formConfig.fields[index]);
-    setEditingFieldIndex(index);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const removeField = (index: number) => {
-    setFormConfig(prev => ({
-      ...prev,
-      fields: prev.fields.filter((_, i) => i !== index).map((field, idx) => ({
-        ...field,
-        fieldOrder: idx
-      }))
-    }));
-    showNotification('success', 'Field removed');
-  };
-
+  const editField = (index: number) => { setCurrentField(formConfig.fields[index]); setEditingFieldIndex(index); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const removeField = (index: number) => { setFormConfig(prev => ({ ...prev, fields: prev.fields.filter((_, i) => i !== index).map((f, i) => ({ ...f, fieldOrder: i })) })); };
   const duplicateField = (index: number) => {
-    const fieldToDuplicate = { ...formConfig.fields[index] };
-    delete fieldToDuplicate.id;
-    fieldToDuplicate.fieldName = `${fieldToDuplicate.fieldName}_copy`;
-    fieldToDuplicate.fieldLabel = `${fieldToDuplicate.fieldLabel} (Copy)`;
-
-    setFormConfig(prev => ({
-      ...prev,
-      fields: [...prev.fields, { ...fieldToDuplicate, fieldOrder: prev.fields.length }]
-    }));
-    showNotification('success', 'Field duplicated successfully');
+    const f = { ...formConfig.fields[index] }; delete f.id;
+    f.fieldName = `${f.fieldName}_copy`; f.fieldLabel = `${f.fieldLabel} (Copy)`;
+    setFormConfig(prev => ({ ...prev, fields: [...prev.fields, { ...f, fieldOrder: prev.fields.length }] }));
+    showNotification('success', 'Field duplicated');
   };
 
   const saveForm = async () => {
-    if (!formConfig.name || !formConfig.formType) {
-      showNotification('error', 'Form name and type are required');
-      return;
-    }
-
-    if (formConfig.fields.length === 0) {
-      showNotification('error', 'At least one field is required');
-      return;
-    }
-
+    if (!formConfig.name || !formConfig.formType) { showNotification('error', 'Form name and type are required'); return; }
+    if (formConfig.fields.length === 0) { showNotification('error', 'At least one field is required'); return; }
     setIsSaving(true);
-
     try {
       const payload = {
-        name: formConfig.name,
-        description: formConfig.description,
-        formType: formConfig.formType,
-        fields: formConfig.fields.map(field => ({
-          ...field,
-          // Only stringify if not already a string (handles PDF upload case)
-          options: field.options
-            ? (typeof field.options === 'string' ? field.options : JSON.stringify(field.options))
-            : null,
-          validationRule: field.validationRule
-            ? (typeof field.validationRule === 'string' ? field.validationRule : JSON.stringify(field.validationRule))
-            : null
+        name: formConfig.name, description: formConfig.description, formType: formConfig.formType,
+        fields: formConfig.fields.map(f => ({
+          ...f,
+          options: f.options ? (typeof f.options === 'string' ? f.options : JSON.stringify(f.options)) : null,
+          validationRule: f.validationRule ? (typeof f.validationRule === 'string' ? f.validationRule : JSON.stringify(f.validationRule)) : null
         })),
-        version: 1,
-        pdfFileUrl: formConfig.pdfFile?.url,
-        pdfFileName: formConfig.pdfFile?.originalName
+        version: 1, pdfFileUrl: formConfig.pdfFile?.url, pdfFileName: formConfig.pdfFile?.originalName
       };
-
-      const res = await fetch('/api/forms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
+      const res = await fetch('/api/forms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result.error || 'Failed to save form');
-      }
-
-      showNotification('success', 'Form created successfully!');
-      resetForm();
-      await fetchForms();
-    } catch (error: unknown) {
-      console.error('Save error:', error);
-      if (error instanceof Error) {
-        showNotification('error', error.message || 'Failed to save form');
-      } else {
-        showNotification('error', 'Failed to save form');
-      }
-    } finally {
-      setIsSaving(false);
-    }
+      if (!res.ok) throw new Error(result.error || 'Failed to save');
+      showNotification('success', 'Form created successfully!'); resetForm(); await fetchForms();
+    } catch (e: unknown) { showNotification('error', e instanceof Error ? e.message : 'Failed to save'); }
+    finally { setIsSaving(false); }
   };
 
   const deleteForm = async (formId: string) => {
-    if (!confirm('Are you sure you want to delete this form? This action cannot be undone.')) {
-      return;
-    }
-
+    if (!confirm('Delete this form? This cannot be undone.')) return;
     try {
-      const res = await fetch(`/api/forms/${formId}`, {
-        method: 'DELETE'
-      });
-
-      if (!res.ok) throw new Error('Failed to delete form');
-
-      showNotification('success', 'Form deleted successfully');
-      await fetchForms();
-    } catch (error) {
-      console.error('Delete error:', error);
-      showNotification('error', 'Failed to delete form');
-    }
+      const res = await fetch(`/api/forms/${formId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete');
+      showNotification('success', 'Form deleted'); await fetchForms();
+    } catch { showNotification('error', 'Failed to delete form'); }
   };
 
   const resetForm = () => {
     setFormConfig({ name: '', description: '', formType: '', fields: [], pdfFile: undefined });
-    setShowBuilder(false);
-    setCurrentField({ columnWidth: 'full', isRequired: false });
-    setEditingFieldIndex(null);
-    setUploadedFileName('');
+    setShowBuilder(false); setCurrentField({ columnWidth: 'full', isRequired: false });
+    setEditingFieldIndex(null); setUploadedFileName('');
   };
 
   const loadTemplate = (template: IForm) => {
-    const parsedFields: Field[] = template.fields.map(convertTemplateFieldToLocal);
-
-    setFormConfig({
-      name: template.name,
-      description: template.description || '',
-      formType: template.formType,
-      fields: parsedFields,
-      pdfFile: undefined
-    });
-
-    setShowTemplateSelection(false);
-    setShowBuilder(true);
-    setCurrentField({ columnWidth: 'full', isRequired: false });
-    showNotification('success', `Template "${template.name}" loaded successfully`);
-  };
-
-  const startFromScratch = () => {
-    setFormConfig({ name: '', description: '', formType: '', fields: [], pdfFile: undefined });
-    setShowTemplateSelection(false);
-    setShowBuilder(true);
-    setCurrentField({ columnWidth: 'full', isRequired: false });
-  };
-
-  const openPreview = (form: FormData) => {
-    setPreviewForm(form);
-    setShowPreview(true);
-  };
-
-  const closePreview = () => {
-    setShowPreview(false);
-    setPreviewForm(null);
+    setFormConfig({ name: template.name, description: template.description || '', formType: template.formType, fields: template.fields.map(convertTemplateFieldToLocal), pdfFile: undefined });
+    setShowTemplateSelection(false); setShowBuilder(true); setCurrentField({ columnWidth: 'full', isRequired: false });
+    showNotification('success', `Template "${template.name}" loaded`);
   };
 
   const exportForm = async (formId: string) => {
-    try {
-      const form = forms.find(f => f.id === formId);
-      if (!form) return;
-
-      const dataStr = JSON.stringify(form, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${form.formType}_${new Date().getTime()}.json`;
-      link.click();
-      URL.revokeObjectURL(url);
-
-      showNotification('success', 'Form exported successfully');
-    } catch (error) {
-      showNotification('error', 'Failed to export form');
-    }
+    const form = forms.find(f => f.id === formId); if (!form) return;
+    const blob = new Blob([JSON.stringify(form, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href = url; a.download = `${form.formType}_${Date.now()}.json`; a.click(); URL.revokeObjectURL(url);
+    showNotification('success', 'Form exported');
   };
 
-  // Get unique form types for filter
   const formTypes = ['all', ...new Set(forms.map(f => f.formType))];
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-amber-50/20 flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative w-16 h-16 mx-auto mb-6">
-            <div className="absolute inset-0 border-4 border-[#038DCD]/20 rounded-full"></div>
-            <div className="absolute inset-0 border-4 border-[#038DCD] border-t-transparent rounded-full animate-spin"></div>
-          </div>
-          <p className="text-slate-600 font-medium">Loading forms...</p>
+  // ─── Loading ────────────────────────────────────────────────────────────────
+
+  if (isLoading) return (
+    <div className="min-h-[50vh] flex items-center justify-center">
+      <div className="text-center">
+        <div className="relative w-10 h-10 mx-auto mb-3">
+          <div className="absolute inset-0 border-2 border-[#038DCD]/20 rounded-full" />
+          <div className="absolute inset-0 border-2 border-[#038DCD] border-t-transparent rounded-full animate-spin" />
         </div>
+        <p className="text-sm text-slate-500 font-medium">Loading forms...</p>
       </div>
-    );
-  }
+    </div>
+  );
+
+  // ─── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-amber-50/20 pb-12">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                  <FileText className="w-6 h-6" />
-                </div>
-                <h1 className="text-3xl md:text-4xl font-bold">Form Builder</h1>
-              </div>
-              <p className="text-blue-100">Create and manage dynamic forms for Jamat members</p>
-            </div>
-            <button
-              onClick={() => setShowTemplateSelection(true)}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/90 hover:bg-white text-[#038DCD] rounded-xl font-bold transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
-            >
-              <Plus className="w-5 h-5" /> Create New Form
-            </button>
-          </div>
+    <div className="min-h-screen bg-slate-50/60 pb-16">
+
+
+
+      {/* ── Toast Notification ── */}
+      {notification && (
+        <div className={`fixed top-5 right-5 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl text-sm font-medium border
+          ${notification.type === 'success' ? 'bg-white border-emerald-200 text-emerald-800' : 'bg-white border-red-200 text-red-800'}`}
+          style={{ animation: 'slideIn 0.2s ease' }}>
+          {notification.type === 'success'
+            ? <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+            : <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />}
+          {notification.message}
         </div>
-      </div>
+      )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Notification */}
-        {notification && (
-          <div className={`mb-6 p-4 rounded-xl border-2 animate-in fade-in slide-in-from-top-4 ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200'
-            }`}>
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${notification.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'
-                }`}>
-                {notification.type === 'success' ? <CheckCircle2 className="w-6 h-6 text-white" /> : <AlertCircle className="w-6 h-6 text-white" />}
-              </div>
-              <p className={`font-semibold ${notification.type === 'success' ? 'text-emerald-800' : 'text-rose-800'}`}>
-                {notification.message}
-              </p>
-            </div>
-          </div>
-        )}
+      <div className="max-w-7xl mx-auto px-6">
 
-        {/* Template Selection Modal */}
+        {/* ══════════════════════════════════════════════════════════
+            TEMPLATE SELECTION MODAL
+        ══════════════════════════════════════════════════════════ */}
         {showTemplateSelection && (
-          <div className="bg-white rounded-2xl shadow-xl border-2 border-slate-200 p-8 mb-8">
-            <div className="flex items-center justify-between mb-6">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-7 py-5 border-b border-slate-100">
               <div>
-                <h2 className="text-2xl font-bold text-slate-900 mb-2">Choose Your Starting Point</h2>
-                <p className="text-slate-600">Select a template, upload a PDF, or start from scratch</p>
+                <h2 className="text-lg font-bold text-slate-900">Create New Form</h2>
+                <p className="text-sm text-slate-500 mt-0.5">Start from a template, upload a PDF, or build from scratch</p>
               </div>
-              <button onClick={() => setShowTemplateSelection(false)} className="p-2 hover:bg-slate-100 rounded-lg">
-                <X className="w-6 h-6" />
+              <button onClick={() => setShowTemplateSelection(false)} className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500">
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* PDF Upload Section */}
-            <div className="mb-8 p-6 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border-2 border-amber-200">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Upload className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">Upload PDF Form</h3>
-                  <p className="text-sm text-slate-600 mb-4">
-                    Upload an existing PDF form and we&apos;ll automatically extract fields. The PDF will be saved and attached to your form.
-                  </p>
-                  <label className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold cursor-pointer transition-all">
-                    <FileUp className="w-5 h-5" />
-                    {isUploadingPdf ? 'Processing...' : 'Choose PDF File'}
-                    <input
-                      type="file"
-                      accept="application/pdf"
-                      onChange={handlePdfUpload}
-                      disabled={isUploadingPdf}
-                      className="hidden"
-                    />
-                  </label>
-                  {isUploadingPdf && (
-                    <div className="mt-3 flex items-center gap-2 text-sm text-amber-700">
-                      <Loader className="w-4 h-4 animate-spin" />
-                      <span>Processing {uploadedFileName}...</span>
-                    </div>
-                  )}
+            <div className="p-7 space-y-7">
+              {/* PDF Upload */}
+              <div className="rounded-xl border border-dashed border-[#038DCD]/30 bg-[#038DCD]/[0.03] p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 rounded-xl bg-[#038DCD]/10 flex items-center justify-center shrink-0">
+                    <Upload className="w-5 h-5 text-[#038DCD]" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-slate-900 mb-1">Import from PDF</h3>
+                    <p className="text-sm text-slate-500 mb-4">Upload an existing PDF form — we&apos;ll automatically extract all fields.</p>
+                    <label className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#038DCD] hover:bg-[#0278b0] text-white rounded-lg font-semibold text-sm cursor-pointer transition-colors">
+                      <FileUp className="w-4 h-4" />
+                      {isUploadingPdf ? 'Processing…' : 'Choose PDF'}
+                      <input type="file" accept="application/pdf" onChange={handlePdfUpload} disabled={isUploadingPdf} className="hidden" />
+                    </label>
+                    {isUploadingPdf && (
+                      <p className="mt-3 flex items-center gap-2 text-xs text-slate-500">
+                        <Loader className="w-3.5 h-3.5 animate-spin text-[#038DCD]" />
+                        Processing <span className="font-medium text-slate-700">{uploadedFileName}</span>…
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Templates Section */}
-            {templates.length > 0 && (
-              <>
-                <div className="mb-4">
-                  <h3 className="text-lg font-bold text-slate-900">Or Choose a Template</h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                  {templates.map((template) => (
-                    <div
-                      key={template.id}
-                      onClick={() => loadTemplate(template)}
-                      className="group border-2 border-slate-200 rounded-xl p-6 hover:border-[#038DCD] hover:shadow-lg transition-all cursor-pointer bg-gradient-to-br from-white to-blue-50/30"
-                    >
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-[#038DCD] to-[#0369A1] rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <FileText className="w-6 h-6 text-white" />
+              {/* Templates */}
+              {templates.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Sparkles className="w-4 h-4 text-[#038DCD]" />
+                    <h3 className="font-semibold text-slate-900 text-sm">Templates</h3>
+                    <span className="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs font-medium rounded-full">{templates.length}</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {templates.map((t) => (
+                      <button key={t.id} onClick={() => loadTemplate(t)}
+                        className="text-left group border border-slate-200 hover:border-[#038DCD]/40 hover:shadow-md rounded-xl p-4 transition-all bg-white">
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="w-8 h-8 rounded-lg bg-slate-100 group-hover:bg-[#038DCD]/10 flex items-center justify-center transition-colors shrink-0">
+                            <FileText className="w-4 h-4 text-slate-600 group-hover:text-[#038DCD]" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-slate-900 text-sm truncate">{t.name}</p>
+                            <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{t.description || 'No description'}</p>
+                          </div>
                         </div>
-                        <h3 className="text-lg font-bold text-slate-900 flex-1">{template.name}</h3>
-                      </div>
-                      <p className="text-sm text-slate-600 mb-4 min-h-[40px] line-clamp-2">
-                        {template.description || 'No description available'}
-                      </p>
-                      <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-                        <div className="flex items-center gap-3 text-xs">
-                          <span className="font-semibold text-slate-500">
-                            {template.fields?.length || 0} fields
-                          </span>
-                          <span className="px-2 py-1 bg-blue-100 text-blue-700 font-bold rounded">
-                            {template.formType}
+                        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                          <span className="text-xs text-slate-500">{t.fields?.length || 0} fields</span>
+                          <span className="text-xs font-semibold text-[#038DCD] flex items-center gap-1">
+                            Use template <ChevronRight className="w-3 h-3" />
                           </span>
                         </div>
-                        <span className="text-[#038DCD] font-semibold text-sm group-hover:translate-x-1 transition-transform">
-                          Use →
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="border-t-2 border-slate-200 pt-6">
-                  <button
-                    onClick={startFromScratch}
-                    className="w-full md:w-auto px-8 py-3 border-2 border-[#038DCD] text-[#038DCD] rounded-xl hover:bg-[#038DCD] hover:text-white transition-all duration-200 font-bold"
-                  >
-                    Start from Scratch
-                  </button>
-                </div>
-              </>
-            )}
+              )}
 
-            {templates.length === 0 && !isUploadingPdf && (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FileText className="w-8 h-8 text-slate-400" />
-                </div>
-                <p className="text-slate-600 font-semibold mb-2">No templates available</p>
-                <p className="text-sm text-slate-500 mb-6">Start by creating your first form from scratch</p>
-                <button
-                  onClick={startFromScratch}
-                  className="px-8 py-3 bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white rounded-xl hover:shadow-lg font-bold transition-all"
-                >
-                  Start from Scratch
+              {/* Scratch */}
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <p className="text-sm text-slate-500">Prefer to start empty?</p>
+                <button onClick={() => { setFormConfig({ name: '', description: '', formType: '', fields: [], pdfFile: undefined }); setShowTemplateSelection(false); setShowBuilder(true); setCurrentField({ columnWidth: 'full', isRequired: false }); }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-lg text-sm font-semibold transition-colors">
+                  <Plus className="w-3.5 h-3.5" /> Start from Scratch
                 </button>
               </div>
-            )}
+            </div>
           </div>
         )}
 
-        {/* Form Builder */}
+        {/* ══════════════════════════════════════════════════════════
+            FORM BUILDER
+        ══════════════════════════════════════════════════════════ */}
         {showBuilder && (
-          <div className="bg-white rounded-2xl shadow-xl border-2 border-slate-200 p-8 mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900">Build Your Form</h2>
+          <div className="space-y-5 mb-8">
+            {/* Builder nav */}
+            <div className="flex items-center justify-between">
+              <button onClick={resetForm} className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors">
+                <ArrowLeft className="w-4 h-4" /> Back to forms
+              </button>
+              <div className="flex gap-2">
+                <button onClick={resetForm} disabled={isSaving}
+                  className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg text-sm font-semibold transition-colors">
+                  Cancel
+                </button>
+                <button onClick={saveForm} disabled={isSaving || formConfig.fields.length === 0}
+                  className="inline-flex items-center gap-2 px-5 py-2 bg-[#038DCD] hover:bg-[#0278b0] text-white rounded-lg text-sm font-semibold transition-colors shadow-sm shadow-[#038DCD]/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                  {isSaving ? <><Loader className="w-3.5 h-3.5 animate-spin" /> Saving…</> : <><Save className="w-3.5 h-3.5" /> Save Form</>}
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+              {/* Left column: Form config + field builder */}
+              <div className="lg:col-span-3 space-y-5">
+
+                {/* PDF source badge */}
                 {formConfig.pdfFile && (
-                  <div className="flex items-center gap-2 mt-2">
-                    <FilePlus className="w-4 h-4 text-amber-600" />
-                    <p className="text-sm text-slate-600">
-                      Source PDF: <span className="font-semibold">{formConfig.pdfFile.originalName}</span>
-                    </p>
-                    <a
-                      href={formConfig.pdfFile.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#038DCD] hover:underline flex items-center gap-1 text-sm"
-                    >
-                      <ExternalLink className="w-3 h-3" /> View
+                  <div className="flex items-center gap-3 px-4 py-3 bg-[#038DCD]/5 border border-[#038DCD]/20 rounded-xl text-sm">
+                    <FileText className="w-4 h-4 text-[#038DCD] shrink-0" />
+                    <span className="font-medium text-slate-700 flex-1 truncate">{formConfig.pdfFile.originalName}</span>
+                    <span className="text-xs text-slate-500">{(formConfig.pdfFile.size / 1024).toFixed(1)} KB</span>
+                    <a href={formConfig.pdfFile.url} target="_blank" rel="noopener noreferrer"
+                      className="text-[#038DCD] hover:text-[#0260a8] transition-colors">
+                      <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                   </div>
                 )}
-              </div>
-              <button
-                onClick={resetForm}
-                className="flex items-center gap-2 px-4 py-2 hover:bg-slate-100 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" /> Back
-              </button>
-            </div>
 
-            {/* Uploaded PDF Info Card */}
-            {formConfig.pdfFile && (
-              <div className="mb-6 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-bold text-slate-900">{formConfig.pdfFile.originalName}</p>
-                    <p className="text-xs text-slate-600">
-                      {(formConfig.pdfFile.size / 1024).toFixed(2)} KB • Uploaded {new Date(formConfig.pdfFile.uploadedAt).toLocaleString()}
-                    </p>
-                  </div>
-                  <a
-                    href={formConfig.pdfFile.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold flex items-center gap-2 transition-colors"
-                  >
-                    <ExternalLink className="w-4 h-4" /> View PDF
-                  </a>
-                </div>
-              </div>
-            )}
-
-            {/* Form Details */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 bg-slate-50 rounded-xl border-2 border-slate-200">
-              <div>
-                <label className="block text-sm font-bold text-slate-900 mb-2">
-                  Form Name <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formConfig.name}
-                  onChange={(e) => setFormConfig(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-[#038DCD] focus:ring-4 focus:ring-[#038DCD]/10 transition-all"
-                  placeholder="e.g., Membership Form"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-slate-900 mb-2">
-                  Form Type <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formConfig.formType}
-                  onChange={(e) => setFormConfig(prev => ({ ...prev, formType: e.target.value }))}
-                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-[#038DCD] focus:ring-4 focus:ring-[#038DCD]/10 transition-all"
-                  placeholder="e.g., membership, widow_female"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-slate-900 mb-2">Description</label>
-                <textarea
-                  value={formConfig.description}
-                  onChange={(e) => setFormConfig(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-[#038DCD] focus:ring-4 focus:ring-[#038DCD]/10 transition-all min-h-[100px]"
-                  placeholder="Describe what this form is for..."
-                  rows={3}
-                />
-              </div>
-            </div>
-
-            {/* Field Builder */}
-            <div className="border-t-2 border-slate-200 pt-8">
-              <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                <Settings className="w-5 h-5 text-[#038DCD]" />
-                Form Fields
-              </h3>
-
-              <div className="bg-gradient-to-br from-blue-50/50 to-amber-50/50 p-6 rounded-xl border-2 border-slate-200 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                  <div>
-                    <label className="text-sm font-bold text-slate-700 mb-2 block">
-                      Field Name <span className="text-rose-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={currentField.fieldName || ''}
-                      onChange={(e) => setCurrentField(prev => ({ ...prev, fieldName: e.target.value }))}
-                      className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10 transition-all text-sm"
-                      placeholder="e.g., firstName"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-bold text-slate-700 mb-2 block">
-                      Field Label <span className="text-rose-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={currentField.fieldLabel || ''}
-                      onChange={(e) => setCurrentField(prev => ({ ...prev, fieldLabel: e.target.value }))}
-                      className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10 transition-all text-sm"
-                      placeholder="e.g., First Name"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-bold text-slate-700 mb-2 block">
-                      Field Type <span className="text-rose-500">*</span>
-                    </label>
-                    <select
-                      value={currentField.fieldType || ''}
-                      onChange={(e) => setCurrentField(prev => ({ ...prev, fieldType: e.target.value as Field['fieldType'] }))}
-                      className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10 transition-all text-sm cursor-pointer"
-                    >
-                      <option value="">Select Type</option>
-                      <option value="text">Text</option>
-                      <option value="email">Email</option>
-                      <option value="number">Number</option>
-                      <option value="date">Date</option>
-                      <option value="textarea">Textarea</option>
-                      <option value="select">Select</option>
-                      <option value="checkbox">Checkbox</option>
-                      <option value="file">File</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="text-sm font-bold text-slate-700 mb-2 block">Placeholder</label>
-                    <input
-                      type="text"
-                      value={currentField.placeholder || ''}
-                      onChange={(e) => setCurrentField(prev => ({ ...prev, placeholder: e.target.value }))}
-                      className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10 transition-all text-sm"
-                      placeholder="Enter placeholder text"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-bold text-slate-700 mb-2 block">Column Width</label>
-                    <select
-                      value={currentField.columnWidth || 'full'}
-                      onChange={(e) => setCurrentField(prev => ({ ...prev, columnWidth: e.target.value as Field['columnWidth'] }))}
-                      className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10 transition-all text-sm cursor-pointer"
-                    >
-                      <option value="full">Full Width</option>
-                      <option value="half">Half Width</option>
-                      <option value="third">Third Width</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <label className="text-sm font-bold text-slate-700 mb-2 block">Help Text</label>
-                  <input
-                    type="text"
-                    value={currentField.helpText || ''}
-                    onChange={(e) => setCurrentField(prev => ({ ...prev, helpText: e.target.value }))}
-                    className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10 transition-all text-sm"
-                    placeholder="Additional help text for this field"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={currentField.isRequired || false}
-                      onChange={(e) => setCurrentField(prev => ({ ...prev, isRequired: e.target.checked }))}
-                      className="w-5 h-5 rounded border-2 border-slate-300 text-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/20 cursor-pointer"
-                    />
-                    <span className="text-sm font-semibold text-slate-700">Required Field</span>
-                  </label>
-                  <button
-                    onClick={addOrUpdateField}
-                    className="px-6 py-2 bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white rounded-lg hover:shadow-lg font-semibold transition-all"
-                  >
-                    {editingFieldIndex !== null ? 'Update Field' : 'Add Field'}
-                  </button>
-                </div>
-              </div>
-
-              {/* Fields List */}
-              {formConfig.fields.length > 0 && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-sm font-bold text-slate-700">
-                      {formConfig.fields.length} Field{formConfig.fields.length !== 1 ? 's' : ''} Added
-                    </h4>
-                  </div>
-                  {formConfig.fields.map((field, index) => (
-                    <div key={index} className="flex items-center gap-3 bg-slate-50 p-4 rounded-xl border-2 border-slate-200 hover:border-slate-300 transition-all group">
-                      <div className="cursor-move text-slate-400 hover:text-slate-600">
-                        <GripVertical className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-bold text-slate-900 truncate">{field.fieldLabel}</p>
-                          {field.isRequired && (
-                            <span className="px-2 py-0.5 bg-rose-100 text-rose-700 text-xs font-bold rounded">Required</span>
-                          )}
-                        </div>
-                        <p className="text-sm text-slate-600">
-                          <span className="font-medium">{field.fieldType}</span>
-                          {' • '}
-                          <span>{field.columnWidth}</span>
-                          {field.placeholder && (
-                            <>
-                              {' • '}
-                              <span className="italic">&quot;{field.placeholder}&quot;</span>
-                            </>
-                          )}
-                        </p>
-                      </div>
-                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => duplicateField(index)}
-                          className="p-2 hover:bg-blue-100 rounded-lg text-blue-600 transition-colors"
-                          title="Duplicate field"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => editField(index)}
-                          className="p-2 hover:bg-amber-100 rounded-lg text-amber-600 transition-colors"
-                          title="Edit field"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => removeField(index)}
-                          className="p-2 hover:bg-rose-100 rounded-lg text-rose-600 transition-colors"
-                          title="Delete field"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
+                {/* Form details card */}
+                <div className="bg-white rounded-2xl border border-slate-200 p-6">
+                  <h2 className="font-bold text-slate-900 text-base mb-5 flex items-center gap-2">
+                    <Settings className="w-4 h-4 text-[#038DCD]" /> Form Details
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label required>Form Name</Label>
+                      <Input value={formConfig.name} onChange={(e) => setFormConfig(p => ({ ...p, name: e.target.value }))} placeholder="e.g., Membership Application" />
                     </div>
-                  ))}
+                    <div>
+                      <Label required>Form Type</Label>
+                      <Input value={formConfig.formType} onChange={(e) => setFormConfig(p => ({ ...p, formType: e.target.value }))} placeholder="e.g., membership" />
+                    </div>
+                    <div className="md:col-span-2">
+                      <Label>Description</Label>
+                      <Textarea value={formConfig.description} onChange={(e) => setFormConfig(p => ({ ...p, description: e.target.value }))} placeholder="What is this form for?" rows={2} />
+                    </div>
+                  </div>
                 </div>
-              )}
 
-              {formConfig.fields.length === 0 && (
-                <div className="text-center py-8 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">
-                  <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                  <p className="text-slate-500 font-medium">No fields added yet</p>
-                  <p className="text-sm text-slate-400 mt-1">Start by adding your first field above</p>
+                {/* Add field card */}
+                <div className="bg-white rounded-2xl border border-slate-200 p-6">
+                  <h2 className="font-bold text-slate-900 text-base mb-5 flex items-center gap-2">
+                    <Plus className="w-4 h-4 text-[#038DCD]" />
+                    {editingFieldIndex !== null ? 'Edit Field' : 'Add Field'}
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                      <Label required>Field Name</Label>
+                      <Input value={currentField.fieldName || ''} onChange={(e) => setCurrentField(p => ({ ...p, fieldName: e.target.value }))} placeholder="firstName" />
+                    </div>
+                    <div>
+                      <Label required>Label</Label>
+                      <Input value={currentField.fieldLabel || ''} onChange={(e) => setCurrentField(p => ({ ...p, fieldLabel: e.target.value }))} placeholder="First Name" />
+                    </div>
+                    <div>
+                      <Label required>Type</Label>
+                      <Select value={currentField.fieldType || ''} onChange={(e) => setCurrentField(p => ({ ...p, fieldType: e.target.value as Field['fieldType'] }))}>
+                        <option value="">Select type</option>
+                        {['text', 'email', 'number', 'date', 'textarea', 'select', 'checkbox', 'file'].map(t => (
+                          <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                        ))}
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <Label>Placeholder</Label>
+                      <Input value={currentField.placeholder || ''} onChange={(e) => setCurrentField(p => ({ ...p, placeholder: e.target.value }))} placeholder="Placeholder text" />
+                    </div>
+                    <div>
+                      <Label>Column Width</Label>
+                      <Select value={currentField.columnWidth || 'full'} onChange={(e) => setCurrentField(p => ({ ...p, columnWidth: e.target.value as Field['columnWidth'] }))}>
+                        <option value="full">Full Width</option>
+                        <option value="half">Half Width</option>
+                        <option value="third">Third Width</option>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="mb-5">
+                    <Label>Help Text</Label>
+                    <Input value={currentField.helpText || ''} onChange={(e) => setCurrentField(p => ({ ...p, helpText: e.target.value }))} placeholder="Optional help text shown below the field" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                      <div className={`w-9 h-5 rounded-full transition-colors ${currentField.isRequired ? 'bg-[#038DCD]' : 'bg-slate-200'}`}
+                        onClick={() => setCurrentField(p => ({ ...p, isRequired: !p.isRequired }))}>
+                        <div className={`w-4 h-4 bg-white rounded-full shadow-sm m-0.5 transition-transform ${currentField.isRequired ? 'translate-x-4' : 'translate-x-0'}`} />
+                      </div>
+                      <span className="text-sm font-medium text-slate-700">Required field</span>
+                    </label>
+                    <div className="flex gap-2">
+                      {editingFieldIndex !== null && (
+                        <button onClick={() => { setCurrentField({ columnWidth: 'full', isRequired: false }); setEditingFieldIndex(null); }}
+                          className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm font-semibold hover:bg-slate-50 transition-colors">
+                          Cancel
+                        </button>
+                      )}
+                      <button onClick={addOrUpdateField}
+                        className="px-5 py-2 bg-[#038DCD] hover:bg-[#0278b0] text-white rounded-lg text-sm font-semibold transition-colors">
+                        {editingFieldIndex !== null ? 'Update Field' : 'Add Field'}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Save Form */}
-            <div className="flex gap-4 mt-8 pt-6 border-t-2">
-              <button
-                onClick={saveForm}
-                disabled={isSaving || formConfig.fields.length === 0}
-                className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-xl hover:shadow-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
-              >
-                {isSaving ? (
-                  <>
-                    <Loader className="w-5 h-5 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-5 h-5" />
-                    Save Form
-                  </>
-                )}
-              </button>
-              <button
-                onClick={resetForm}
-                disabled={isSaving}
-                className="px-8 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 font-bold disabled:opacity-50 transition-all"
-              >
-                Cancel
-              </button>
+              {/* Right column: Fields list */}
+              <div className="lg:col-span-2">
+                <div className="bg-white rounded-2xl border border-slate-200 p-6 sticky top-4">
+                  <div className="flex items-center justify-between mb-5">
+                    <h2 className="font-bold text-slate-900 text-base">Fields</h2>
+                    <span className="px-2.5 py-1 bg-[#038DCD]/10 text-[#038DCD] text-xs font-bold rounded-full">
+                      {formConfig.fields.length}
+                    </span>
+                  </div>
+
+                  {formConfig.fields.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
+                        <FileText className="w-5 h-5 text-slate-400" />
+                      </div>
+                      <p className="text-sm font-medium text-slate-600 mb-1">No fields yet</p>
+                      <p className="text-xs text-slate-400">Add fields using the form on the left</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
+                      {formConfig.fields.map((field, index) => (
+                        <div key={index}
+                          className={`flex items-center gap-3 p-3 rounded-xl border transition-all group
+                            ${editingFieldIndex === index ? 'border-[#038DCD]/40 bg-[#038DCD]/5' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`}>
+                          <GripVertical className="w-4 h-4 text-slate-300 cursor-grab shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-slate-900 text-sm truncate">{field.fieldLabel}</p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-xs text-slate-400">{field.fieldType}</span>
+                              {field.isRequired && <span className="text-[10px] font-semibold text-[#038DCD] bg-[#038DCD]/10 px-1.5 py-0.5 rounded">Required</span>}
+                              {field.columnWidth !== 'full' && <span className="text-[10px] text-slate-400">{field.columnWidth}</span>}
+                            </div>
+                          </div>
+                          <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => duplicateField(index)} className="p-1.5 hover:bg-white rounded-lg text-slate-400 hover:text-slate-700 transition-colors" title="Duplicate">
+                              <Copy className="w-3.5 h-3.5" />
+                            </button>
+                            <button onClick={() => editField(index)} className="p-1.5 hover:bg-white rounded-lg text-slate-400 hover:text-[#038DCD] transition-colors" title="Edit">
+                              <Edit className="w-3.5 h-3.5" />
+                            </button>
+                            <button onClick={() => removeField(index)} className="p-1.5 hover:bg-red-50 rounded-lg text-slate-400 hover:text-red-500 transition-colors" title="Remove">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Forms Grid */}
+        {/* ══════════════════════════════════════════════════════════
+            DASHBOARD VIEW
+        ══════════════════════════════════════════════════════════ */}
         {!showBuilder && !showTemplateSelection && (
-          <>
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="bg-white rounded-xl shadow-sm border-2 border-slate-200 p-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                    <FileText className="w-6 h-6 text-[#038DCD]" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-500 uppercase">Total Forms</p>
-                    <p className="text-2xl font-bold text-slate-900">{forms.length}</p>
-                  </div>
-                </div>
+          <div className="space-y-8">
+
+            {/* Stats row */}
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-bold text-slate-900">Overview</h2>
+              <button
+                onClick={() => setShowTemplateSelection(true)}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#038DCD] hover:bg-[#0278b0] text-white rounded-xl font-semibold text-sm transition-colors shadow-sm shadow-[#038DCD]/20"
+              >
+                <Plus className="w-4 h-4" /> New Form
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <StatCard icon={FileText} label="Total Forms" value={forms.length} accent />
+              <StatCard icon={Users} label="Field Types Used" value={new Set(forms.flatMap(f => f.fields.map(fi => fi.fieldType))).size || 0} />
+              <StatCard icon={FolderOpen} label="Form Types" value={formTypes.length - 1} />
+              <StatCard icon={Settings} label="Total Fields" value={forms.reduce((a, f) => a + f.fields.length, 0)} />
+            </div>
+
+            {/* Charts */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <div className="bg-white rounded-2xl border border-slate-200 p-6">
+                <p className="text-sm font-bold text-slate-900 mb-5">Fields per Form</p>
+                {forms.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={180}>
+                    <BarChart data={forms.slice(0, 6).map(f => ({ name: f.name.substring(0, 10), fields: f.fields.length }))} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="name" fontSize={11} tick={{ fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                      <YAxis fontSize={11} tick={{ fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                      <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
+                      <Bar dataKey="fields" fill="#038DCD" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : <div className="h-44 flex items-center justify-center text-sm text-slate-400">No data yet</div>}
               </div>
-              <div className="bg-white rounded-xl shadow-sm border-2 border-slate-200 p-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                    <Users className="w-6 h-6 text-emerald-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-500 uppercase">Active Forms</p>
-                    <p className="text-2xl font-bold text-slate-900">{forms.length}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-xl shadow-sm border-2 border-slate-200 p-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-amber-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-500 uppercase">Last Updated</p>
-                    <p className="text-sm font-bold text-slate-900">
-                      {forms.length > 0 ? new Date(forms[0].updatedAt || forms[0].createdAt || '').toLocaleDateString() : 'N/A'}
-                    </p>
-                  </div>
-                </div>
+
+              <div className="bg-white rounded-2xl border border-slate-200 p-6">
+                <p className="text-sm font-bold text-slate-900 mb-5">Forms by Type</p>
+                {formTypes.length > 1 ? (
+                  <ResponsiveContainer width="100%" height={180}>
+                    <PieChart>
+                      <Pie data={formTypes.filter(t => t !== 'all').map(type => ({ name: type, value: forms.filter(f => f.formType === type).length }))}
+                        cx="50%" cy="50%" innerRadius={50} outerRadius={75} dataKey="value" paddingAngle={3}>
+                        {formTypes.filter(t => t !== 'all').map((_, i) => (
+                          <Cell key={i} fill={['#038DCD', '#0260a8', '#64748b', '#94a3b8'][i % 4]} />
+                        ))}
+                      </Pie>
+                      <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : <div className="h-44 flex items-center justify-center text-sm text-slate-400">No data yet</div>}
               </div>
             </div>
 
-            {/* Search Bar */}
-            <div className="bg-white rounded-xl shadow-sm border-2 border-slate-200 p-6 mb-6">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search forms by name, description, or type..."
-                    className="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-xl focus:border-[#038DCD] focus:ring-4 focus:ring-[#038DCD]/10 transition-all"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Filter className="w-5 h-5 text-slate-400" />
-                  <select
-                    value={filterType}
-                    onChange={(e) => setFilterType(e.target.value)}
-                    className="px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-[#038DCD] focus:ring-4 focus:ring-[#038DCD]/10 cursor-pointer transition-all"
-                  >
-                    {formTypes.map(type => (
-                      <option key={type} value={type}>
-                        {type === 'all' ? 'All Types' : type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+            {/* Search + Filter */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search forms by name, description, or type…"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#038DCD] focus:ring-2 focus:ring-[#038DCD]/10 transition-all" />
+              </div>
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-slate-400 shrink-0" />
+                <select value={filterType} onChange={(e) => setFilterType(e.target.value)}
+                  className="px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#038DCD] transition-all cursor-pointer">
+                  {formTypes.map(t => <option key={t} value={t}>{t === 'all' ? 'All Types' : t.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</option>)}
+                </select>
               </div>
             </div>
 
-            {/* Forms Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredForms.map(form => (
-                <div key={form.id} className="bg-white rounded-xl shadow-sm border-2 border-slate-200 p-6 hover:shadow-lg hover:border-[#038DCD]/50 transition-all">
-                  <div className="flex items-start gap-3 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-[#038DCD] to-[#0369A1] rounded-xl flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-6 h-6 text-white" />
+            {/* Forms grid */}
+            {filteredForms.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {filteredForms.map(form => (
+                  <div key={form.id} className="bg-white rounded-2xl border border-slate-200 hover:border-[#038DCD]/30 hover:shadow-md transition-all group p-5">
+                    {/* Card header */}
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-xl bg-[#038DCD]/8 flex items-center justify-center shrink-0">
+                        <FileText className="w-5 h-5 text-[#038DCD]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-slate-900 text-sm leading-tight">{form.name}</h3>
+                        <p className="text-xs text-slate-500 mt-1 line-clamp-2">{form.description || 'No description'}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-bold text-slate-900 mb-1 truncate">{form.name}</h3>
-                      <p className="text-sm text-slate-600 line-clamp-2">{form.description || 'No description provided'}</p>
-                    </div>
-                  </div>
 
-                  {/* PDF indicator if form has source PDF */}
-                  {form.pdfFile && (
-                    <div className="mb-3 p-2 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2">
-                      <FilePlus className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                      <span className="text-xs text-slate-600 truncate">
-                        Source: {form.pdfFile.originalName}
-                      </span>
-                      <a
-                        href={form.pdfFile.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="ml-auto text-amber-600 hover:text-amber-700"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    </div>
-                  )}
-
-                  <div className="space-y-2 mb-4 pb-4 border-b border-slate-200">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-500">Type:</span>
-                      <span className="text-xs font-bold text-[#038DCD] bg-blue-50 px-2 py-1 rounded">
-                        {form.formType}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-500">Fields:</span>
-                      <span className="text-xs font-bold text-slate-700">{form.fields.length}</span>
-                    </div>
-                    {form.createdAt && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-slate-500">Created:</span>
-                        <span className="text-xs text-slate-600">{new Date(form.createdAt).toLocaleDateString()}</span>
+                    {/* PDF badge */}
+                    {form.pdfFile && (
+                      <div className="mb-3 flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg text-xs">
+                        <FilePlus className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <span className="text-slate-600 truncate flex-1">{form.pdfFile.originalName}</span>
+                        <a href={form.pdfFile.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-slate-400 hover:text-[#038DCD] transition-colors">
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
                       </div>
                     )}
-                  </div>
 
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => openPreview(form)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-semibold transition-colors"
-                    >
-                      <Eye className="w-4 h-4" /> Preview
-                    </button>
-                    <button
-                      onClick={() => downloadFormPdf(form.id)}
-                      className="px-3 py-2 bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors"
-                      title="Download PDF"
-                    >
-                      <Download className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => exportForm(form.id)}
-                      className="px-3 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors"
-                      title="Export JSON"
-                    >
-                      <Download className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => deleteForm(form.id)}
-                      className="px-3 py-2 bg-rose-50 text-rose-700 rounded-lg hover:bg-rose-100 transition-colors"
-                      title="Delete form"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                    {/* Meta */}
+                    <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-100">
+                      <span className="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-lg">
+                        {form.formType.replace(/_/g, ' ')}
+                      </span>
+                      <span className="text-xs text-slate-500">{form.fields.length} fields</span>
+                      {form.updatedAt && (
+                        <span className="text-xs text-slate-400 ml-auto">
+                          {new Date(form.updatedAt).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
 
-            {filteredForms.length === 0 && (
-              <div className="text-center py-16 bg-white rounded-xl border-2 border-slate-200">
-                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FileText className="w-10 h-10 text-slate-400" />
+                    {/* Actions */}
+                    <div className="flex items-center gap-1.5">
+                      <button onClick={() => { setPreviewForm(form); setShowPreview(true); }}
+                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-50 hover:bg-[#038DCD]/10 hover:text-[#038DCD] rounded-lg text-slate-600 text-xs font-semibold transition-colors">
+                        <Eye className="w-3.5 h-3.5" /> Preview
+                      </button>
+                      <button onClick={() => downloadFormPdf(form.id)}
+                        className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-700 transition-colors" title="Download PDF">
+                        <Download className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => exportForm(form.id)}
+                        className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-700 transition-colors" title="Export JSON">
+                        <FileUp className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => deleteForm(form.id)}
+                        className="p-2 hover:bg-red-50 rounded-lg text-slate-400 hover:text-red-500 transition-colors" title="Delete">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
+                <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                  <FileText className="w-6 h-6 text-slate-400" />
                 </div>
-                <p className="text-slate-600 text-lg font-semibold mb-2">
-                  {searchQuery || filterType !== 'all' ? 'No forms match your filters' : 'No forms created yet'}
+                <p className="font-semibold text-slate-700 mb-1">
+                  {searchQuery || filterType !== 'all' ? 'No forms match your search' : 'No forms yet'}
                 </p>
-                <p className="text-slate-500 mb-6">
-                  {searchQuery || filterType !== 'all'
-                    ? 'Try adjusting your search or filter criteria'
-                    : 'Get started by creating your first form'}
+                <p className="text-sm text-slate-500 mb-6">
+                  {searchQuery || filterType !== 'all' ? 'Try adjusting your filters' : 'Create your first form to get started'}
                 </p>
                 {!searchQuery && filterType === 'all' && (
-                  <button
-                    onClick={() => setShowTemplateSelection(true)}
-                    className="px-6 py-3 bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white rounded-xl hover:shadow-lg font-semibold transition-all"
-                  >
-                    Create Your First Form
+                  <button onClick={() => setShowTemplateSelection(true)}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#038DCD] hover:bg-[#0278b0] text-white rounded-xl font-semibold text-sm transition-colors">
+                    <Plus className="w-4 h-4" /> Create Your First Form
                   </button>
                 )}
               </div>
             )}
-          </>
+          </div>
         )}
 
-        {/* Preview Modal using DynamicForm Component */}
+        {/* ══════════════════════════════════════════════════════════
+            PREVIEW MODAL
+        ══════════════════════════════════════════════════════════ */}
         {showPreview && previewForm && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-            <div className="bg-gradient-to-br from-slate-50 via-blue-50/20 to-amber-50/20 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white p-6 flex justify-between items-center rounded-t-2xl z-10">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between z-10 rounded-t-2xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center">
-                    <Eye className="w-5 h-5" />
+                  <div className="w-8 h-8 rounded-lg bg-[#038DCD]/10 flex items-center justify-center">
+                    <Eye className="w-4 h-4 text-[#038DCD]" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold">Form Preview</h2>
-                    <p className="text-blue-100 text-sm mt-1">{previewForm.name}</p>
+                    <p className="font-bold text-slate-900 text-sm">{previewForm.name}</p>
+                    <p className="text-xs text-slate-500">Preview mode — submissions disabled</p>
                   </div>
                 </div>
-                <button
-                  onClick={closePreview}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                >
-                  <X className="w-6 h-6" />
+                <button onClick={() => { setShowPreview(false); setPreviewForm(null); }}
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500">
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
-              <div className="p-8">
-                {/* Preview Info Banner */}
-                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                      <Eye className="w-4 h-4 text-white" />
+              <div className="p-6">
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  {[
+                    { label: 'Total Fields', value: previewForm.fields.length },
+                    { label: 'Required', value: previewForm.fields.filter(f => f.isRequired).length },
+                    { label: 'Est. Time', value: `${Math.ceil(previewForm.fields.length / 3)} min` },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="bg-slate-50 rounded-xl p-4 border border-slate-100 text-center">
+                      <p className="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wide">{label}</p>
+                      <p className="text-xl font-bold text-slate-900">{value}</p>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-bold text-blue-900">Preview Mode</p>
-                      <p className="text-xs text-blue-700">This is a preview of how the form will appear to users. Form submissions are disabled in preview mode.</p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
-
-                {/* Form Stats */}
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="bg-white rounded-xl p-4 border-2 border-slate-200">
-                    <p className="text-xs font-semibold text-slate-500 uppercase mb-1">Total Fields</p>
-                    <p className="text-xl font-bold text-slate-900">{previewForm.fields.length}</p>
-                  </div>
-                  <div className="bg-white rounded-xl p-4 border-2 border-slate-200">
-                    <p className="text-xs font-semibold text-slate-500 uppercase mb-1">Required</p>
-                    <p className="text-xl font-bold text-slate-900">
-                      {previewForm.fields.filter(f => f.isRequired).length}
-                    </p>
-                  </div>
-                  <div className="bg-white rounded-xl p-4 border-2 border-slate-200">
-                    <p className="text-xs font-semibold text-slate-500 uppercase mb-1">Est. Time</p>
-                    <p className="text-xl font-bold text-slate-900">
-                      {Math.ceil(previewForm.fields.length / 3)} mins
-                    </p>
-                  </div>
-                </div>
-
-                {/* Use DynamicForm Component for Preview */}
                 <DynamicForm formId={previewForm.id} />
               </div>
             </div>
           </div>
         )}
       </div>
+
+      <style jsx>{`
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateY(-8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
