@@ -951,6 +951,19 @@ model VerificationCode {
   @@index([expiresAt])
 }
 
+model PasswordResetToken {
+  id        String   @id @default(cuid()) @db.VarChar(255)
+  email     String   @db.VarChar(255)
+  token     String   @unique @db.VarChar(255)
+  expiresAt DateTime @db.DateTime(0)
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @updatedAt @db.DateTime(0)
+
+  @@index([email])
+  @@index([token])
+}
+
 model Event {
   id          String   @id @default(cuid()) @db.VarChar(255)
   title       String   @db.VarChar(255)

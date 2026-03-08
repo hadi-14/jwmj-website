@@ -184,7 +184,7 @@ function Step1_Verification({ onNext, formData, setFormData }: { onNext: () => v
       <button
         onClick={handleVerify}
         disabled={loading || !canSubmit}
-        className="w-full bg-gradient-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 uppercase tracking-wide text-sm"
+        className="w-full bg-linear-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 uppercase tracking-wide text-sm"
       >
         {loading ? (
           <span className="flex items-center justify-center">
@@ -358,7 +358,7 @@ function Step3_EmailVerification({ onNext, onBack, formData, setFormData }: { on
           <button
             onClick={sendVerificationCode}
             disabled={loading}
-            className="w-full bg-gradient-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 uppercase tracking-wide text-sm"
+            className="w-full bg-linear-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 uppercase tracking-wide text-sm"
           >
             {loading ? (
               <span className="flex items-center justify-center">
@@ -409,7 +409,7 @@ function Step3_EmailVerification({ onNext, onBack, formData, setFormData }: { on
           <button
             onClick={verifyCode}
             disabled={loading || verificationCode.length !== 6}
-            className="w-full bg-gradient-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 uppercase tracking-wide text-sm"
+            className="w-full bg-linear-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 uppercase tracking-wide text-sm"
           >
             {loading ? (
               <span className="flex items-center justify-center">
@@ -610,7 +610,7 @@ function Step4_CreatePassword({ onNext, onBack, formData }: { onNext: () => void
         <button
           onClick={handleSubmit}
           disabled={loading || password !== confirmPassword || password.length < 8}
-          className="flex-1 bg-gradient-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 uppercase tracking-wide text-sm"
+          className="flex-1 bg-linear-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 uppercase tracking-wide text-sm"
         >
           {loading ? (
             <span className="flex items-center justify-center">

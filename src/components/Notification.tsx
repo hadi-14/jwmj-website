@@ -41,7 +41,7 @@ export function Notification({ message, type, onClose }: NotificationProps) {
                 } ${colors[type]}`}
         >
             <div className="flex items-start">
-                <Icon className="w-5 h-5 mt-0.5 mr-3 flex-shrink-0" />
+                <Icon className="w-5 h-5 mt-0.5 mr-3 shrink-0" />
                 <div className="flex-1">
                     <p className="text-sm font-medium">{message}</p>
                 </div>
@@ -50,7 +50,7 @@ export function Notification({ message, type, onClose }: NotificationProps) {
                         setIsVisible(false);
                         setTimeout(onClose, 300);
                     }}
-                    className="ml-3 flex-shrink-0"
+                    className="ml-3 shrink-0"
                 >
                     <X className="w-4 h-4" />
                 </button>

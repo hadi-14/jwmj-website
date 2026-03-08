@@ -571,3 +571,107 @@ Event Management Committee — Jamnagar Wehvaria Memon Jamat
     throw error;
   }
 }
+
+export async function sendPasswordResetEmail(email: string, resetToken: string, userName: string) {
+  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/member/reset-password?token=${resetToken}`;
+
+  const mailOptions = {
+    from: `"${process.env.APP_NAME || 'JWMJ Member Portal'}" <${process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@jwmj.org'}>`,
+    to: email,
+    subject: 'Password Reset - JWMJ Member Portal',
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #038DCD 0%, #03BDCD 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .button { display: inline-block; background: #038DCD; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+            .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 12px; }
+            .warning { background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 20px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>JWMJ Member Portal</h1>
+              <p>Password Reset Request</p>
+            </div>
+            <div class="content">
+              <h2>Hello ${userName},</h2>
+
+              <p>You have requested to reset your password for your JWMJ Member Portal account.</p>
+
+              <p>Please click the button below to reset your password:</p>
+
+              <div style="text-align: center;">
+                <a href="${resetUrl}" class="button">Reset Password</a>
+              </div>
+
+              <p><strong>This link will expire in 1 hour.</strong></p>
+
+              <div class="warning">
+                <strong>Security Notice:</strong>
+                <ul>
+                  <li>If you didn't request this password reset, please ignore this email</li>
+                  <li>The reset link can only be used once</li>
+                  <li>Do not share this link with anyone</li>
+                </ul>
+              </div>
+
+              <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
+              <p style="word-break: break-all; background: #f0f0f0; padding: 10px; border-radius: 3px;">${resetUrl}</p>
+
+              <p>If you have any questions or need assistance, please contact our support team.</p>
+
+              <p style="margin-top: 30px;">Best regards,<br><strong>JWMJ Portal Team</strong></p>
+            </div>
+            <div class="footer">
+              <p>&copy; ${new Date().getFullYear()} Jamnagar Wehvaria Memon Jamat. All rights reserved.</p>
+              <p style="margin-top: 10px;">This is an automated message, please do not reply to this email.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `
+JWMJ Member Portal - Password Reset
+
+Hello ${userName},
+
+You have requested to reset your password for your JWMJ Member Portal account.
+
+Please visit the following link to reset your password:
+${resetUrl}
+
+This link will expire in 1 hour.
+
+Security Notice:
+- If you didn't request this password reset, please ignore this email
+- The reset link can only be used once
+- Do not share this link with anyone
+
+If you have any questions, please contact our support team.
+
+Best regards,
+JWMJ Portal Team
+
+---
+© ${new Date().getFullYear()} Jamnagar Wehvaria Memon Jamat. All rights reserved.
+This is an automated message, please do not reply to this email.
+    `
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('✅ Password reset email sent successfully:', info.messageId);
+    return info;
+  } catch (error) {
+    console.error('❌ Error sending password reset email:', error);
+    throw error;
+  }
+}
