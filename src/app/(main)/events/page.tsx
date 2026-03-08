@@ -14,6 +14,9 @@ export default function EventsPage() {
     title: string;
     desc: string;
     date: string;
+    time?: string;
+    islamicDate?: string;
+    venue?: string;
     category: string;
     img: string;
     fb?: string;
@@ -70,7 +73,7 @@ export default function EventsPage() {
   }, [filteredCategoryEvents]);
 
   return (
-    <main className="w-full min-h-screen pb-20 bg-gradient-to-b from-gray-50 to-white">
+    <main className="w-full min-h-screen pb-20 bg-linear-to-b from-gray-50 to-white">
       {/* Hero Section */}
       <section className="relative flex justify-center items-center mt-10 mb-12">
         {/* Main box: smaller width, more height */}
@@ -87,9 +90,9 @@ export default function EventsPage() {
       <section className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-1 h-8 bg-gradient-to-b from-sky-400 to-blue-500 rounded-full"></div>
-            <h2 className="text-3xl font-bold text-gray-800">Event Timeline</h2>
-            <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent ml-4"></div>
+            <div className="w-1 h-8 bg-linear-to-b from-sky-400 to-blue-500 rounded-full"></div>
+            <h2 className="text-3xl font-bold text-gray-800">Events</h2>
+            <div className="flex-1 h-px bg-linear-to-r from-gray-300 to-transparent ml-4"></div>
           </div>
 
           <select
@@ -108,7 +111,7 @@ export default function EventsPage() {
             <button
               key={cat}
               className={`px-6 py-3 rounded-full border-2 text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${activeTab === cat
-                ? 'bg-gradient-to-r from-sky-400 to-blue-500 text-white border-sky-300 shadow-lg'
+                ? 'bg-linear-to-r from-sky-400 to-blue-500 text-white border-sky-300 shadow-lg'
                 : 'bg-white text-gray-700 border-gray-200 hover:border-sky-300 hover:text-sky-600 shadow-sm'
                 }`}
               onClick={() => setActiveTab(cat)}
@@ -131,7 +134,7 @@ export default function EventsPage() {
           ) : (
             <div className="space-y-4">
               {/* Timeline line */}
-              <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-sky-300 via-blue-400 to-sky-300 rounded-full transform -translate-x-1/2 shadow-sm"></div>
+              <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-linear-to-b from-sky-300 via-blue-400 to-sky-300 rounded-full transform -translate-x-1/2 shadow-sm"></div>
               {filteredCategoryEvents.map((event, index) => {
                 const isEven = index % 2 === 0;
                 const isVisible = visibleCards.has(event.id.toString());
@@ -150,7 +153,7 @@ export default function EventsPage() {
                     {/* Timeline dot */}
                     <div className={`absolute left-1/2 transform -translate-x-1/2 z-20 transition-all duration-700 ${isVisible ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
                       }`}>
-                      <div className="w-6 h-6 bg-gradient-to-br from-sky-400 to-blue-500 rounded-full border-4 border-white shadow-lg animate-pulse"></div>
+                      <div className="w-6 h-6 bg-linear-to-br from-sky-400 to-blue-500 rounded-full border-4 border-white shadow-lg animate-pulse"></div>
                       <div className="absolute inset-0 w-6 h-6 bg-sky-300 rounded-full animate-ping opacity-30"></div>
                     </div>
 
@@ -171,7 +174,7 @@ export default function EventsPage() {
                             height={300}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                          <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent"></div>
 
                           {/* Date overlay */}
                           <div className={`absolute top-3 ${isEven ? 'right-3' : 'left-3'} bg-white/55 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg`}>
@@ -184,11 +187,28 @@ export default function EventsPage() {
                         </div>
 
                         <div className="p-5">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="inline-block px-2 py-1 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 text-xs font-semibold rounded-full">
-                              {event.category}
-                            </span>
+                          <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                            <div className="flex items-center gap-2">
+                              <span className="inline-block px-2 py-1 bg-linear-to-r from-sky-100 to-blue-100 text-sky-800 text-xs font-semibold rounded-full">
+                                {event.category}
+                              </span>
+                              {new Date(event.date) >= new Date() && (
+                                <span className="inline-block px-2 py-1 bg-linear-to-r from-emerald-100 to-green-100 text-emerald-800 text-xs font-semibold rounded-full">
+                                  🚀 Upcoming
+                                </span>
+                              )}
+                            </div>
                           </div>
+
+                          {event.time && (
+                            <div className="flex items-center gap-2 mb-2 text-sm text-gray-700">
+                              <span>⏰ {event.time}</span>
+                              {event.venue && <span>📍 {event.venue}</span>}
+                            </div>
+                          )}
+                          {event.islamicDate && (
+                            <div className="text-xs text-gray-500 mb-2">☪️ {event.islamicDate}</div>
+                          )}
 
                           <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-sky-600 transition-colors line-clamp-2">
                             {event.title}

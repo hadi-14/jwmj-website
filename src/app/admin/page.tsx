@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from './AuthContext';
+import { useNotification } from '@/components/Notification';
 import {
   Users,
   User,
@@ -19,9 +20,27 @@ interface ChartDataPoint {
   applications: number;
 }
 
+interface Registration {
+  id: string;
+  memberId: string;
+  memberName: string;
+  memberEmail: string | null;
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+  event: {
+    id: string;
+    title: string;
+    date: string;
+    category: string;
+  };
+}
+
 export default function AdminDashboard() {
   const { user } = useAuth();
   const router = useRouter();
+  const { showNotification } = useNotification();
   const [statsData, setStatsData] = useState({
     totalMembers: 0,
     newApplications: 0,
@@ -30,6 +49,7 @@ export default function AdminDashboard() {
   });
   const [recentApplications, setRecentApplications] = useState<Record<string, unknown>[]>([]);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [eventRegistrations, setEventRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,6 +62,13 @@ export default function AdminDashboard() {
         setStatsData(statsResult.stats);
         setRecentApplications(statsResult.recentApplications);
         setChartData(statsResult.chartData || []);
+
+        // Fetch event registrations
+        const eventResponse = await fetch('/api/admin/events/registrations');
+        if (eventResponse.ok) {
+          const eventData = await eventResponse.json();
+          setEventRegistrations(eventData);
+        }
       } catch (error) {
         console.error('Failed to load dashboard data', error);
       } finally {
@@ -52,11 +79,35 @@ export default function AdminDashboard() {
     fetchData();
   }, []);
 
+  const handleRegistrationAction = async (id: string, status: string, notes?: string) => {
+    try {
+      const response = await fetch('/api/admin/events/registrations', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status, notes })
+      });
+
+      if (response.ok) {
+        // Refresh registrations
+        const eventResponse = await fetch('/api/admin/events/registrations');
+        if (eventResponse.ok) {
+          const eventData = await eventResponse.json();
+          setEventRegistrations(eventData);
+        }
+      } else {
+        showNotification('Failed to update registration', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating registration:', error);
+      showNotification('Failed to update registration', 'error');
+    }
+  };
+
   const stats = [
     { name: 'Total Members', value: loading ? '...' : statsData.totalMembers.toLocaleString(), change: 'Active', icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
     { name: 'New Applications', value: loading ? '...' : statsData.newApplications.toLocaleString(), change: 'Last 30 days', icon: FileText, color: 'text-purple-600', bg: 'bg-purple-100' },
     { name: 'Pending Review', value: loading ? '...' : statsData.pendingReview.toLocaleString(), change: 'To review', icon: Clock, color: 'text-amber-600', bg: 'bg-amber-100' },
-    { name: 'Joined Today', value: loading ? '...' : statsData.approvedToday.toLocaleString(), change: 'Today', icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100' },
+    { name: 'Event Registrations', value: loading ? '...' : eventRegistrations.filter(r => r.status === 'pending').length.toString(), change: 'Pending approval', icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100' },
   ];
 
   return (
@@ -180,7 +231,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-200 shadow-sm p-6">
+          <div className="bg-linear-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-200 shadow-sm p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-amber-100 rounded-lg">
                 <AlertCircle className="w-5 h-5 text-amber-600" />
@@ -214,6 +265,97 @@ export default function AdminDashboard() {
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Event Registrations Section */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-slate-900">Event Registration Requests</h2>
+          <button
+            onClick={() => router.push('/admin/events')}
+            className="text-sm font-semibold text-[#038DCD] hover:text-[#0369A1]"
+          >
+            Manage Events
+          </button>
+        </div>
+        <div className="p-6">
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="w-8 h-8 border-4 border-[#038DCD] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-slate-600">Loading event registrations...</p>
+            </div>
+          ) : eventRegistrations.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-slate-600">No event registration requests.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {eventRegistrations.slice(0, 5).map((registration) => (
+                <div key={registration.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+                  <div className="grow">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-bold text-slate-900">{registration.event.title}</h3>
+                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${registration.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                        registration.status === 'approved' ? 'bg-green-100 text-green-700' :
+                          registration.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                            'bg-gray-100 text-gray-700'
+                        }`}>
+                        {registration.status.toUpperCase()}
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-600 mb-1">
+                      <span className="font-semibold">Member:</span> {registration.memberName}
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      <span className="font-semibold">Event Date:</span> {new Date(registration.event.date).toLocaleDateString()}
+                    </p>
+                    {registration.notes && (
+                      <p className="text-sm text-slate-600 mt-1">
+                        <span className="font-semibold">Notes:</span> {registration.notes}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex gap-2 ml-4">
+                    {registration.status === 'pending' && (
+                      <>
+                        <button
+                          onClick={() => handleRegistrationAction(registration.id, 'approved')}
+                          className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg transition-colors"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleRegistrationAction(registration.id, 'rejected')}
+                          className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-lg transition-colors"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                    {registration.status === 'approved' && (
+                      <button
+                        onClick={() => handleRegistrationAction(registration.id, 'cancelled')}
+                        className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-sm font-bold rounded-lg transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {eventRegistrations.length > 5 && (
+                <div className="text-center pt-4">
+                  <button
+                    onClick={() => router.push('/admin/events')}
+                    className="text-[#038DCD] hover:text-[#0369A1] font-semibold"
+                  >
+                    View All Registrations ({eventRegistrations.length})
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { MemberAuthProvider, useMemberAuth } from '@/contexts/MemberAuthContext';
+import { NotificationProvider } from '@/components/Notification';
 
 // ==================== PROTECTED ROUTE ====================
 
@@ -60,15 +61,17 @@ export default function MemberLayout({ children }: { children: React.ReactNode }
 
   return (
     <MemberAuthProvider>
-      {isPublicRoute ? (
-        // Public pages (login, register) - render directly
-        children
-      ) : (
-        // Protected pages - wrap with authentication check
-        <ProtectedMemberRoute>
-          {children}
-        </ProtectedMemberRoute>
-      )}
+      <NotificationProvider>
+        {isPublicRoute ? (
+          // Public pages (login, register) - render directly
+          children
+        ) : (
+          // Protected pages - wrap with authentication check
+          <ProtectedMemberRoute>
+            {children}
+          </ProtectedMemberRoute>
+        )}
+      </NotificationProvider>
     </MemberAuthProvider>
   );
 }

@@ -111,7 +111,7 @@ export default function FormsPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-amber-50/20 flex items-center justify-center">
+            <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/20 to-amber-50/20 flex items-center justify-center">
                 <div className="text-center">
                     <div className="relative w-16 h-16 mx-auto mb-6">
                         <div className="absolute inset-0 border-4 border-[#038DCD]/20 rounded-full"></div>
@@ -124,9 +124,9 @@ export default function FormsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-amber-50/20">
+        <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/20 to-amber-50/20">
             {/* Header Section */}
-            <div className="bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white relative overflow-hidden">
+            <div className="bg-linear-to-r from-[#038DCD] to-[#0369A1] text-white relative overflow-hidden">
                 {/* Decorative background elements */}
                 <div className="absolute inset-0 overflow-hidden">
                     <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
@@ -190,7 +190,7 @@ export default function FormsPage() {
                 {error && (
                     <div className="mb-6 bg-rose-50 border-l-4 border-rose-500 rounded-lg p-4">
                         <div className="flex items-start gap-3">
-                            <AlertCircle className="w-5 h-5 text-rose-500 mt-0.5 flex-shrink-0" />
+                            <AlertCircle className="w-5 h-5 text-rose-500 mt-0.5 shrink-0" />
                             <div>
                                 <p className="font-semibold text-rose-900">Error loading forms</p>
                                 <p className="text-rose-700 text-sm mt-1">{error}</p>
@@ -324,7 +324,7 @@ export default function FormsPage() {
                             return (
                                 <div key={form.id} className="bg-white rounded-2xl shadow-sm border-2 border-slate-200 hover:shadow-2xl hover:border-[#038DCD] transition-all duration-300 hover:-translate-y-1 overflow-hidden group">
                                     {/* Card Header with Gradient */}
-                                    <div className={`bg-gradient-to-r ${colorGradient} p-6 relative overflow-hidden`}>
+                                    <div className={`bg-linear-to-r ${colorGradient} p-6 relative overflow-hidden`}>
                                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
                                         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
 
@@ -356,7 +356,7 @@ export default function FormsPage() {
 
                                     {/* Card Body */}
                                     <div className="p-6">
-                                        <p className="text-slate-600 mb-6 line-clamp-3 min-h-[4.5rem]">
+                                        <p className="text-slate-600 mb-6 line-clamp-3 min-h-18">
                                             {form.description || 'Complete this form to submit your information to JWMJ.'}
                                         </p>
 
@@ -387,7 +387,7 @@ export default function FormsPage() {
                                             {/* Online Submission Button */}
                                             {isAuthenticated ? (
                                                 <Link href={`/forms/${form.formType}`}>
-                                                    <button className="w-full py-3 bg-gradient-to-r from-[#038DCD] to-[#0369A1] hover:from-[#0369A1] hover:to-[#038DCD] text-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
+                                                    <button className="w-full py-3 bg-linear-to-r from-[#038DCD] to-[#0369A1] hover:from-[#0369A1] hover:to-[#038DCD] text-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
                                                         <Sparkles className="w-5 h-5" />
                                                         Submit Online
                                                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -396,7 +396,7 @@ export default function FormsPage() {
                                             ) : (
                                                 <button
                                                     onClick={() => setShowLoginPrompt(true)}
-                                                    className="w-full py-3 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                                                    className="w-full py-3 bg-linear-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
                                                 >
                                                     <Lock className="w-4 h-4" />
                                                     Login to Submit Online
@@ -440,7 +440,7 @@ export default function FormsPage() {
                 )}
 
                 {/* Help Section */}
-                <div className="mt-12 bg-gradient-to-r from-blue-50 to-amber-50 rounded-2xl border-2 border-slate-200 p-8">
+                <div className="mt-12 bg-linear-to-r from-blue-50 to-amber-50 rounded-2xl border-2 border-slate-200 p-8">
                     <div className="max-w-3xl mx-auto text-center">
                         <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-sm mb-4">
                             <AlertCircle className="w-8 h-8 text-[#038DCD]" />
@@ -474,7 +474,7 @@ export default function FormsPage() {
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
                     <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate-in zoom-in-95 duration-300">
                         <div className="text-center mb-6">
-                            <div className="w-16 h-16 bg-gradient-to-br from-[#038DCD] to-[#0369A1] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                            <div className="w-16 h-16 bg-linear-to-br from-[#038DCD] to-[#0369A1] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                                 <LogIn className="w-8 h-8 text-white" />
                             </div>
                             <h3 className="text-2xl font-bold text-slate-900 mb-2">Login Required</h3>
@@ -486,7 +486,7 @@ export default function FormsPage() {
                         <div className="space-y-3">
                             <Link
                                 href="/member"
-                                className="block w-full py-3 bg-gradient-to-r from-[#038DCD] to-[#0369A1] hover:from-[#0369A1] hover:to-[#038DCD] text-white rounded-xl font-bold transition-all duration-200 text-center shadow-lg hover:shadow-xl"
+                                className="block w-full py-3 bg-linear-to-r from-[#038DCD] to-[#0369A1] hover:from-[#0369A1] hover:to-[#038DCD] text-white rounded-xl font-bold transition-all duration-200 text-center shadow-lg hover:shadow-xl"
                             >
                                 Go to Login
                             </Link>

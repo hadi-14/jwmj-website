@@ -4,13 +4,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Search, Calendar, CheckCircle, Clock, Trash2, Eye, Download,
   AlertCircle, X, FileText, User, Mail, Hash, SlidersHorizontal,
-  RefreshCw, ChevronLeft, ChevronRight
+  RefreshCw, ChevronLeft, ChevronRight, XCircle
 } from 'lucide-react';
 import {
   BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer
 } from 'recharts';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useNotification, ConfirmationModal } from '@/components/Notification';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -40,10 +41,10 @@ interface StatsData {
 
 const STATUS_CONFIG: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
   approved: { label: 'Approved', className: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: <CheckCircle className="w-3 h-3" /> },
-  pending:  { label: 'Pending',  className: 'bg-amber-50 text-amber-700 border-amber-200',     icon: <Clock className="w-3 h-3" /> },
-  submitted:{ label: 'Submitted',className: 'bg-amber-50 text-amber-700 border-amber-200',     icon: <Clock className="w-3 h-3" /> },
-  draft:    { label: 'Draft',    className: 'bg-slate-100 text-slate-600 border-slate-200',    icon: <FileText className="w-3 h-3" /> },
-  rejected: { label: 'Rejected', className: 'bg-rose-50 text-rose-700 border-rose-200',        icon: <AlertCircle className="w-3 h-3" /> },
+  pending: { label: 'Pending', className: 'bg-amber-50 text-amber-700 border-amber-200', icon: <Clock className="w-3 h-3" /> },
+  submitted: { label: 'Submitted', className: 'bg-amber-50 text-amber-700 border-amber-200', icon: <Clock className="w-3 h-3" /> },
+  draft: { label: 'Draft', className: 'bg-slate-100 text-slate-600 border-slate-200', icon: <FileText className="w-3 h-3" /> },
+  rejected: { label: 'Rejected', className: 'bg-rose-50 text-rose-700 border-rose-200', icon: <AlertCircle className="w-3 h-3" /> },
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -78,6 +79,7 @@ function formatDate(d: string) {
 export default function SubmissionsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { showNotification } = useNotification();
 
   const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
   const [stats, setStats] = useState<StatsData | null>(null);
@@ -91,6 +93,8 @@ export default function SubmissionsPage() {
   const [pagination, setPagination] = useState<PaginationData | null>(null);
   const [selected, setSelected] = useState<FormSubmission | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [submissionToDelete, setSubmissionToDelete] = useState<string | null>(null);
 
   const fetchSubmissions = useCallback(async () => {
     try {
@@ -125,15 +129,26 @@ export default function SubmissionsPage() {
 
   useEffect(() => { fetchSubmissions(); fetchStats(); }, [fetchSubmissions, fetchStats]);
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Delete this submission? This cannot be undone.')) return;
+  const handleDelete = (id: string) => {
+    setSubmissionToDelete(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteSubmission = async () => {
+    if (!submissionToDelete) return;
     try {
-      const res = await fetch(`/api/submissions/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/submissions/${submissionToDelete}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
-      setSubmissions(s => s.filter(x => x.id !== id));
-      if (selected?.id === id) setSelected(null);
+      setSubmissions(s => s.filter(x => x.id !== submissionToDelete));
+      if (selected?.id === submissionToDelete) setSelected(null);
       fetchStats();
-    } catch (e) { alert(e instanceof Error ? e.message : 'Failed to delete'); }
+      showNotification('Submission deleted successfully', 'success');
+    } catch (e) {
+      showNotification(e instanceof Error ? e.message : 'Failed to delete', 'error');
+    } finally {
+      setShowDeleteConfirm(false);
+      setSubmissionToDelete(null);
+    }
   };
 
   const handleExport = async () => {
@@ -148,7 +163,21 @@ export default function SubmissionsPage() {
       const a = document.createElement('a'); a.href = url;
       a.download = `submissions-${new Date().toISOString().split('T')[0]}.csv`;
       a.click(); URL.revokeObjectURL(url);
-    } catch (e) { alert(e instanceof Error ? e.message : 'Failed to export'); }
+    } catch (e) { showNotification(e instanceof Error ? e.message : 'Failed to export', 'error'); }
+  };
+
+  const handleStatusUpdate = async (id: string, status: FormSubmission['status']) => {
+    try {
+      const res = await fetch(`/api/submissions/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (!res.ok) throw new Error('Failed to update status');
+      setSubmissions(s => s.map(x => x.id === id ? { ...x, status } : x));
+      if (selected?.id === id) setSelected({ ...selected, status });
+      fetchStats();
+    } catch (e) { showNotification(e instanceof Error ? e.message : 'Failed to update', 'error'); }
   };
 
   const filtered = submissions.filter(s => {
@@ -195,10 +224,10 @@ export default function SubmissionsPage() {
 
         {/* ── Stats ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard icon={FileText}     label="Total"    value={stats?.totalSubmissions || 0} accent />
-          <StatCard icon={CheckCircle}  label="Approved" value={stats?.byStatus['approved'] || 0} />
-          <StatCard icon={Clock}        label="Pending"  value={stats?.byStatus['pending'] || stats?.byStatus['submitted'] || 0} />
-          <StatCard icon={AlertCircle}  label="Rejected" value={stats?.byStatus['rejected'] || 0} />
+          <StatCard icon={FileText} label="Total" value={stats?.totalSubmissions || 0} accent />
+          <StatCard icon={CheckCircle} label="Approved" value={stats?.byStatus['approved'] || 0} />
+          <StatCard icon={Clock} label="Pending" value={stats?.byStatus['pending'] || stats?.byStatus['submitted'] || 0} />
+          <StatCard icon={AlertCircle} label="Rejected" value={stats?.byStatus['rejected'] || 0} />
         </div>
 
         {/* ── Charts ── */}
@@ -489,14 +518,42 @@ export default function SubmissionsPage() {
                 className="inline-flex items-center gap-2 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-sm font-semibold transition-colors">
                 <Trash2 className="w-3.5 h-3.5" /> Delete
               </button>
-              <button onClick={() => setSelected(null)}
-                className="px-5 py-2 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-sm font-semibold border border-slate-200 transition-colors">
-                Close
-              </button>
+              <div className="flex items-center gap-3">
+                {selected.status !== 'approved' && (
+                  <button onClick={() => handleStatusUpdate(selected.id, 'approved')}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg text-sm font-semibold transition-colors">
+                    <CheckCircle className="w-3.5 h-3.5" /> Approve
+                  </button>
+                )}
+                {selected.status !== 'rejected' && (
+                  <button onClick={() => handleStatusUpdate(selected.id, 'rejected')}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-sm font-semibold transition-colors">
+                    <XCircle className="w-3.5 h-3.5" /> Reject
+                  </button>
+                )}
+                <button onClick={() => setSelected(null)}
+                  className="px-5 py-2 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-sm font-semibold border border-slate-200 transition-colors">
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
+
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        title="Delete Submission"
+        message="Delete this submission? This cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDeleteSubmission}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setSubmissionToDelete(null);
+        }}
+        type="danger"
+      />
 
       {/* <style jsx>{`
         @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }

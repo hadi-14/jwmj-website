@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useMemberAuth } from '@/contexts/MemberAuthContext';
+import { useNotification, ConfirmationModal } from '@/components/Notification';
 import Image from "next/image";
 
 interface MemberInfo {
@@ -62,6 +63,7 @@ interface FeeData {
 }
 
 interface FamilyMember {
+  id?: string | number;
   name?: string;
   membershipNo?: string;
   dob?: string;
@@ -84,389 +86,317 @@ interface Application {
   notes: string;
 }
 
+interface EventRegistration {
+  eventId: string;
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  createdAt: string;
+}
+
+interface Event {
+  id: string;
+  title: string;
+  desc: string;
+  date: string;
+  time?: string;
+  islamicDate?: string;
+  venue?: string;
+  category: string;
+  img: string;
+  fb?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
 export default function MemberDashboard() {
   const { logout, isLoading: authLoading } = useMemberAuth();
+  const { showNotification } = useNotification();
   const [member, setMember] = useState<MemberInfo | null>(null);
   const [feeData, setFeeData] = useState<FeeData | null>(null);
   const [familyTree, setFamilyTree] = useState<FamilyTree | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<string | null>(null);
+
+  useEffect(() => { fetchMemberInfo(); }, []);
 
   useEffect(() => {
-    fetchMemberInfo();
-  }, []);
-
-  useEffect(() => {
-    if (activeTab === 'family' && !familyTree) {
-      fetchFamilyTree();
-    } else if (activeTab === 'fees' && !feeData) {
-      fetchFeeData();
-    } else if (activeTab === 'applications' && applications.length === 0) {
-      fetchApplications();
-    }
-  }, [activeTab, applications.length, familyTree, feeData]);
+    if (activeTab === 'family' && !familyTree) fetchFamilyTree();
+    else if (activeTab === 'fees' && !feeData) fetchFeeData();
+    else if (activeTab === 'applications' && applications.length === 0) fetchApplications();
+    else if (activeTab === 'events' && events.length === 0) fetchEvents();
+    // Also load family tree for events tab since it's needed for registration
+    if (activeTab === 'events' && !familyTree) fetchFamilyTree();
+  }, [activeTab, applications.length, familyTree, feeData, events.length]);
 
   const fetchMemberInfo = async () => {
     try {
       const response = await fetch('/api/member');
-      if (response.ok) {
-        const data = await response.json();
-        setMember(data);
-      } else {
-        console.error('Failed to fetch member info');
-      }
-    } catch (error) {
-      console.error('Error fetching member info:', error);
-    } finally {
-      setLoading(false);
-    }
+      if (response.ok) { const data = await response.json(); setMember(data); }
+      else console.error('Failed to fetch member info');
+    } catch (error) { console.error('Error fetching member info:', error); }
+    finally { setLoading(false); }
   };
 
   const fetchFamilyTree = async () => {
     try {
       const response = await fetch('/api/member/family-tree');
-      if (response.ok) {
-        const data = await response.json();
-        setFamilyTree(data);
-      }
-    } catch (error) {
-      console.error('Error fetching family tree:', error);
-    }
+      if (response.ok) { const data = await response.json(); setFamilyTree(data); }
+    } catch (error) { console.error('Error fetching family tree:', error); }
   };
 
   const fetchFeeData = async () => {
     try {
       const response = await fetch('/api/member/fees');
-      if (response.ok) {
-        const data = await response.json();
-        setFeeData(data);
-      }
-    } catch (error) {
-      console.error('Error fetching fee data:', error);
-    }
+      if (response.ok) { const data = await response.json(); setFeeData(data); }
+    } catch (error) { console.error('Error fetching fee data:', error); }
   };
 
   const fetchApplications = async () => {
     try {
       const response = await fetch('/api/member/applications');
-      if (response.ok) {
-        const data = await response.json();
-        setApplications(data.applications || []);
-      }
-    } catch (error) {
-      console.error('Error fetching applications:', error);
-    }
+      if (response.ok) { const data = await response.json(); setApplications(data.applications || []); }
+    } catch (error) { console.error('Error fetching applications:', error); }
+  };
+
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch('/api/events');
+      if (response.ok) { const data = await response.json(); setEvents(data); }
+    } catch (error) { console.error('Error fetching events:', error); }
   };
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#038DCD] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-semibold">Loading your dashboard...</p>
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 gap-4">
+        <div className="w-10 h-10 border-[3px] border-[#038DCD]/20 border-t-[#038DCD] rounded-full animate-spin" />
+        <p className="text-sm font-semibold text-gray-500">Loading your dashboard…</p>
       </div>
     );
   }
 
   if (!member) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <p className="text-red-600 mb-4 font-semibold">Failed to load member information</p>
-          <button
-            onClick={fetchMemberInfo}
-            className="px-6 py-3 bg-[#038DCD] text-white rounded-full font-bold hover:bg-[#038DCD]/90 transition"
-          >
-            Retry
-          </button>
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 gap-4">
+        <p className="text-red-500 font-semibold">Failed to load member information</p>
+        <button
+          onClick={fetchMemberInfo}
+          className="px-5 py-2.5 bg-[#038DCD] text-white text-sm font-bold rounded-full hover:bg-[#026fa0] transition-colors"
+        >
+          Retry
+        </button>
       </div>
     );
   }
 
+  const tabs = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'events', label: 'Events' },
+    { id: 'family', label: 'Family Tree' },
+    { id: 'fees', label: 'Fee Status' },
+    { id: 'applications', label: 'Applications' },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header - matching main page style */}
-      {/* <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <div className="pl-35">
-                <h1 className="text-xl font-bold text-gray-900 italic">Member Portal</h1>
-                <p className="text-xs text-gray-600 font-medium">Welcome back, {member?.MemName?.split(' ')[0]}</p>
-              </div>
+
+      {/* ── Top nav bar ── */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+          {/* Logo / brand */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-[#038DCD] to-[#F9C856] flex items-center justify-center">
+              <span className="text-white font-bold text-sm">J</span>
             </div>
-            <div className="flex items-center space-x-3">
-              <Link
-                href="/"
-                className="px-5 py-2.5 text-[#038DCD] hover:text-[#038DCD]/80 font-bold tracking-wide transition-colors"
-              >
-                HOME
-              </Link>
-              <button
-                onClick={logout}
-                className="px-5 py-2.5 bg-white/80 border-2 border-gray-300 hover:border-[#038DCD] text-gray-700 hover:text-[#038DCD] font-bold rounded-full transition-all duration-200"
-              >
-                LOGOUT
-              </button>
-            </div>
+            <span className="font-bold text-gray-900 text-sm hidden sm:block">Member Portal</span>
+          </div>
+
+          {/* Welcome + logout */}
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-500 hidden sm:block">
+              Welcome, <span className="font-semibold text-gray-800">{member?.MemName?.split(' ')[0]}</span>
+            </span>
+            <button
+              onClick={logout}
+              className="px-4 py-1.5 text-sm font-bold text-red-500 border border-red-200 rounded-full hover:bg-red-50 transition-colors"
+            >
+              Logout
+            </button>
           </div>
         </div>
-      </header> */}
+      </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
 
-        {/* Profile Header Card - inspired by main page president section */}
-        <div className="bg-gradient-to-br from-[#038DCD]/5 to-[#F9D98F]/5 rounded-3xl border border-gray-200 shadow-lg p-8 mb-8">
-          <div className="flex flex-col md:flex-row md:items-start gap-8">
+        {/* ── Profile card ── */}
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+          {/* Accent stripe */}
+          <div className="h-1 bg-linear-to-r from-[#038DCD] to-[#F9C856]" />
+          <div className="p-6 sm:p-8">
+            <div className="flex flex-col sm:flex-row gap-6 items-start">
 
-            {/* Profile Image */}
-            <div className="flex-shrink-0">
-              {member?.profileImage ? (
-                <Image
-                  src={member.profileImage}
-                  alt={member?.MemName || 'Profile'}
-                  width={160}
-                  height={160}
-                  className="w-32 h-32 md:w-40 md:h-40 rounded-2xl object-cover border-4 border-white shadow-lg"
-                />
-              ) : (
-                <div className="w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-[#038DCD] to-[#F9C856] rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
-                  <span className="text-white font-bold text-5xl">
-                    {member?.MemName?.split(' ').map((n: string) => n[0]).join('').slice(0, 2) || 'M'}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Member Info */}
-            <div className="flex-grow">
-              <div className="flex items-center gap-3 mb-2">
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900">{member?.MemName || 'Member'}</h2>
-                {member?.surname && (
-                  <span className="px-4 py-1.5 bg-[#038DCD]/10 text-[#038DCD] rounded-full text-sm font-bold tracking-wide">
-                    {member.surname}
-                  </span>
+              {/* Avatar */}
+              <div className="flex flex-col items-center gap-2 shrink-0">
+                {member?.profileImage ? (
+                  <Image
+                    src={member.profileImage}
+                    alt={member?.MemName || 'Profile'}
+                    width={96} height={96}
+                    className="w-24 h-24 rounded-xl object-cover"
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-xl bg-linear-to-br from-[#038DCD] to-[#F9C856] flex items-center justify-center shadow-md">
+                    <span className="text-white font-bold text-3xl">
+                      {member?.MemName?.split(' ').map((n: string) => n[0]).join('').slice(0, 2) || 'M'}
+                    </span>
+                  </div>
                 )}
+                <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                  Active
+                </span>
               </div>
 
-              <p className="text-gray-600 font-medium mb-6">Member ID: {member?.MemMembershipNo || 'N/A'}</p>
-
-              {/* Info Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
-                <div className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-[#038DCD] rounded-full mt-2"></div>
-                  <div>
-                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">CNIC</p>
-                    <p className="font-semibold text-gray-900">{member?.MemCNIC || 'N/A'}</p>
-                  </div>
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <h2 className="text-2xl font-bold text-gray-900">{member?.MemName || 'Member'}</h2>
+                  {member?.surname && (
+                    <span className="text-xs font-bold text-[#038DCD] bg-[#e8f6fd] px-3 py-0.5 rounded-full uppercase tracking-wider">
+                      {member.surname}
+                    </span>
+                  )}
                 </div>
+                <p className="text-sm text-gray-400 font-medium mb-5">
+                  # {member?.MemMembershipNo || 'N/A'}
+                </p>
 
-                <div className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-[#F9C856] rounded-full mt-2"></div>
-                  <div>
-                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Father&apos;s Name</p>
-                    <p className="font-semibold text-gray-900">{member?.MemFatherName || 'N/A'}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-[#038DCD] rounded-full mt-2"></div>
-                  <div>
-                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Date of Birth</p>
-                    <p className="font-semibold text-gray-900">
-                      {member?.MemDOB ? new Date(member.MemDOB).toLocaleDateString() : 'N/A'}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-[#F9C856] rounded-full mt-2"></div>
-                  <div>
-                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Email</p>
-                    <p className="font-semibold text-gray-900">{member?.email || 'N/A'}</p>
-                  </div>
-                </div>
-
-                {member?.cellNumbers && member.cellNumbers.length > 0 && (
-                  <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 bg-[#038DCD] rounded-full mt-2"></div>
-                    <div>
-                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Contact</p>
-                      <p className="font-semibold text-gray-900">{member.cellNumbers[0]}</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4">
+                  {[
+                    { label: 'CNIC', value: member?.MemCNIC },
+                    { label: "Father's Name", value: member?.MemFatherName },
+                    { label: 'Date of Birth', value: member?.MemDOB ? new Date(member.MemDOB).toLocaleDateString() : undefined },
+                    { label: 'Email', value: member?.email },
+                    { label: 'Contact', value: member?.cellNumbers?.[0] },
+                    { label: 'Gender', value: member?.gender },
+                    member?.occupation ? { label: 'Occupation', value: member.occupation } : null,
+                    member?.area ? { label: 'Area', value: member.area } : null,
+                    member?.maritalStatus ? { label: 'Marital Status', value: member.maritalStatus } : null,
+                  ].filter(Boolean).map((field) => (
+                    <div key={field!.label}>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">{field!.label}</p>
+                      <p className="text-sm font-semibold text-gray-700">{field!.value || 'N/A'}</p>
                     </div>
-                  </div>
-                )}
-
-                <div className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-[#F9C856] rounded-full mt-2"></div>
-                  <div>
-                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Gender</p>
-                    <p className="font-semibold text-gray-900">{member?.gender || 'N/A'}</p>
-                  </div>
+                  ))}
                 </div>
-
-                {member?.occupation && (
-                  <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 bg-[#038DCD] rounded-full mt-2"></div>
-                    <div>
-                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Occupation</p>
-                      <p className="font-semibold text-gray-900">{member.occupation}</p>
-                    </div>
-                  </div>
-                )}
-
-                {member?.area && (
-                  <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 bg-[#F9C856] rounded-full mt-2"></div>
-                    <div>
-                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Area</p>
-                      <p className="font-semibold text-gray-900">{member.area}</p>
-                    </div>
-                  </div>
-                )}
-
-                {member?.maritalStatus && (
-                  <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 bg-[#038DCD] rounded-full mt-2"></div>
-                    <div>
-                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Marital Status</p>
-                      <p className="font-semibold text-gray-900">{member.maritalStatus}</p>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Navigation Tabs - matching main page services style */}
-        <div className="mb-8">
-          <div className="bg-white/80 rounded-2xl shadow-lg border border-gray-200 p-2">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {[
-                { id: 'overview', name: 'OVERVIEW', gradient: 'from-[#038DCD] to-[#03BDCD]' },
-                { id: 'family', name: 'FAMILY TREE', gradient: 'from-[#F9C856] to-[#F9D98F]' },
-                { id: 'fees', name: 'FEE STATUS', gradient: 'from-[#038DCD] to-[#03BDCD]' },
-                { id: 'applications', name: 'APPLICATIONS', gradient: 'from-[#F9C856] to-[#F9D98F]' },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-4 font-bold text-sm tracking-wide rounded-xl transition-all duration-200 ${activeTab === tab.id
-                    ? `bg-gradient-to-r ${tab.gradient} text-white shadow-md`
-                    : 'text-gray-600 hover:bg-gray-100'
-                    }`}
-                >
-                  {tab.name}
-                </button>
-              ))}
-            </div>
-          </div>
+        {/* ── Tab bar ── */}
+        <div className="bg-white rounded-xl border border-gray-200 p-1.5 shadow-sm flex flex-wrap gap-1">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 min-w-fit px-4 py-2.5 rounded-lg text-sm font-bold transition-all duration-150 ${activeTab === tab.id
+                ? 'bg-gray-900 text-white shadow-sm'
+                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-800'
+                }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* Tab Content */}
-        <div className="bg-white rounded-3xl shadow-lg border border-gray-200 p-8">
+        {/* ── Tab content ── */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8">
           {activeTab === 'overview' && <OverviewTab feeData={feeData} familyTree={familyTree} applications={applications} />}
+          {activeTab === 'events' && <EventsTab events={events} member={member} familyTree={familyTree} showNotification={showNotification} showDeleteConfirm={showDeleteConfirm} setShowDeleteConfirm={setShowDeleteConfirm} eventToDelete={eventToDelete} setEventToDelete={setEventToDelete} />}
           {activeTab === 'family' && <FamilyTreeTab familyTree={familyTree} />}
           {activeTab === 'fees' && <FeeStatusTab feeData={feeData} />}
           {activeTab === 'applications' && <ApplicationsTab applications={applications} />}
         </div>
 
       </main>
-
-      {/* Floating Logout Button */}
-      <button
-        onClick={logout}
-        className="fixed bottom-8 right-8 px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 z-100"
-      >
-        <span>🚪</span>
-        LOGOUT
-      </button>
     </div>
-
   );
 }
 
-function OverviewTab({ feeData, familyTree, applications }: { feeData: FeeData | null, familyTree: FamilyTree | null, applications: Application[] }) {
+// ─── Overview ─────────────────────────────────────────────────────────────────
+function OverviewTab({ feeData, familyTree, applications }: {
+  feeData: FeeData | null;
+  familyTree: FamilyTree | null;
+  applications: Application[];
+}) {
+  const totalFamily = familyTree
+    ? (familyTree.spouse?.length || 0) + (familyTree.children?.length || 0) + (familyTree.parents?.length || 0)
+    : null;
+  const paidPct = feeData ? Math.round((feeData.summary.totalPaid / feeData.summary.totalDue) * 100) : 0;
+
   return (
     <div>
-      <h3 className="text-2xl font-bold text-gray-900 mb-6">Dashboard Overview</h3>
+      <h3 className="text-xl font-bold text-gray-900 mb-1">Dashboard Overview</h3>
+      <p className="text-sm text-gray-400 mb-6">Your membership summary at a glance</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Family Members Card */}
-        <div className="relative overflow-hidden rounded-2xl border-2 border-gray-200 p-6 bg-gradient-to-br from-white to-gray-50 hover:shadow-lg transition-shadow duration-300">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#038DCD]/10 to-transparent rounded-bl-full"></div>
-          <div className="relative">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#038DCD] to-[#03BDCD] rounded-xl flex items-center justify-center mb-4 shadow-md">
-              <span className="text-white text-2xl">👨‍👩‍👧‍👦</span>
-            </div>
-            <p className="text-sm text-gray-600 font-semibold uppercase tracking-wide mb-1">Family Members</p>
-            <p className="text-4xl font-bold text-[#038DCD] mb-2">
-              {familyTree ? ((familyTree.spouse?.length || 0) + (familyTree.children?.length || 0) + (familyTree.parents?.length || 0)) : '...'}
-            </p>
-            <p className="text-sm text-gray-600">Registered in system</p>
-          </div>
+      {/* Stat cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        {/* Family */}
+        <div className="rounded-xl border border-gray-100 bg-gray-50 p-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-16 h-16 rounded-bl-full bg-[#038DCD]/8" />
+          <div className="w-10 h-10 rounded-xl bg-[#e8f6fd] flex items-center justify-center text-xl mb-3">👨‍👩‍👧‍👦</div>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Family Members</p>
+          <p className="text-3xl font-bold text-[#038DCD]">{totalFamily ?? '…'}</p>
+          <p className="text-xs text-gray-400 mt-1">Registered in system</p>
         </div>
 
-        {/* Fee Balance Card */}
-        <div className="relative overflow-hidden rounded-2xl border-2 border-gray-200 p-6 bg-gradient-to-br from-white to-gray-50 hover:shadow-lg transition-shadow duration-300">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#F9C856]/10 to-transparent rounded-bl-full"></div>
-          <div className="relative">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#F9C856] to-[#F9D98F] rounded-xl flex items-center justify-center mb-4 shadow-md">
-              <span className="text-white text-2xl">💰</span>
+        {/* Fee balance */}
+        <div className="rounded-xl border border-gray-100 bg-gray-50 p-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-16 h-16 rounded-bl-full bg-[#F9C856]/20" />
+          <div className="w-10 h-10 rounded-xl bg-[#fefaec] flex items-center justify-center text-xl mb-3">💰</div>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Fee Balance</p>
+          <p className="text-3xl font-bold text-[#c8920f]">{feeData ? feeData.summary.balance.toLocaleString() : '…'}</p>
+          <p className="text-xs text-gray-400 mt-1">{feeData ? `PKR ${feeData.summary.totalDue.toLocaleString()} total due` : 'Loading…'}</p>
+          {feeData && (
+            <div className="h-1 bg-gray-200 rounded-full mt-3 overflow-hidden">
+              <div className="h-full rounded-full bg-linear-to-r from-[#038DCD] to-[#F9C856]" style={{ width: `${paidPct}%` }} />
             </div>
-            <p className="text-sm text-gray-600 font-semibold uppercase tracking-wide mb-1">Fee Balance</p>
-            <p className="text-4xl font-bold text-[#F9C856] mb-2">
-              {feeData ? `${feeData.summary.balance.toLocaleString()}` : '...'}
-            </p>
-            <p className="text-sm text-gray-600">
-              {feeData ? `PKR ${feeData.summary.totalDue.toLocaleString()} total due` : 'Loading...'}
-            </p>
-          </div>
+          )}
         </div>
 
-        {/* Applications Card */}
-        <div className="relative overflow-hidden rounded-2xl border-2 border-gray-200 p-6 bg-gradient-to-br from-white to-gray-50 hover:shadow-lg transition-shadow duration-300">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#038DCD]/10 to-transparent rounded-bl-full"></div>
-          <div className="relative">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#038DCD] to-[#03BDCD] rounded-xl flex items-center justify-center mb-4 shadow-md">
-              <span className="text-white text-2xl">📝</span>
-            </div>
-            <p className="text-sm text-gray-600 font-semibold uppercase tracking-wide mb-1">Applications</p>
-            <p className="text-4xl font-bold text-[#038DCD] mb-2">{applications?.length || 0}</p>
-            <p className="text-sm text-gray-600">
-              {applications?.filter((a: Application) => a.status === 'pending').length || 0} pending review
-            </p>
-          </div>
+        {/* Applications */}
+        <div className="rounded-xl border border-gray-100 bg-gray-50 p-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-16 h-16 rounded-bl-full bg-violet-500/8" />
+          <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center text-xl mb-3">📝</div>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Applications</p>
+          <p className="text-3xl font-bold text-violet-600">{applications?.length || 0}</p>
+          <p className="text-xs text-gray-400 mt-1">{applications?.filter((a) => a.status === 'pending').length || 0} pending review</p>
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="mt-8 pt-8 border-t border-gray-200">
-        <h4 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button className="flex items-center justify-between p-4 rounded-xl border-2 border-gray-200 hover:border-[#038DCD] transition-all duration-200 group">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-100 group-hover:bg-[#038DCD]/10 rounded-lg flex items-center justify-center transition-colors">
-                <span className="text-xl">📄</span>
-              </div>
-              <span className="font-bold text-gray-700 group-hover:text-[#038DCD] transition-colors">Submit New Application</span>
+      <div className="border-t border-gray-100 pt-6">
+        <p className="text-sm font-bold text-gray-700 mb-3">Quick Actions</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button className="flex items-center gap-3 p-4 rounded-xl border-2 border-gray-100 hover:border-[#038DCD] hover:bg-[#e8f6fd] transition-all group text-left">
+            <div className="w-10 h-10 rounded-xl bg-gray-100 group-hover:bg-[#e8f6fd] flex items-center justify-center text-xl transition-colors">📄</div>
+            <div>
+              <p className="text-sm font-bold text-gray-800 group-hover:text-[#038DCD] transition-colors">Submit New Application</p>
+              <p className="text-xs text-gray-400">Welfare, scholarship, medical & more</p>
             </div>
-            <span className="text-gray-400 group-hover:text-[#038DCD] transition-colors">&rarr;</span>
+            <span className="ml-auto text-gray-300 group-hover:text-[#038DCD] transition-colors">→</span>
           </button>
-
-          <button className="flex items-center justify-between p-4 rounded-xl border-2 border-gray-200 hover:border-[#F9C856] transition-all duration-200 group">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-100 group-hover:bg-[#F9C856]/10 rounded-lg flex items-center justify-center transition-colors">
-                <span className="text-xl">💳</span>
-              </div>
-              <span className="font-bold text-gray-700 group-hover:text-[#F9C856] transition-colors">Pay Annual Fees</span>
+          <button className="flex items-center gap-3 p-4 rounded-xl border-2 border-gray-100 hover:border-[#F9C856] hover:bg-[#fefaec] transition-all group text-left">
+            <div className="w-10 h-10 rounded-xl bg-gray-100 group-hover:bg-[#fefaec] flex items-center justify-center text-xl transition-colors">💳</div>
+            <div>
+              <p className="text-sm font-bold text-gray-800 group-hover:text-[#c8920f] transition-colors">Pay Annual Fees</p>
+              <p className="text-xs text-gray-400">{feeData ? `PKR ${feeData.summary.balance.toLocaleString()} outstanding` : 'View balance'}</p>
             </div>
-            <span className="text-gray-400 group-hover:text-[#F9C856] transition-colors">&rarr;</span>
+            <span className="ml-auto text-gray-300 group-hover:text-[#c8920f] transition-colors">→</span>
           </button>
         </div>
       </div>
@@ -474,213 +404,156 @@ function OverviewTab({ feeData, familyTree, applications }: { feeData: FeeData |
   );
 }
 
+// ─── Family Tree ──────────────────────────────────────────────────────────────
 function FamilyTreeTab({ familyTree }: { familyTree: FamilyTree | null }) {
   if (!familyTree) {
     return (
-      <div className="text-center py-12">
-        <div className="w-16 h-16 border-4 border-[#038DCD] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-gray-600 font-semibold">Loading family tree...</p>
+      <div className="flex flex-col items-center justify-center py-16 gap-3">
+        <div className="w-8 h-8 border-[3px] border-[#038DCD]/20 border-t-[#038DCD] rounded-full animate-spin" />
+        <p className="text-sm font-semibold text-gray-400">Loading family tree…</p>
       </div>
     );
   }
 
-  const FamilyMemberCard = ({ member, relationship }: { member: FamilyMember, relationship: string }) => {
-    const initials = (member.name as string)?.split(' ').map((n: string) => n[0]).join('').slice(0, 2) || '?';
-    const colors: Record<string, { bg: string, border: string, accent: string }> = {
-      parent: { bg: 'from-purple-500 to-purple-600', border: 'border-purple-200', accent: 'bg-purple-100' },
-      spouse: { bg: 'from-pink-500 to-rose-600', border: 'border-pink-200', accent: 'bg-pink-100' },
-      child: { bg: 'from-[#038DCD] to-[#03BDCD]', border: 'border-blue-200', accent: 'bg-blue-100' },
-    };
+  const avatarGradient: Record<string, string> = {
+    parent: 'from-violet-600 to-violet-700',
+    spouse: 'from-pink-500 to-rose-600',
+    child: 'from-[#038DCD] to-[#026fa0]',
+  };
+  const sectionColors: Record<string, { iconBg: string; countBg: string; countText: string }> = {
+    parent: { iconBg: 'bg-violet-50', countBg: 'bg-violet-100', countText: 'text-violet-700' },
+    spouse: { iconBg: 'bg-pink-50', countBg: 'bg-pink-100', countText: 'text-pink-700' },
+    child: { iconBg: 'bg-[#e8f6fd]', countBg: 'bg-[#e8f6fd]', countText: 'text-[#026fa0]' },
+  };
 
+  const FamCard = ({ member, rel }: { member: FamilyMember; rel: string }) => {
+    const initials = (member.name as string)?.split(' ').map((n) => n[0]).join('').slice(0, 2) || '?';
     return (
-      <div className={`bg-white rounded-2xl p-5 border-2 ${colors[relationship].border} hover:shadow-lg transition-all duration-300`}>
-        <div className="flex items-start gap-4">
-          <div className={`flex-shrink-0 w-16 h-16 bg-gradient-to-br ${colors[relationship].bg} rounded-xl flex items-center justify-center shadow-md`}>
-            <span className="text-white font-bold text-xl">{initials}</span>
-          </div>
-          <div className="flex-grow min-w-0">
-            <p className="font-bold text-gray-900 text-lg mb-2">{member.name}</p>
-            <div className="space-y-1.5">
-              <div className="flex items-start gap-2">
-                <div className={`w-1.5 h-1.5 ${colors[relationship].accent} rounded-full mt-1.5`}></div>
-                <div>
-                  <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Member ID</p>
-                  <p className="text-sm font-semibold text-gray-700">{member.membershipNo}</p>
-                </div>
-              </div>
-              {member.dob && (
-                <div className="flex items-start gap-2">
-                  <div className={`w-1.5 h-1.5 ${colors[relationship].accent} rounded-full mt-1.5`}></div>
-                  <div>
-                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Date of Birth</p>
-                    <p className="text-sm font-semibold text-gray-700">{new Date(member.dob).toLocaleDateString()}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+      <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all">
+        <div className={`w-11 h-11 rounded-xl bg-linear-to-br ${avatarGradient[rel]} flex items-center justify-center shrink-0`}>
+          <span className="text-white font-bold text-sm">{initials}</span>
+        </div>
+        <div>
+          <p className="text-sm font-bold text-gray-900">{member.name}</p>
+          <p className="text-xs text-gray-400 mt-0.5">ID: <span className="font-semibold text-gray-600">{member.membershipNo}</span></p>
+          {member.dob && (
+            <p className="text-xs text-gray-400 mt-0.5">DOB: <span className="font-semibold text-gray-600">{new Date(member.dob).toLocaleDateString()}</span></p>
+          )}
         </div>
       </div>
     );
   };
 
-  return (
-    <div className="space-y-10">
-      <div className="text-center pb-6">
-        <h3 className="text-3xl font-bold text-gray-900 mb-2">Family Tree</h3>
-        <p className="text-gray-600">Your registered family members in the Jamat system</p>
+  const Section = ({ emoji, title, members, rel }: { emoji: string; title: string; members: FamilyMember[]; rel: string }) => {
+    if (!members?.length) return null;
+    const c = sectionColors[rel];
+    return (
+      <div className="mb-8">
+        <div className="flex items-center gap-2.5 mb-4">
+          <div className={`w-9 h-9 rounded-xl ${c.iconBg} flex items-center justify-center text-lg`}>{emoji}</div>
+          <span className="font-bold text-gray-900">{title}</span>
+          <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${c.countBg} ${c.countText}`}>{members.length}</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {members.map((m, i) => <FamCard key={i} member={m} rel={rel} />)}
+        </div>
       </div>
+    );
+  };
 
-      {familyTree.parents && familyTree.parents.length > 0 && (
-        <div>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-              <span className="text-2xl">👴</span>
-            </div>
-            <h4 className="text-2xl font-bold text-gray-900">Parents</h4>
-            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-bold">
-              {familyTree.parents.length}
-            </span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {familyTree.parents.map((parent: FamilyMember, idx: number) => (
-              <FamilyMemberCard key={idx} member={parent} relationship="parent" />
-            ))}
-          </div>
-        </div>
-      )}
+  const noFamily = !familyTree.parents?.length && !familyTree.spouse?.length && !familyTree.children?.length;
 
-      {familyTree.spouse && familyTree.spouse.length > 0 && (
-        <div>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl flex items-center justify-center shadow-md">
-              <span className="text-2xl">💑</span>
-            </div>
-            <h4 className="text-2xl font-bold text-gray-900">Spouse</h4>
-            <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm font-bold">
-              {familyTree.spouse.length}
-            </span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {familyTree.spouse.map((spouse: FamilyMember, idx: number) => (
-              <FamilyMemberCard key={idx} member={spouse} relationship="spouse" />
-            ))}
-          </div>
-        </div>
-      )}
+  return (
+    <div>
+      <h3 className="text-xl font-bold text-gray-900 mb-1">Family Tree</h3>
+      <p className="text-sm text-gray-400 mb-6">Your registered family members in the Jamat system</p>
 
-      {familyTree.children && familyTree.children.length > 0 && (
-        <div>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#038DCD] to-[#03BDCD] rounded-xl flex items-center justify-center shadow-md">
-              <span className="text-2xl">👶</span>
-            </div>
-            <h4 className="text-2xl font-bold text-gray-900">Children</h4>
-            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
-              {familyTree.children.length}
-            </span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {familyTree.children.map((child: FamilyMember, idx: number) => (
-              <FamilyMemberCard key={idx} member={child} relationship="child" />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {!familyTree.parents?.length && !familyTree.spouse?.length && !familyTree.children?.length && (
+      {noFamily ? (
         <div className="text-center py-16">
-          <div className="text-6xl mb-4">👨‍👩‍👧‍👦</div>
-          <h4 className="text-2xl font-bold text-gray-900 mb-2">No Family Members Found</h4>
-          <p className="text-gray-600 mb-6">No family members are currently registered in the system.</p>
-          <button className="px-6 py-3 bg-[#038DCD] hover:bg-[#038DCD]/90 text-white font-bold rounded-full transition-all duration-200 shadow-md">
+          <p className="text-5xl mb-3 opacity-50">👨‍👩‍👧‍👦</p>
+          <p className="font-bold text-gray-900 text-lg mb-2">No Family Members Found</p>
+          <p className="text-sm text-gray-400 mb-5">No family members are currently registered in the system.</p>
+          <button className="px-5 py-2.5 bg-[#038DCD] text-white text-sm font-bold rounded-full hover:bg-[#026fa0] transition-colors">
             Add Family Member
           </button>
         </div>
+      ) : (
+        <>
+          <Section emoji="👴" title="Parents" members={familyTree.parents} rel="parent" />
+          <Section emoji="💑" title="Spouse" members={familyTree.spouse} rel="spouse" />
+          <Section emoji="👶" title="Children" members={familyTree.children} rel="child" />
+        </>
       )}
     </div>
   );
 }
 
+// ─── Fee Status ───────────────────────────────────────────────────────────────
 function FeeStatusTab({ feeData }: { feeData: FeeData | null }) {
   if (!feeData) {
     return (
-      <div className="text-center py-12">
-        <div className="w-16 h-16 border-4 border-[#038DCD] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-gray-600 font-semibold">Loading fee status...</p>
+      <div className="flex flex-col items-center justify-center py-16 gap-3">
+        <div className="w-8 h-8 border-[3px] border-[#038DCD]/20 border-t-[#038DCD] rounded-full animate-spin" />
+        <p className="text-sm font-semibold text-gray-400">Loading fee status…</p>
       </div>
     );
   }
 
+  const statusBadge = (status: string) => {
+    const s = status.toLowerCase();
+    if (s === 'paid') return 'bg-emerald-100 text-emerald-700';
+    if (s === 'partial') return 'bg-amber-100 text-amber-700';
+    return 'bg-gray-100 text-gray-600';
+  };
+
   return (
-    <div className="space-y-8">
-      <div>
-        <h3 className="text-3xl font-bold text-gray-900 mb-2">Annual Fee Status</h3>
-        <p className="text-gray-600">Your annual fee breakdown and payment history</p>
+    <div>
+      <h3 className="text-xl font-bold text-gray-900 mb-1">Annual Fee Status</h3>
+      <p className="text-sm text-gray-400 mb-6">Your annual fee breakdown and payment history</p>
+
+      {/* Summary pills */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+        {[
+          { label: 'Total Due', value: feeData.summary.totalDue, cls: 'bg-[#e8f6fd] text-[#026fa0]', border: 'border-[#038DCD]/20' },
+          { label: 'Total Paid', value: feeData.summary.totalPaid, cls: 'bg-emerald-50 text-emerald-800', border: 'border-emerald-200' },
+          { label: 'Discount', value: feeData.summary.totalDiscount, cls: 'bg-violet-50 text-violet-800', border: 'border-violet-200' },
+          { label: 'Balance', value: feeData.summary.balance, cls: feeData.summary.balance > 0 ? 'bg-red-50 text-red-800' : 'bg-gray-50 text-gray-700', border: feeData.summary.balance > 0 ? 'border-red-200' : 'border-gray-200' },
+        ].map((item) => (
+          <div key={item.label} className={`${item.cls} border ${item.border} rounded-xl p-4`}>
+            <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-1.5">{item.label}</p>
+            <p className="text-lg font-bold">PKR {item.value.toLocaleString()}</p>
+          </div>
+        ))}
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl p-6 border-2 border-blue-200">
-          <p className="text-sm text-blue-700 font-bold uppercase tracking-wide mb-2">Total Due</p>
-          <p className="text-3xl font-bold text-blue-900">PKR {feeData.summary.totalDue.toLocaleString()}</p>
-        </div>
-
-        <div className="bg-gradient-to-br from-green-50 to-green-100/50 rounded-2xl p-6 border-2 border-green-200">
-          <p className="text-sm text-green-700 font-bold uppercase tracking-wide mb-2">Total Paid</p>
-          <p className="text-3xl font-bold text-green-900">PKR {feeData.summary.totalPaid.toLocaleString()}</p>
-        </div>
-
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-2xl p-6 border-2 border-purple-200">
-          <p className="text-sm text-purple-700 font-bold uppercase tracking-wide mb-2">Discount</p>
-          <p className="text-3xl font-bold text-purple-900">PKR {feeData.summary.totalDiscount.toLocaleString()}</p>
-        </div>
-
-        <div className={`bg-gradient-to-br rounded-2xl p-6 border-2 ${feeData.summary.balance > 0
-          ? 'from-red-50 to-red-100/50 border-red-200'
-          : 'from-gray-50 to-gray-100/50 border-gray-200'
-          }`}>
-          <p className={`text-sm font-bold uppercase tracking-wide mb-2 ${feeData.summary.balance > 0 ? 'text-red-700' : 'text-gray-700'
-            }`}>
-            Balance
-          </p>
-          <p className={`text-3xl font-bold ${feeData.summary.balance > 0 ? 'text-red-900' : 'text-gray-900'
-            }`}>
-            PKR {feeData.summary.balance.toLocaleString()}
-          </p>
-        </div>
-      </div>
-
-      {/* Yearly Breakdown */}
-      {feeData.yearlyBreakdown && feeData.yearlyBreakdown.length > 0 && (
-        <div>
-          <h4 className="text-xl font-bold text-gray-900 mb-4">Yearly Breakdown</h4>
-          <div className="space-y-3">
+      {/* Yearly breakdown */}
+      {feeData.yearlyBreakdown?.length > 0 && (
+        <div className="mb-7">
+          <p className="text-sm font-bold text-gray-800 mb-3">Yearly Breakdown</p>
+          <div className="space-y-2.5">
             {feeData.yearlyBreakdown.map((year) => (
-              <div key={year.fiscalYear} className="bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-[#038DCD]/30 transition-all">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-2">
-                    <p className="text-lg font-bold text-gray-900">FY {year.fiscalYear}</p>
-                    <div className="flex gap-6 text-sm">
-                      <div>
-                        <p className="text-gray-500 font-semibold uppercase tracking-wide text-xs">Fee Amount</p>
-                        <p className="font-bold text-gray-900">PKR {year.feeAmount.toLocaleString()}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500 font-semibold uppercase tracking-wide text-xs">Paid Amount</p>
-                        <p className="font-bold text-gray-900">PKR {year.paidAmount.toLocaleString()}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold mb-3 ${year.status === 'Paid'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-yellow-100 text-yellow-700'
-                      }`}>
-                      {year.status.toUpperCase()}
+              <div key={year.fiscalYear} className="flex items-center justify-between gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50 hover:border-gray-200 hover:shadow-sm transition-all">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-1.5">
+                    <p className="font-bold text-gray-900 text-sm">FY {year.fiscalYear}</p>
+                    <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full uppercase ${statusBadge(year.status)}`}>
+                      {year.status}
                     </span>
-                    <p className="text-2xl font-bold text-gray-900">PKR {year.balance.toLocaleString()}</p>
                   </div>
+                  <div className="flex gap-4 text-xs text-gray-400 mb-2">
+                    <span>Due: PKR {year.feeAmount.toLocaleString()}</span>
+                    <span>Paid: PKR {year.paidAmount.toLocaleString()}</span>
+                  </div>
+                  <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-linear-to-r from-[#038DCD] to-[#F9C856]"
+                      style={{ width: `${Math.min(100, (year.paidAmount / year.feeAmount) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="font-bold text-gray-900">PKR {year.balance.toLocaleString()}</p>
+                  <p className="text-xs text-gray-400">remaining</p>
                 </div>
               </div>
             ))}
@@ -688,67 +561,47 @@ function FeeStatusTab({ feeData }: { feeData: FeeData | null }) {
         </div>
       )}
 
-      {/* Annual Fees */}
-      <div>
-        <h4 className="text-xl font-bold text-gray-900 mb-4">Annual Fees Invoices</h4>
-        <div className="space-y-3">
+      {/* Invoices */}
+      <div className="mb-7">
+        <p className="text-sm font-bold text-gray-800 mb-3">Annual Fee Invoices</p>
+        <div className="space-y-2.5">
           {feeData.annualFees.map((fee) => (
-            <div key={fee.invoiceNo} className="bg-white rounded-2xl p-6 border-2 border-gray-200">
-              <div className="flex justify-between items-start">
-                <div className="space-y-2">
-                  <p className="text-lg font-bold text-gray-900">FY {fee.fiscalYear}</p>
-                  <div className="space-y-1 text-sm">
-                    <p className="text-gray-600">
-                      <span className="font-semibold">Invoice:</span> {fee.invoiceNo}
-                    </p>
-                    <p className="text-gray-600">
-                      <span className="font-semibold">Date:</span> {new Date(fee.invoiceDate).toLocaleDateString()}
-                    </p>
-                    {fee.details && <p className="text-gray-700 font-medium">{fee.details}</p>}
-                  </div>
-                </div>
-                <p className="text-2xl font-bold text-gray-900">PKR {fee.amount.toLocaleString()}</p>
+            <div key={fee.invoiceNo} className="flex items-center justify-between gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50 hover:border-gray-200 transition-all">
+              <div>
+                <p className="font-bold text-gray-900 text-sm mb-1">FY {fee.fiscalYear}</p>
+                <p className="text-xs text-gray-400">Invoice: {fee.invoiceNo} · {new Date(fee.invoiceDate).toLocaleDateString()}</p>
+                {fee.details && <p className="text-xs text-gray-600 font-medium mt-0.5">{fee.details}</p>}
               </div>
+              <p className="font-bold text-gray-900 shrink-0">PKR {fee.amount.toLocaleString()}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Payment History */}
+      {/* Payments */}
       {feeData.payments.length > 0 && (
         <div>
-          <h4 className="text-xl font-bold text-gray-900 mb-4">Payment History</h4>
-          <div className="space-y-3">
+          <p className="text-sm font-bold text-gray-800 mb-3">Payment History</p>
+          <div className="space-y-2.5">
             {feeData.payments.map((payment) => (
-              <div key={payment.voucherNo} className="bg-gradient-to-r from-green-50 to-white rounded-2xl p-6 border-2 border-green-200">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold">✓</span>
-                      </div>
-                      <p className="text-lg font-bold text-gray-900">Payment Received</p>
-                    </div>
-                    <div className="space-y-1 text-sm">
-                      <p className="text-gray-600">
-                        <span className="font-semibold">Voucher:</span> {payment.voucherNo}
-                      </p>
-                      <p className="text-gray-600">
-                        <span className="font-semibold">Date:</span> {new Date(payment.receiveDate).toLocaleDateString()}
-                      </p>
-                      {payment.discount > 0 && (
-                        <p className="text-green-700 font-semibold">
-                          Discount Applied: PKR {payment.discount.toLocaleString()}
-                        </p>
-                      )}
-                    </div>
+              <div key={payment.voucherNo} className="flex items-center justify-between gap-4 p-4 rounded-xl border-l-[3px] border-l-emerald-500 border border-gray-100 bg-gray-50 hover:shadow-sm transition-all">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-emerald-600 text-sm">✓</span>
+                    <p className="font-bold text-gray-900 text-sm">Payment Received</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-green-900">PKR {payment.amount.toLocaleString()}</p>
-                    <span className="inline-block mt-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
-                      PAID
-                    </span>
-                  </div>
+                  <p className="text-xs text-gray-400">
+                    Voucher: {payment.voucherNo} · {new Date(payment.receiveDate).toLocaleDateString()}
+                  </p>
+                  {payment.discount > 0 && (
+                    <p className="text-xs font-semibold text-emerald-600 mt-0.5">
+                      Discount: PKR {payment.discount.toLocaleString()}
+                    </p>
+                  )}
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="font-bold text-emerald-700">PKR {payment.amount.toLocaleString()}</p>
+                  <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full mt-1 inline-block">PAID</span>
                 </div>
               </div>
             ))}
@@ -759,77 +612,472 @@ function FeeStatusTab({ feeData }: { feeData: FeeData | null }) {
   );
 }
 
+// ─── Applications ─────────────────────────────────────────────────────────────
 function ApplicationsTab({ applications }: { applications: Application[] }) {
-  if (!applications || applications.length === 0) {
-    return (
-      <div className="text-center py-16">
-        <div className="text-6xl mb-4">📝</div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">No Applications Yet</h3>
-        <p className="text-slate-500">You haven&apos;t submitted any applications yet.</p>
-        <button className="px-8 py-3 bg-gradient-to-r from-[#038DCD] to-[#03BDCD] hover:opacity-90 text-white font-bold rounded-full transition-all duration-200 shadow-lg">
-          Submit New Application
-        </button>
-      </div>
-    );
-  }
-
-  const getStatusStyle = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'approved':
-        return 'bg-green-100 text-green-700 border-green-300';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-700 border-yellow-300';
-      case 'rejected':
-        return 'bg-red-100 text-red-700 border-red-300';
-      default:
-        return 'bg-gray-100 text-gray-700 border-gray-300';
+  const statusCls = (s: string) => {
+    switch (s.toLowerCase()) {
+      case 'approved': return 'bg-emerald-100 text-emerald-700';
+      case 'pending': return 'bg-amber-100 text-amber-700';
+      case 'rejected': return 'bg-red-100 text-red-700';
+      default: return 'bg-gray-100 text-gray-600';
     }
   };
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex items-end justify-between mb-6">
         <div>
-          <h3 className="text-3xl font-bold text-gray-900 mb-2">My Applications</h3>
-          <p className="text-gray-600">Track your submitted applications and their status</p>
+          <h3 className="text-xl font-bold text-gray-900 mb-1">My Applications</h3>
+          <p className="text-sm text-gray-400">Track your submitted applications and their status</p>
         </div>
-        <button className="px-6 py-3 bg-gradient-to-r from-[#038DCD] to-[#03BDCD] hover:opacity-90 text-white font-bold rounded-full transition-all duration-200 shadow-md">
+        <button className="px-4 py-2 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-gray-800 transition-colors">
           + New Application
         </button>
       </div>
 
-      <div className="space-y-4">
-        {applications.map((app) => (
-          <div key={app.id} className="bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-[#038DCD]/30 hover:shadow-lg transition-all duration-300">
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex-grow">
-                <h4 className="text-xl font-bold text-gray-900 mb-1">{app.formName}</h4>
-                <p className="text-sm text-gray-600 font-semibold">{app.formType}</p>
+      {!applications || applications.length === 0 ? (
+        <div className="text-center py-16">
+          <p className="text-5xl mb-3 opacity-50">📝</p>
+          <p className="font-bold text-gray-900 text-lg mb-2">No Applications Yet</p>
+          <p className="text-sm text-gray-400 mb-5">You haven&apos;t submitted any applications yet.</p>
+          <button className="px-5 py-2.5 bg-[#038DCD] text-white text-sm font-bold rounded-full hover:bg-[#026fa0] transition-colors">
+            Submit New Application
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {applications.map((app) => (
+            <div key={app.id} className="flex items-start justify-between gap-4 p-5 rounded-xl border border-gray-100 bg-gray-50 hover:border-gray-200 hover:shadow-sm transition-all">
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-gray-900 mb-0.5">{app.formName}</p>
+                <p className="text-xs font-semibold text-gray-400 mb-2">{app.formType}</p>
+                {app.notes && (
+                  <p className="text-xs text-gray-500 bg-white border border-gray-100 rounded-lg px-3 py-2 leading-relaxed">{app.notes}</p>
+                )}
               </div>
-              <span className={`px-4 py-1.5 rounded-full text-xs font-bold border-2 ${getStatusStyle(app.status)}`}>
-                {app.status.toUpperCase()}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
-              <span className="font-semibold">Submitted:</span>
-              <span>{new Date(app.submissionDate).toLocaleDateString()}</span>
-            </div>
-
-            {app.notes && (
-              <div className="bg-gray-50 rounded-xl p-4 mb-4">
-                <p className="text-sm text-gray-700 font-medium">{app.notes}</p>
+              <div className="flex flex-col items-end gap-1.5 shrink-0">
+                <span className={`text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide ${statusCls(app.status)}`}>
+                  {app.status}
+                </span>
+                <p className="text-xs text-gray-400">{new Date(app.submissionDate).toLocaleDateString()}</p>
+                <button className="text-xs font-bold text-[#038DCD] hover:underline mt-1">View Details →</button>
               </div>
-            )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
-            <button className="text-[#038DCD] hover:text-[#038DCD]/80 font-bold text-sm flex items-center gap-2 transition-colors">
-              View Details
-              <span>→</span>
+// ─── Events ───────────────────────────────────────────────────────────────────
+function EventsTab({
+  events,
+  member,
+  familyTree,
+  showNotification,
+  showDeleteConfirm,
+  setShowDeleteConfirm,
+  eventToDelete,
+  setEventToDelete
+}: {
+  events: Event[];
+  member: MemberInfo | null;
+  familyTree: FamilyTree | null;
+  showNotification: (message: string, type: 'success' | 'error' | 'warning') => void;
+  showDeleteConfirm: boolean;
+  setShowDeleteConfirm: (show: boolean) => void;
+  eventToDelete: string | null;
+  setEventToDelete: (id: string | null) => void;
+}) {
+  const { member: authMember } = useMemberAuth();
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
+  const [registering, setRegistering] = useState<string | null>(null);
+  const [newEvent, setNewEvent] = useState({ title: '', desc: '', date: '', category: '', img: '', fb: '' });
+  const [showFamilyModal, setShowFamilyModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedSpouse, setSelectedSpouse] = useState<string[]>([]);
+  const [selectedChildren, setSelectedChildren] = useState<string[]>([]);
+  const [selectedParents, setSelectedParents] = useState<string[]>([]);
+
+  const upcomingEvents = events
+    .filter(event => new Date(event.date) >= new Date())
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  useEffect(() => { fetchRegistrations(); }, []);
+
+  const fetchRegistrations = async () => {
+    try {
+      const response = await fetch('/api/events/register', { credentials: 'include' });
+      if (response.ok) { const data = await response.json(); setRegistrations(data); }
+    } catch (error) { console.error('Error fetching registrations:', error); }
+  };
+
+  const handleRegister = async (eventId: string) => {
+    const familyMembers = {
+      spouse: selectedSpouse,
+      children: selectedChildren,
+      parents: selectedParents
+    };
+    setRegistering(eventId);
+    try {
+      const response = await fetch('/api/events/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ eventId, familyMembers }),
+      });
+      if (response.ok) {
+        await fetchRegistrations();
+        showNotification('Registration request submitted successfully!', 'success');
+        setShowFamilyModal(false);
+        setSelectedEvent(null);
+        setSelectedSpouse([]);
+        setSelectedChildren([]);
+        setSelectedParents([]);
+      } else {
+        const error = await response.json();
+        showNotification(error.error || 'Failed to register', 'error');
+      }
+    } catch (error) {
+      console.error('Error registering:', error);
+      showNotification('Failed to register for event', 'error');
+    } finally { setRegistering(null); }
+  };
+
+  const getRegistrationStatus = (eventId: string) =>
+    registrations.find(r => r.eventId === eventId)?.status || null;
+
+  const handleAddEvent = async () => {
+    try {
+      const response = await fetch('/api/events', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newEvent),
+      });
+      if (response.ok) window.location.reload();
+    } catch (error) { console.error('Error adding event:', error); }
+  };
+
+  const handleDeleteEvent = (eventId: string) => {
+    setEventToDelete(eventId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteEvent = async () => {
+    if (!eventToDelete) return;
+    try {
+      const response = await fetch(`/api/events/${eventToDelete}`, { method: 'DELETE' });
+      if (response.ok) {
+        showNotification('Event deleted successfully', 'success');
+        window.location.reload();
+      } else {
+        showNotification('Failed to delete event', 'error');
+      }
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      showNotification('Failed to delete event', 'error');
+    } finally {
+      setShowDeleteConfirm(false);
+      setEventToDelete(null);
+    }
+  };
+
+  const isAdmin = authMember?.role === 'admin';
+
+  return (
+    <div>
+      <div className="flex items-end justify-between mb-6">
+        <div>
+          <h3 className="text-xl font-bold text-gray-900 mb-1">Upcoming Events</h3>
+          <p className="text-sm text-gray-400">Stay updated with our community events</p>
+        </div>
+        {isAdmin && (
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="px-4 py-2 bg-[#F9C856] text-gray-900 text-sm font-bold rounded-xl hover:bg-[#e0a830] transition-colors"
+          >
+            + Add Event
+          </button>
+        )}
+      </div>
+
+      {/* Admin add form */}
+      {showAddForm && isAdmin && (
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 mb-6">
+          <p className="font-bold text-gray-800 mb-4">Add New Event</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input
+              type="text" placeholder="Event Title" value={newEvent.title}
+              onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+              className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#038DCD] bg-white"
+            />
+            <input
+              type="date" value={newEvent.date}
+              onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+              className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#038DCD] bg-white"
+            />
+            <input
+              type="text" placeholder="Category" value={newEvent.category}
+              onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
+              className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#038DCD] bg-white"
+            />
+            <input
+              type="text" placeholder="Image URL" value={newEvent.img}
+              onChange={(e) => setNewEvent({ ...newEvent, img: e.target.value })}
+              className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#038DCD] bg-white"
+            />
+            <input
+              type="text" placeholder="Facebook Link (optional)" value={newEvent.fb}
+              onChange={(e) => setNewEvent({ ...newEvent, fb: e.target.value })}
+              className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#038DCD] bg-white sm:col-span-2"
+            />
+            <textarea
+              placeholder="Event Description" value={newEvent.desc} rows={3}
+              onChange={(e) => setNewEvent({ ...newEvent, desc: e.target.value })}
+              className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#038DCD] bg-white sm:col-span-2"
+            />
+          </div>
+          <div className="flex gap-2 mt-4">
+            <button onClick={handleAddEvent} className="px-4 py-2 bg-[#038DCD] text-white text-sm font-bold rounded-xl hover:bg-[#026fa0] transition-colors">
+              Add Event
+            </button>
+            <button onClick={() => setShowAddForm(false)} className="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-bold rounded-xl hover:bg-gray-300 transition-colors">
+              Cancel
             </button>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
+
+      {upcomingEvents.length === 0 ? (
+        <div className="text-center py-16">
+          <p className="text-5xl mb-3 opacity-50">📅</p>
+          <p className="font-bold text-gray-900 text-lg mb-2">No Upcoming Events</p>
+          <p className="text-sm text-gray-400">Check back later for upcoming events.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {upcomingEvents.map((event) => {
+            const d = new Date(event.date);
+            const status = getRegistrationStatus(event.id);
+            return (
+              <div key={event.id} className="flex gap-4 p-5 rounded-xl border border-gray-100 bg-gray-50 hover:border-gray-200 hover:shadow-sm transition-all">
+                {/* Date block */}
+                <div className="shrink-0 w-14 bg-gray-900 rounded-xl text-white text-center py-3 px-2">
+                  <p className="text-2xl font-bold leading-none">{d.getDate()}</p>
+                  <p className="text-[9px] font-bold tracking-widest uppercase opacity-60 mt-1">{MONTHS[d.getMonth()]}</p>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div>
+                      <p className="font-bold text-gray-900 mb-1">{event.title}</p>
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <span className="text-xs font-bold text-[#038DCD] bg-[#e8f6fd] px-2.5 py-0.5 rounded-full uppercase tracking-wide">
+                          {event.category}
+                        </span>
+                        {new Date(event.date) >= new Date() && (
+                          <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full uppercase tracking-wide">
+                            🚀 Upcoming
+                          </span>
+                        )}
+                        <span className="text-xs text-gray-400">{d.toLocaleDateString()}</span>
+                        {event.time && <span className="text-xs text-gray-400">⏰ {event.time}</span>}
+                        {event.venue && <span className="text-xs text-gray-400">📍 {event.venue}</span>}
+                      </div>
+                      {event.islamicDate && (
+                        <div className="text-xs text-gray-500">☪️ {event.islamicDate}</div>
+                      )}
+                    </div>
+                    {isAdmin && (
+                      <button
+                        onClick={() => handleDeleteEvent(event.id)}
+                        className="text-xs font-bold text-red-500 bg-red-50 px-2.5 py-1 rounded-lg hover:bg-red-100 transition-colors shrink-0"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+
+                  <p className="text-sm text-gray-500 leading-relaxed mb-3">{event.desc}</p>
+
+                  {event.img && (
+                    <div className="mb-3">
+                      <Image
+                        src={event.img} alt={event.title} width={200} height={150}
+                        className="w-full max-w-50 h-28 object-cover rounded-xl"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap gap-2">
+                    {(() => {
+                      if (status === 'approved') return (
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-lg">✓ Registered</span>
+                      );
+                      if (status === 'pending') return (
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-lg">⏳ Registration Pending</span>
+                      );
+                      if (status === 'rejected') return (
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-red-700 bg-red-100 px-3 py-1.5 rounded-lg">✗ Registration Rejected</span>
+                      );
+                      return (
+                        <button
+                          disabled={registering === event.id}
+                          onClick={() => {
+                            setSelectedEvent(event);
+                            setShowFamilyModal(true);
+                            setSelectedSpouse([]);
+                            setSelectedChildren([]);
+                            setSelectedParents([]);
+                          }}
+                          className="text-xs font-bold text-white bg-[#038DCD] px-4 py-1.5 rounded-lg hover:bg-[#026fa0] transition-colors disabled:opacity-50"
+                        >
+                          {registering === event.id ? 'Registering…' : 'Register for Event'}
+                        </button>
+                      );
+                    })()}
+                    {event.fb && (
+                      <a href={event.fb} target="_blank" rel="noopener noreferrer">
+                        <button className="text-xs font-bold text-gray-800 bg-[#F9C856] px-4 py-1.5 rounded-lg hover:bg-[#e0a830] transition-colors">
+                          Facebook Event
+                        </button>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Family selection modal */}
+      {showFamilyModal && selectedEvent && (
+        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowFamilyModal(false)}>
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">Register for Event</h3>
+            <p className="text-sm text-gray-400 mb-4">{selectedEvent.title}</p>
+
+            {!familyTree ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#038DCD] mx-auto mb-2"></div>
+                <p className="text-sm text-gray-600">Loading family information...</p>
+              </div>
+            ) : (
+              <div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Select attendees</p>
+
+                <div className="space-y-2 mb-5">
+                  {/* Self — always checked */}
+                  <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-transparent cursor-default">
+                    <input type="checkbox" checked disabled className="accent-[#038DCD] w-4 h-4" />
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{member?.MemName || 'You'}</p>
+                      <p className="text-xs text-gray-400">Member (you)</p>
+                    </div>
+                  </label>
+
+                  {familyTree?.spouse?.filter(spouse => String(spouse.id || '').trim() !== String(member?.MemComputerID || '').trim()).map((spouse, idx) => {
+                    const spouseId = String(spouse.id || '');
+                    return (
+                      <label key={`spouse-${idx}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-transparent hover:border-[#038DCD] hover:bg-[#e8f6fd] transition-all cursor-pointer">
+                        <input
+                          type="checkbox" className="accent-[#038DCD] w-4 h-4"
+                          checked={selectedSpouse.includes(spouseId)}
+                          onChange={(e) => {
+                            if (e.target.checked) setSelectedSpouse(prev => [...prev, spouseId]);
+                            else setSelectedSpouse(prev => prev.filter(id => id !== spouseId));
+                          }}
+                        />
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">{spouse.name}</p>
+                          <p className="text-xs text-gray-400">Spouse</p>
+                        </div>
+                      </label>
+                    );
+                  })}
+
+                  {familyTree?.children?.filter(child => String(child.id || '').trim() !== String(member?.MemComputerID || '').trim()).map((child, idx) => {
+                    const childId = String(child.id || '');
+                    return (
+                      <label key={`child-${idx}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-transparent hover:border-[#038DCD] hover:bg-[#e8f6fd] transition-all cursor-pointer">
+                        <input
+                          type="checkbox" className="accent-[#038DCD] w-4 h-4"
+                          checked={selectedChildren.includes(childId)}
+                          onChange={(e) => {
+                            if (e.target.checked) setSelectedChildren(prev => [...prev, childId]);
+                            else setSelectedChildren(prev => prev.filter(id => id !== childId));
+                          }}
+                        />
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">{child.name}</p>
+                          <p className="text-xs text-gray-400">Child</p>
+                        </div>
+                      </label>
+                    );
+                  })}
+
+                  {familyTree?.parents?.filter(parent => String(parent.id || '').trim() !== String(member?.MemComputerID || '').trim()).map((parent, idx) => {
+                    const parentId = String(parent.id || '');
+                    return (
+                      <label key={`parent-${idx}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-transparent hover:border-[#038DCD] hover:bg-[#e8f6fd] transition-all cursor-pointer">
+                        <input
+                          type="checkbox" className="accent-[#038DCD] w-4 h-4"
+                          checked={selectedParents.includes(parentId)}
+                          onChange={(e) => {
+                            if (e.target.checked) setSelectedParents(prev => [...prev, parentId]);
+                            else setSelectedParents(prev => prev.filter(id => id !== parentId));
+                          }}
+                        />
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">{parent.name}</p>
+                          <p className="text-xs text-gray-400">Parent</p>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    disabled={registering === selectedEvent.id}
+                    onClick={() => handleRegister(selectedEvent.id)}
+                    className="flex-1 py-2.5 bg-[#038DCD] text-white text-sm font-bold rounded-xl hover:bg-[#026fa0] transition-colors disabled:opacity-50"
+                  >
+                    {registering === selectedEvent.id ? 'Registering…' : 'Confirm Registration'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowFamilyModal(false);
+                      setSelectedEvent(null);
+                      setSelectedSpouse([]);
+                      setSelectedChildren([]);
+                      setSelectedParents([]);
+                    }}
+                    className="px-4 py-2.5 bg-gray-100 text-gray-700 text-sm font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        title="Delete Event"
+        message="Are you sure you want to delete this event? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDeleteEvent}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setEventToDelete(null);
+        }}
+        type="danger"
+      />
     </div>
   );
 }

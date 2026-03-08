@@ -8,7 +8,7 @@ export default function Footer() {
     if (pathname?.startsWith("/admin")) return null;
 
     return (
-        <footer className="relative bottom-0 bg-primary-black text-white z-50 rounded-t-[4rem] mx-10">
+        <footer className="relative bottom-0 bg-primary-black text-white z-30 rounded-t-[4rem] mx-10">
             <div className="max-w-7xl mx-auto px-8 py-12">
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -147,7 +147,7 @@ export default function Footer() {
                             {/* Instagram */}
                             <a href="https://www.instagram.com/jwmjyo/"
                                 className="flex items-center gap-3 p-3 bg-gray-800 hover:bg-pink-600 rounded-lg transition-all duration-300 group">
-                                <div className="bg-gradient-to-br from-purple-500 to-pink-500 p-2 rounded-full group-hover:bg-white">
+                                <div className="bg-linear-to-br from-purple-500 to-pink-500 p-2 rounded-full group-hover:bg-white">
                                     <svg className="w-5 h-5 text-white group-hover:text-pink-500" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5zm4.25 3.25a5.25 5.25 0 1 1 0 10.5 5.25 5.25 0 0 1 0-10.5zm0 1.5a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm5.13.62a1.13 1.13 0 1 1-2.26 0 1.13 1.13 0 0 1 2.26 0z" />
                                     </svg>

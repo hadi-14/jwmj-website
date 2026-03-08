@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface MemberData {
   MemName?: string;
@@ -246,7 +247,7 @@ function Step2_ConfirmDetails({ onNext, onBack, formData }: { onNext: () => void
           </p>
         </div>
 
-        <div className="bg-gradient-to-br from-[#038DCD]/5 to-[#03BDCD]/5 rounded-xl p-3 border-2 border-[#038DCD]/30">
+        <div className="bg-linear-to-br from-[#038DCD]/5 to-[#03BDCD]/5 rounded-xl p-3 border-2 border-[#038DCD]/30">
           <p className="text-[10px] text-[#038DCD] font-bold uppercase tracking-wide mb-1">Email (to be linked)</p>
           <p className="font-bold text-gray-900 text-sm">{formData.email}</p>
         </div>
@@ -262,7 +263,7 @@ function Step2_ConfirmDetails({ onNext, onBack, formData }: { onNext: () => void
         </button>
         <button
           onClick={onNext}
-          className="flex-1 bg-gradient-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] uppercase tracking-wide text-sm"
+          className="flex-1 bg-linear-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] uppercase tracking-wide"
         >
           Confirm →
         </button>
@@ -348,7 +349,7 @@ function Step3_EmailVerification({ onNext, onBack, formData, setFormData }: { on
 
       {!codeSent ? (
         <div className="text-center py-6">
-          <div className="w-20 h-20 bg-gradient-to-br from-[#F9C856]/20 to-[#F9D98F]/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-20 h-20 bg-linear-to-br from-[#F9C856]/20 to-[#F9D98F]/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <span className="text-4xl">📧</span>
           </div>
           <p className="text-gray-600 mb-6 text-sm">
@@ -568,7 +569,7 @@ function Step4_CreatePassword({ onNext, onBack, formData }: { onNext: () => void
                   style={{ width: `${(strength.strength / 4) * 100}%` }}
                 />
               </div>
-              <span className={`text-[10px] font-bold ${strength.textColor} uppercase tracking-wide min-w-[50px]`}>
+              <span className={`text-[10px] font-bold ${strength.textColor} uppercase tracking-wide min-w-12.5`}>
                 {strength.label}
               </span>
             </div>
@@ -630,7 +631,7 @@ function Step5_Success() {
   return (
     <div className="space-y-5 text-center">
       {/* Success Icon */}
-      <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
+      <div className="w-24 h-24 bg-linear-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
         <span className="text-5xl text-white">✓</span>
       </div>
 
@@ -647,7 +648,7 @@ function Step5_Success() {
       <div className="space-y-3">
         <Link
           href="/member/login"
-          className="block w-full bg-gradient-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] uppercase tracking-wide text-sm"
+          className="block w-full bg-linear-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] uppercase tracking-wide"
         >
           Go to Login
         </Link>
@@ -685,15 +686,21 @@ export default function MemberRegistration() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-5 min-h-[600px]">
+        <div className="grid grid-cols-1 lg:grid-cols-5 min-h-150">
 
           {/* Left Sidebar - Progress */}
-          <div className="lg:col-span-2 bg-gradient-to-br from-[#038DCD] to-[#03BDCD] p-8 lg:p-10">
+          <div className="lg:col-span-2 bg-linear-to-br from-[#038DCD] to-[#03BDCD] p-8 lg:p-10">
             {/* Logo and Header */}
             <Link href="/" className="inline-block mb-8">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">JWMJ</span>
+                <div className="w-12 h-12 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                  <Image
+                    src="/logo.png"
+                    alt="JWMJ Logo"
+                    width={48}
+                    height={48}
+                    className="object-contain"
+                  />
                 </div>
                 <div>
                   <h1 className="text-white font-bold text-xl italic">Member Portal</h1>

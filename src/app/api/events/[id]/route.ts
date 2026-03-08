@@ -31,7 +31,7 @@ export async function PUT(request: NextRequest) {
   try {
     const id = await getEventId(request);
     const body = await request.json();
-    const { title, desc, date, category, img, fb } = body;
+    const { title, desc, date, time, islamicDate, venue, category, img, fb } = body;
 
     const event = await prisma.event.update({
       where: { id: id as string },
@@ -39,6 +39,9 @@ export async function PUT(request: NextRequest) {
         ...(title && { title }),
         ...(desc && { desc }),
         ...(date && { date: new Date(date) }),
+        ...(time !== undefined && { time }),
+        ...(islamicDate !== undefined && { islamicDate }),
+        ...(venue !== undefined && { venue }),
         ...(category && { category }),
         ...(img && { img }),
         ...(fb !== undefined && { fb }),

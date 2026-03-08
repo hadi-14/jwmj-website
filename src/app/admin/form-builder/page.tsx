@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Plus, Trash2, Eye, Download, X, GripVertical, Save, Edit, Copy,
-  AlertCircle, CheckCircle2, FileText, Users, Settings, ArrowLeft,
+  FileText, Users, Settings, ArrowLeft,
   Loader, Search, Filter, Upload, FileUp, ExternalLink, FilePlus,
   Sparkles, FolderOpen,
   ChevronRight
@@ -10,6 +10,7 @@ import {
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { IForm, IFormField } from '@/types/forms';
 import DynamicForm from '@/components/form/DynamicForm';
+import { useNotification } from '@/components/Notification';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -109,6 +110,7 @@ function StatCard({ icon: Icon, label, value, accent }: { icon: React.ElementTyp
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function FormBuilder() {
+  const { showNotification } = useNotification();
   const [forms, setForms] = useState<FormData[]>([]);
   const [filteredForms, setFilteredForms] = useState<FormData[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -121,13 +123,15 @@ export default function FormBuilder() {
     name: '', description: '', formType: '', fields: [] as Field[], pdfFile: undefined as PdfFile | undefined
   });
   const [currentField, setCurrentField] = useState<Partial<Field>>({ columnWidth: 'full', isRequired: false });
-  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [templates, setTemplates] = useState<IForm[]>([]);
   const [isUploadingPdf, setIsUploadingPdf] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState('');
+
+  const [formToDelete, setFormToDelete] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const fetchForms = async () => {
     try {
@@ -136,7 +140,7 @@ export default function FormBuilder() {
       if (!res.ok) throw new Error('Failed to fetch forms');
       const response = await res.json();
       setForms(response.data || []);
-    } catch { showNotification('error', 'Failed to load forms'); }
+    } catch { showNotification('Failed to load forms', 'error'); }
     finally { setIsLoading(false); }
   };
 
@@ -147,12 +151,7 @@ export default function FormBuilder() {
     } catch { /* silent */ }
   };
 
-  const showNotification = (type: 'success' | 'error', message: string) => {
-    setNotification({ type, message });
-    setTimeout(() => setNotification(null), 4000);
-  };
-
-  useEffect(() => { fetchForms(); fetchTemplates(); }, []);
+  useEffect(() => { fetchForms(); fetchTemplates(); }, [fetchForms]);
 
   useEffect(() => {
     let filtered = [...forms];
@@ -184,7 +183,7 @@ export default function FormBuilder() {
   const handlePdfUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    if (file.type !== 'application/pdf') { showNotification('error', 'Please upload a PDF file'); return; }
+    if (file.type !== 'application/pdf') { showNotification('Please upload a PDF file', 'error'); return; }
     setIsUploadingPdf(true); setUploadedFileName(file.name);
     try {
       const fd = new FormData(); fd.append('file', file);
@@ -193,26 +192,26 @@ export default function FormBuilder() {
       if (!res.ok) throw new Error(result.error || 'Failed to process PDF');
       setFormConfig({ name: result.data.formName, description: result.data.description, formType: result.data.formType, fields: result.data.fields, pdfFile: result.data.pdfFile });
       setShowTemplateSelection(false); setShowBuilder(true);
-      showNotification('success', `${result.data.fields.length} fields extracted from PDF`);
-    } catch (e: unknown) { showNotification('error', e instanceof Error ? e.message : 'Failed to process PDF'); }
+      showNotification(`${result.data.fields.length} fields extracted from PDF`, 'success');
+    } catch (e: unknown) { showNotification(e instanceof Error ? e.message : 'Failed to process PDF', 'error'); }
     finally { setIsUploadingPdf(false); event.target.value = ''; }
   };
 
   const downloadFormPdf = async (formId: string) => {
     try {
-      showNotification('success', 'Generating PDF...');
+      showNotification('Generating PDF...', 'success');
       const res = await fetch(`/api/forms/generate-pdf/${formId}`);
       if (!res.ok) throw new Error((await res.json()).error || 'Failed');
       const blob = await res.blob(); const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url; a.download = `form_${formId}.pdf`;
       document.body.appendChild(a); a.click(); URL.revokeObjectURL(url); a.remove();
-      showNotification('success', 'PDF downloaded');
-    } catch (e: unknown) { showNotification('error', e instanceof Error ? e.message : 'Failed'); }
+      showNotification('PDF downloaded', 'success');
+    } catch (e: unknown) { showNotification(e instanceof Error ? e.message : 'Failed', 'error'); }
   };
 
   const addOrUpdateField = () => {
     if (!currentField.fieldName || !currentField.fieldLabel || !currentField.fieldType) {
-      showNotification('error', 'Field name, label, and type are required'); return;
+      showNotification('Field name, label, and type are required', 'error'); return;
     }
     setFormConfig(prev => {
       const newFields = [...prev.fields];
@@ -221,7 +220,7 @@ export default function FormBuilder() {
       return { ...prev, fields: newFields };
     });
     setCurrentField({ columnWidth: 'full', isRequired: false }); setEditingFieldIndex(null);
-    showNotification('success', editingFieldIndex !== null ? 'Field updated' : 'Field added');
+    showNotification(editingFieldIndex !== null ? 'Field updated' : 'Field added', 'success');
   };
 
   const editField = (index: number) => { setCurrentField(formConfig.fields[index]); setEditingFieldIndex(index); window.scrollTo({ top: 0, behavior: 'smooth' }); };
@@ -230,12 +229,12 @@ export default function FormBuilder() {
     const f = { ...formConfig.fields[index] }; delete f.id;
     f.fieldName = `${f.fieldName}_copy`; f.fieldLabel = `${f.fieldLabel} (Copy)`;
     setFormConfig(prev => ({ ...prev, fields: [...prev.fields, { ...f, fieldOrder: prev.fields.length }] }));
-    showNotification('success', 'Field duplicated');
+    showNotification('Field duplicated', 'success');
   };
 
   const saveForm = async () => {
-    if (!formConfig.name || !formConfig.formType) { showNotification('error', 'Form name and type are required'); return; }
-    if (formConfig.fields.length === 0) { showNotification('error', 'At least one field is required'); return; }
+    if (!formConfig.name || !formConfig.formType) { showNotification('Form name and type are required', 'error'); return; }
+    if (formConfig.fields.length === 0) { showNotification('At least one field is required', 'error'); return; }
     setIsSaving(true);
     try {
       const payload = {
@@ -250,18 +249,29 @@ export default function FormBuilder() {
       const res = await fetch('/api/forms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || 'Failed to save');
-      showNotification('success', 'Form created successfully!'); resetForm(); await fetchForms();
-    } catch (e: unknown) { showNotification('error', e instanceof Error ? e.message : 'Failed to save'); }
+      showNotification('Form created successfully!', 'success'); resetForm(); await fetchForms();
+    } catch (e: unknown) { showNotification(e instanceof Error ? e.message : 'Failed to save', 'error'); }
     finally { setIsSaving(false); }
   };
 
-  const deleteForm = async (formId: string) => {
-    if (!confirm('Delete this form? This cannot be undone.')) return;
+  const deleteForm = (formId: string) => {
+    setFormToDelete(formId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteForm = async () => {
+    if (!formToDelete) return;
     try {
-      const res = await fetch(`/api/forms/${formId}`, { method: 'DELETE' });
+      const res = await fetch(`/api/forms/${formToDelete}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
-      showNotification('success', 'Form deleted'); await fetchForms();
-    } catch { showNotification('error', 'Failed to delete form'); }
+      showNotification('Form deleted successfully', 'success');
+      await fetchForms();
+    } catch {
+      showNotification('Failed to delete form', 'error');
+    } finally {
+      setShowDeleteConfirm(false);
+      setFormToDelete(null);
+    }
   };
 
   const resetForm = () => {
@@ -273,7 +283,7 @@ export default function FormBuilder() {
   const loadTemplate = (template: IForm) => {
     setFormConfig({ name: template.name, description: template.description || '', formType: template.formType, fields: template.fields.map(convertTemplateFieldToLocal), pdfFile: undefined });
     setShowTemplateSelection(false); setShowBuilder(true); setCurrentField({ columnWidth: 'full', isRequired: false });
-    showNotification('success', `Template "${template.name}" loaded`);
+    showNotification(`Template "${template.name}" loaded`, 'success');
   };
 
   const exportForm = async (formId: string) => {
@@ -281,7 +291,7 @@ export default function FormBuilder() {
     const blob = new Blob([JSON.stringify(form, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob); const a = document.createElement('a');
     a.href = url; a.download = `${form.formType}_${Date.now()}.json`; a.click(); URL.revokeObjectURL(url);
-    showNotification('success', 'Form exported');
+    showNotification('Form exported', 'success');
   };
 
   const formTypes = ['all', ...new Set(forms.map(f => f.formType))];
@@ -304,21 +314,6 @@ export default function FormBuilder() {
 
   return (
     <div className="min-h-screen bg-slate-50/60 pb-16">
-
-
-
-      {/* ── Toast Notification ── */}
-      {notification && (
-        <div className={`fixed top-5 right-5 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl text-sm font-medium border
-          ${notification.type === 'success' ? 'bg-white border-emerald-200 text-emerald-800' : 'bg-white border-red-200 text-red-800'}`}
-          style={{ animation: 'slideIn 0.2s ease' }}>
-          {notification.type === 'success'
-            ? <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-            : <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />}
-          {notification.message}
-        </div>
-      )}
-
       <div className="max-w-7xl mx-auto px-6">
 
         {/* ══════════════════════════════════════════════════════════
@@ -782,6 +777,33 @@ export default function FormBuilder() {
                   ))}
                 </div>
                 <DynamicForm formId={previewForm.id} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                  <Trash2 className="w-6 h-6 text-red-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-slate-900 text-lg mb-1">Delete Form</h3>
+                  <p className="text-sm text-slate-500">Are you sure you want to delete this form? This action cannot be undone.</p>
+                </div>
+              </div>
+              <div className="flex gap-3 justify-end">
+                <button onClick={() => { setShowDeleteConfirm(false); setFormToDelete(null); }}
+                  className="px-4 py-2 border border-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors">
+                  Cancel
+                </button>
+                <button onClick={confirmDeleteForm}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors">
+                  Delete
+                </button>
               </div>
             </div>
           </div>

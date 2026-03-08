@@ -20,7 +20,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, desc, date, category, img, fb } = body;
+    const { title, desc, date, time, islamicDate, venue, category, img, fb } = body;
 
     if (!title || !desc || !date || !category || !img) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -31,6 +31,9 @@ export async function POST(request: NextRequest) {
         title,
         desc,
         date: new Date(date),
+        time: time || null,
+        islamicDate: islamicDate || null,
+        venue: venue || null,
         category,
         img,
         fb: fb || null,

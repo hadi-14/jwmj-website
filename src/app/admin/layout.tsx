@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AuthProvider, useAuth } from './AuthContext';
+import { NotificationProvider } from '@/components/Notification';
 import {
   LayoutDashboard,
   Users,
@@ -275,7 +276,9 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
-      <AdminLayoutContent>{children}</AdminLayoutContent>
+      <NotificationProvider>
+        <AdminLayoutContent>{children}</AdminLayoutContent>
+      </NotificationProvider>
     </AuthProvider>
   );
 }

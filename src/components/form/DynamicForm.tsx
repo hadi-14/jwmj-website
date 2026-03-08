@@ -97,7 +97,7 @@ const FormField = ({ field, value, error, onChange }: {
             value={value as string | number | readonly string[] | undefined}
             onChange={(e) => onChange(e.target.value)}
             placeholder={field.placeholder || ''}
-            className={`${baseInputClass} min-h-[120px] resize-y`}
+            className={`${baseInputClass} min-h-30 resize-y`}
             rows={4}
           />
         );
@@ -129,7 +129,7 @@ const FormField = ({ field, value, error, onChange }: {
       case 'checkbox':
         return (
           <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl border-2 border-slate-200 hover:border-[#038DCD] hover:bg-blue-50/50 transition-all cursor-pointer group">
-            <div className="relative flex-shrink-0">
+            <div className="relative shrink-0">
               <input
                 type="checkbox"
                 checked={value === true || value === 'true'}
@@ -215,7 +215,7 @@ const FormField = ({ field, value, error, onChange }: {
       {error && (
         <div className="mt-2 p-2 bg-rose-50 rounded-lg border border-rose-200">
           <p className="text-sm text-rose-700 flex items-center gap-1.5">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </p>
         </div>
@@ -223,7 +223,7 @@ const FormField = ({ field, value, error, onChange }: {
 
       {!error && field.helpText && field.fieldType !== 'checkbox' && (
         <p className="mt-2 text-xs text-slate-500 flex items-start gap-1">
-          <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+          <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
           <span>{field.helpText}</span>
         </p>
       )}
@@ -394,7 +394,7 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
+      <div className="flex justify-center items-center min-h-100">
         <div className="text-center">
           <div className="relative w-16 h-16 mx-auto mb-6">
             <div className="absolute inset-0 border-4 border-[#038DCD]/20 rounded-full"></div>
@@ -426,9 +426,9 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
     <div className="space-y-6">
       {/* Messages */}
       {submitMessage && (
-        <div className="p-4 bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="p-4 bg-linear-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex items-center gap-3">
-            <div className="flex-shrink-0 w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center">
+            <div className="shrink-0 w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center">
               <CheckCircle2 className="w-6 h-6 text-white" />
             </div>
             <p className="text-emerald-800 font-semibold flex-1">{submitMessage}</p>
@@ -437,9 +437,9 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
       )}
 
       {submitError && (
-        <div className="p-4 bg-gradient-to-r from-rose-50 to-red-50 border-2 border-rose-200 rounded-xl animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="p-4 bg-linear-to-r from-rose-50 to-red-50 border-2 border-rose-200 rounded-xl animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex items-center gap-3">
-            <div className="flex-shrink-0 w-10 h-10 bg-rose-500 rounded-full flex items-center justify-center">
+            <div className="shrink-0 w-10 h-10 bg-rose-500 rounded-full flex items-center justify-center">
               <AlertCircle className="w-6 h-6 text-white" />
             </div>
             <p className="text-rose-800 font-semibold flex-1">{submitError}</p>
@@ -459,7 +459,7 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
         </div>
         <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
           <div
-            className="bg-gradient-to-r from-[#038DCD] to-[#0369A1] h-3 rounded-full transition-all duration-500 ease-out relative overflow-hidden"
+            className="bg-linear-to-r from-[#038DCD] to-[#0369A1] h-3 rounded-full transition-all duration-500 ease-out relative overflow-hidden"
             style={{ width: `${progress}%` }}
           >
             <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
@@ -509,7 +509,7 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="flex-1 px-6 py-3.5 bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white font-bold rounded-xl hover:from-[#0369A1] hover:to-[#038DCD] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02]"
+            className="flex-1 px-6 py-3.5 bg-linear-to-r from-[#038DCD] to-[#0369A1] text-white font-bold rounded-xl hover:from-[#0369A1] hover:to-[#038DCD] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02]"
           >
             {isSubmitting ? (
               <>
@@ -528,7 +528,7 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
         {/* Help Text */}
         <div className="mt-4 pt-4 border-t-2 border-slate-200">
           <div className="flex items-start gap-2 text-xs text-slate-500">
-            <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <Info className="w-4 h-4 shrink-0 mt-0.5" />
             <p>
               Your information is secure and will be kept confidential / آپ کی معلومات محفوظ اور خفیہ رکھی جائیں گی
             </p>

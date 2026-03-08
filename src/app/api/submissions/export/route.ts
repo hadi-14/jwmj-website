@@ -35,12 +35,34 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Fetch member details for Wehvaria card number
+    const memberIds = submissions
+      .map(sub => sub.memberComputerId)
+      .filter((id) => id !== null && id !== undefined);
+
+    const memberMap = new Map();
+    if (memberIds.length > 0) {
+      const members = await prisma.member_Information.findMany({
+        where: {
+          MemComputerID: { in: memberIds }
+        },
+        select: {
+          MemComputerID: true,
+          MemWehvariaNo: true
+        }
+      });
+      members.forEach(m => {
+        memberMap.set(m.MemComputerID.toString(), m.MemWehvariaNo?.toString() || '');
+      });
+    }
+
     const headers = [
       'ID',
       'Form Name',
       'Status',
       'Submitted Date',
       'Submitted By',
+      'Member Wehvaria Card No.',
       ...submissions[0].fieldValues.map(fv => fv.field.fieldLabel)
     ];
 
@@ -50,6 +72,7 @@ export async function GET(request: NextRequest) {
       sub.status,
       new Date(sub.submissionDate).toLocaleString(),
       sub.submittedBy,
+      memberMap.get(sub.memberComputerId?.toString() || '') || '',
       ...submissions[0].fieldValues.map(fv =>
         sub.fieldValues.find(fv2 => fv2.fieldId === fv.fieldId)?.value || ''
       )

@@ -12,17 +12,18 @@ import {
   Eye,
   Mail,
   Calendar,
-  CheckCircle,
   XCircle,
   X,
   Save,
   Loader,
   UserCheck,
   AlertCircle,
-  UserPlus,
   Shield,
+  UserPlus,
   Lock
 } from 'lucide-react';
+import { useNotification, ConfirmationModal } from '@/components/Notification';
+
 
 interface Member {
   id: string;
@@ -41,6 +42,7 @@ interface FormData {
 }
 
 export default function AdminMembersPage() {
+  const { showNotification } = useNotification();
   const [members, setMembers] = useState<Member[]>([]);
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -50,17 +52,10 @@ export default function AdminMembersPage() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [formData, setFormData] = useState<FormData>({ name: '', email: '', password: '', role: 'MEMBER' });
   const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    fetchMembers();
-  }, []);
-
-  useEffect(() => {
-    filterMembers();
-  }, [searchQuery, statusFilter, members]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
 
   const fetchMembers = useCallback(async () => {
     try {
@@ -72,11 +67,11 @@ export default function AdminMembersPage() {
       }
     } catch (error) {
       console.error('Error fetching members:', error);
-      showNotification('error', 'Failed to load members');
+      showNotification('Failed to load members', 'error');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [showNotification]);
 
   const filterMembers = useCallback(() => {
     let filtered = [...members];
@@ -97,38 +92,50 @@ export default function AdminMembersPage() {
     setFilteredMembers(filtered);
   }, [members, searchQuery, statusFilter]);
 
-  const showNotification = (type: 'success' | 'error', message: string) => {
-    setNotification({ type, message });
-    setTimeout(() => setNotification(null), 4000);
+  useEffect(() => {
+    fetchMembers();
+  }, [fetchMembers]);
+
+  useEffect(() => {
+    filterMembers();
+  }, [searchQuery, statusFilter, members, filterMembers]);
+
+  const handleDelete = (id: string) => {
+    setMemberToDelete(id);
+    setShowDeleteConfirm(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
-
+  const confirmDeleteMember = async () => {
+    if (!memberToDelete) return;
     try {
-      const response = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+      const response = await fetch(`/api/users/${memberToDelete}`, { method: 'DELETE' });
       if (response.ok) {
-        showNotification('success', 'User deleted successfully');
+        showNotification('User deleted successfully', 'success');
         fetchMembers();
+      } else {
+        showNotification('Failed to delete user', 'error');
       }
     } catch {
-      showNotification('error', 'Failed to delete user');
+      showNotification('Failed to delete user', 'error');
+    } finally {
+      setShowDeleteConfirm(false);
+      setMemberToDelete(null);
     }
   };
 
   const handleSubmit = async () => {
     if (!formData.email) {
-      showNotification('error', 'Email is required');
+      showNotification('Email is required', 'error');
       return;
     }
 
     if (!showEditModal && !formData.password) {
-      showNotification('error', 'Password is required for new users');
+      showNotification('Password is required for new users', 'error');
       return;
     }
 
     if (formData.password && formData.password.length < 8) {
-      showNotification('error', 'Password must be at least 8 characters');
+      showNotification('Password must be at least 8 characters', 'error');
       return;
     }
 
@@ -162,7 +169,7 @@ export default function AdminMembersPage() {
         throw new Error(result.error || 'Operation failed');
       }
 
-      showNotification('success', showEditModal ? 'User updated successfully' : 'User created successfully');
+      showNotification(showEditModal ? 'User updated successfully' : 'User created successfully', 'success');
       setShowAddModal(false);
       setShowEditModal(false);
       setFormData({ name: '', email: '', password: '', role: 'MEMBER' });
@@ -170,9 +177,9 @@ export default function AdminMembersPage() {
       fetchMembers();
     } catch (error: unknown) {
       if (error instanceof Error) {
-        showNotification('error', error.message || 'Operation failed');
+        showNotification(error.message || 'Operation failed', 'error');
       } else {
-        showNotification('error', 'Operation failed');
+        showNotification('Operation failed', 'error');
       }
     } finally {
       setIsSaving(false);
@@ -222,7 +229,7 @@ export default function AdminMembersPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-100">
         <div className="text-center">
           <Loader className="w-12 h-12 text-[#038DCD] animate-spin mx-auto mb-4" />
           <p className="text-slate-600 font-medium">Loading members...</p>
@@ -248,39 +255,13 @@ export default function AdminMembersPage() {
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white rounded-xl hover:shadow-lg font-semibold transition-all"
+            className="flex items-center gap-2 px-6 py-2 bg-linear-to-r from-[#038DCD] to-[#0369A1] text-white rounded-xl hover:shadow-lg font-semibold transition-all"
           >
             <Plus className="w-4 h-4" />
             Add Member
           </button>
         </div>
       </div>
-
-      {notification && (
-        <div
-          className={`p-4 rounded-xl border-2 ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200'
-            }`}
-        >
-          <div className="flex items-center gap-3">
-            <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center ${notification.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'
-                }`}
-            >
-              {notification.type === 'success' ? (
-                <CheckCircle className="w-6 h-6 text-white" />
-              ) : (
-                <AlertCircle className="w-6 h-6 text-white" />
-              )}
-            </div>
-            <p
-              className={`font-semibold ${notification.type === 'success' ? 'text-emerald-800' : 'text-rose-800'
-                }`}
-            >
-              {notification.message}
-            </p>
-          </div>
-        </div>
-      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl shadow-sm border-2 border-slate-200 p-6">
@@ -403,7 +384,7 @@ export default function AdminMembersPage() {
                   <tr key={member.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#038DCD] to-[#0369A1] rounded-full flex items-center justify-center">
+                        <div className="w-10 h-10 bg-linear-to-br from-[#038DCD] to-[#0369A1] rounded-full flex items-center justify-center">
                           <span className="text-white font-bold text-sm">
                             {(member.name || member.email).charAt(0).toUpperCase()}
                           </span>
@@ -479,7 +460,7 @@ export default function AdminMembersPage() {
       {(showAddModal || showEditModal) && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white p-6 flex justify-between items-center rounded-t-2xl">
+            <div className="sticky top-0 bg-linear-to-r from-[#038DCD] to-[#0369A1] text-white p-6 flex justify-between items-center rounded-t-2xl">
               <div className="flex items-center gap-3">
                 {showEditModal ? <Edit className="w-6 h-6" /> : <UserPlus className="w-6 h-6" />}
                 <h2 className="text-2xl font-bold">{showEditModal ? 'Edit User' : 'Add New User'}</h2>
@@ -598,7 +579,7 @@ export default function AdminMembersPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={isSaving}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white rounded-xl hover:shadow-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-linear-to-r from-[#038DCD] to-[#0369A1] text-white rounded-xl hover:shadow-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSaving ? (
                     <>
@@ -621,7 +602,7 @@ export default function AdminMembersPage() {
       {showViewModal && selectedMember && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white p-6 flex justify-between items-center rounded-t-2xl">
+            <div className="sticky top-0 bg-linear-to-r from-[#038DCD] to-[#0369A1] text-white p-6 flex justify-between items-center rounded-t-2xl">
               <h2 className="text-2xl font-bold">Member Details</h2>
               <button onClick={() => setShowViewModal(false)} className="p-2 hover:bg-white/10 rounded-lg">
                 <X className="w-6 h-6" />
@@ -629,7 +610,7 @@ export default function AdminMembersPage() {
             </div>
             <div className="p-6 space-y-6">
               <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl">
-                <div className="w-16 h-16 bg-gradient-to-br from-[#038DCD] to-[#0369A1] rounded-full flex items-center justify-center">
+                <div className="w-16 h-16 bg-linear-to-br from-[#038DCD] to-[#0369A1] rounded-full flex items-center justify-center">
                   <span className="text-white font-bold text-2xl">
                     {(selectedMember.name || selectedMember.email).charAt(0).toUpperCase()}
                   </span>
@@ -681,7 +662,7 @@ export default function AdminMembersPage() {
                     setShowViewModal(false);
                     openEditModal(selectedMember);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white rounded-xl hover:shadow-lg font-semibold transition-all"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-linear-to-r from-[#038DCD] to-[#0369A1] text-white rounded-xl hover:shadow-lg font-semibold transition-all"
                 >
                   <Edit className="w-5 h-5" />
                   Edit User
@@ -691,6 +672,20 @@ export default function AdminMembersPage() {
           </div>
         </div>
       )}
+
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        title="Delete User"
+        message="Are you sure you want to delete this user? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDeleteMember}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setMemberToDelete(null);
+        }}
+        type="danger"
+      />
     </div>
   );
 }

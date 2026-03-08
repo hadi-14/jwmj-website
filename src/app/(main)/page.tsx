@@ -40,10 +40,10 @@ export default function Home() {
               alt="Building Hero"
               fill
               style={{ objectFit: "cover" }}
-              className="rounded-b-[2rem]"
+              className="rounded-b-4xl"
               priority
             />
-            <div className="absolute inset-0 rounded-b-[2rem]" style={{
+            <div className="absolute inset-0 rounded-b-4xl" style={{
               background: 'linear-gradient(120deg, #03BDCD 8%, #F9D98F 99%)',
               opacity: 0.55,
             }} />
@@ -88,7 +88,7 @@ export default function Home() {
                     {service.name}
                   </Link>
                   {idx < arr.length - 1 && (
-                    <div className="w-full h-[1px] bg-gradient-to-r from-[#038DCD]/15 via-[#038DCD]/30 to-[#038DCD]/15 rounded-full" />
+                    <div className="w-full h-px bg-linear-to-r from-[#038DCD]/15 via-[#038DCD]/30 to-[#038DCD]/15 rounded-full" />
                   )}
                 </div>
               ))}
@@ -147,7 +147,7 @@ export default function Home() {
             {/* Right: Services Card */}
             <div className="relative z-10 flex flex-col justify-center items-center h-full pr-20 pt-16">
               <div
-                className="bg-white/80 rounded-2xl shadow-lg px-5 py-5 flex flex-col min-w-[240px] max-w-[260px] min-h-[370px] border border-[#038DCD]/10 justify-between"
+                className="bg-white/80 rounded-2xl shadow-lg px-5 py-5 flex flex-col min-w-60 max-w-65 min-h-92.5 border border-[#038DCD]/10 justify-between"
                 style={{ boxShadow: "0 4px 18px 0 rgba(3,141,205,0.10)" }}
               >
                 {services.map((service, idx, arr) => (
@@ -159,7 +159,7 @@ export default function Home() {
                       {service.name}
                     </Link>
                     {idx < arr.length - 1 && (
-                      <div className="w-full h-[1.5px] bg-gradient-to-r from-[#038DCD]/15 via-[#038DCD]/30 to-[#038DCD]/15 rounded-full" />
+                      <div className="w-full h-[1.5px] bg-linear-to-r from-[#038DCD]/15 via-[#038DCD]/30 to-[#038DCD]/15 rounded-full" />
                     )}
                   </div>
                 ))}
@@ -295,14 +295,14 @@ export default function Home() {
         </div>
 
 
-        <div className="bg-gradient-to-b from-zinc-300/0 to-yellow-500/25 backdrop-blur-sm">
+        <div className="bg-linear-to-b from-zinc-300/0 to-yellow-500/25 backdrop-blur-sm">
           {/* Hero Section with Three Cards */}
           <section className="relative px-3 py-4 md:px-6 lg:px-10">
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
               {/* About Us Card */}
-              <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-6 min-h-[280px] flex flex-col">
+              <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-6 min-h-70 flex flex-col">
                 <h2 className="text-sky-600 text-xl lg:text-2xl font-bold mb-4">About Us</h2>
-                <div className="text-black/60 text-xs lg:text-sm font-medium leading-relaxed flex-grow">
+                <div className="text-black/60 text-xs lg:text-sm font-medium leading-relaxed grow">
                   Jamnagar Wehvaria Memon Jamat (JWMJ), established in 1949 in Karachi, is a non-profit community organization dedicated to fostering unity, brotherhood, and welfare among its members. Guided by its constitution, JWMJ actively supports education, healthcare, housing, employment, and social services while ensuring dignity and upliftment for all. Through various committees and initiatives, it continues to strengthen the community, provide essential facilities, and work for the collective progress of its members.
                 </div>
                 <Link href="/about" className="mt-4 self-center bg-sky-600/95 hover:bg-sky-700 text-black font-bold text-sm px-4 py-2 rounded-full border border-sky-700 transition-colors">
@@ -311,9 +311,9 @@ export default function Home() {
               </div>
 
               {/* Aims & Objectives Card */}
-              <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-6 min-h-[280px] flex flex-col">
+              <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-6 min-h-70 flex flex-col">
                 <h2 className="text-emerald-400 text-xl lg:text-2xl font-bold mb-4">Aims & Objectives</h2>
-                <div className="text-black/60 text-xs lg:text-sm font-medium leading-relaxed flex-grow">
+                <div className="text-black/60 text-xs lg:text-sm font-medium leading-relaxed grow">
                   Jamnagar Wehvaria Memon Jamat, established in 1949 as a non-profit organization, aims to foster unity, brotherhood, and welfare among its members by supporting their educational, religious, social, and economic needs. The community raises funds through donations and contributions to provide essential services such as burial facilities, Jamat Khana, libraries, training centers, healthcare, and welfare institutions. It also works to strengthen social bonds, promote collective progress, and collaborate with other Memon organizations across Pakistan, while remaining strictly non-political.
                 </div>
                 <Link href="/about#aims" className="mt-4 self-center bg-emerald-400/75 hover:bg-emerald-500 text-black font-bold text-sm px-4 py-2 rounded-full border border-emerald-800 transition-colors">
@@ -322,9 +322,9 @@ export default function Home() {
               </div>
 
               {/* Vision Card */}
-              <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-6 min-h-[280px] flex flex-col">
+              <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-6 min-h-70 flex flex-col">
                 <h2 className="text-amber-300 text-xl lg:text-2xl font-bold mb-4">Vision</h2>
-                <div className="text-black/60 text-xs lg:text-sm font-medium leading-relaxed flex-grow">
+                <div className="text-black/60 text-xs lg:text-sm font-medium leading-relaxed grow">
                   The vision of Jamat is to holistically support its members by promoting education, reducing unemployment through training, providing interest-free business loans, ensuring healthcare with Islamic Takaful, offering 24/7 emergency services, facilitating Hajj/Umrah for the needy, assisting in housing, expanding and transparently distributing zakat and welfare funds, empowering sub-committees, granting voting rights to overseas members, maintaining updated member data with digital tools, updating the constitution, seeking guidance from senior members, and ensuring transparency through annual financial and performance reports.
                 </div>
                 <Link href="/about#vision" className="mt-4 self-center bg-amber-300/60 hover:bg-amber-400 text-black font-bold text-sm px-4 py-2 rounded-full border border-orange-400 transition-colors">
@@ -360,7 +360,7 @@ export default function Home() {
                       <div className="bg-white/60 rounded-xl border border-gray-300 p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 hover:bg-white/80">
                         {/* Business Logo */}
                         <div className="flex items-center justify-center mb-3">
-                          <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-[#038DCD] to-[#F9C856] rounded-lg flex items-center justify-center">
+                          <div className="w-12 h-12 lg:w-16 lg:h-16 bg-linear-to-br from-[#038DCD] to-[#F9C856] rounded-lg flex items-center justify-center">
                             <span className="text-white font-bold text-sm lg:text-lg">
                               {business.name.split(' ').map(word => word[0]).join('').slice(0, 2)}
                             </span>
@@ -453,7 +453,7 @@ export default function Home() {
                   <p className="text-black text-base lg:text-lg leading-relaxed mt-2">
                     The primary aims of JWMYO are the development of youth with strong religious belief and positive approach towards the modern world, organization of a healthcare system to arrange blood donation camps and free of cost medical camps for the members of community to facilitate a healthy lifestyle. Providing the educational opportunities to the students in the community with an intention to promote and encourage the positive approach towards higher and professional qualifications in order to achieve better jobs and work opportunities in the market.
                   </p>
-                  <div className="bg-blue-900 max-w-6xl -mx-6 lg:-mx-10 my-8 h-[1px]"></div>
+                  <div className="bg-blue-900 max-w-6xl -mx-6 lg:-mx-10 my-8 h-px"></div>
                   {/* History */}
                   <div>
                     <h2 className="text-neutral-900 text-2xl lg:text-3xl font-bold mb-4">History</h2>

@@ -63,9 +63,9 @@ export default function EventsHighlights() {
     return (
         <section className="max-w-7xl mx-auto mb-20">
             <div className="flex items-center gap-3 mb-8">
-                <div className="w-1 h-8 bg-gradient-to-b from-sky-400 to-blue-500 rounded-full"></div>
+                <div className="w-1 h-8 bg-linear-to-b from-sky-400 to-blue-500 rounded-full"></div>
                 <h2 className="text-3xl font-bold text-gray-800">Latest Events</h2>
-                <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent ml-4"></div>
+                <div className="flex-1 h-px bg-linear-to-r from-gray-300 to-transparent ml-4"></div>
             </div>
 
             {error && (
@@ -88,7 +88,7 @@ export default function EventsHighlights() {
 
                 {/* Navigation arrows */}
                 <button
-                    className="absolute -left-0 top-1/2 -translate-y-1/2 p-0 m-0 bg-transparent rounded-none w-auto h-auto flex items-center justify-center z-30 group hover:scale-110 transition-transform duration-300 ml-2 opacity-60 hover:opacity-100"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 p-0 m-0 bg-transparent rounded-none w-auto h-auto flex items-center justify-center z-30 group hover:scale-110 transition-transform duration-300 ml-2 opacity-60 hover:opacity-100"
                     onClick={() => scrollSlider('left')}
                     aria-label="Scroll left"
                     style={{ boxShadow: 'none', border: 'none' }}
@@ -99,7 +99,7 @@ export default function EventsHighlights() {
                 </button>
 
                 <button
-                    className="absolute -right-0 top-1/2 -translate-y-1/2 p-0 m-0 bg-transparent rounded-none w-auto h-auto flex items-center justify-center z-30 group hover:scale-110 transition-transform duration-300 mr-2 opacity-60 hover:opacity-100"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 p-0 m-0 bg-transparent rounded-none w-auto h-auto flex items-center justify-center z-30 group hover:scale-110 transition-transform duration-300 mr-2 opacity-60 hover:opacity-100"
                     onClick={() => scrollSlider('right')}
                     aria-label="Scroll right"
                     style={{ boxShadow: 'none', border: 'none' }}
@@ -110,8 +110,8 @@ export default function EventsHighlights() {
                 </button>
 
                 {/* Fade gradients */}
-                <div className="absolute left-0 top-0 h-full w-16 z-20 bg-gradient-to-r from-[#e7eadc] via-[#e7eadc]/20 to-transparent pointer-events-none"></div>
-                <div className="absolute right-0 top-0 h-full w-16 z-20 bg-gradient-to-l from-[#cce4ec] via-[#cce4ec]/80 to-transparent pointer-events-none"></div>
+                <div className="absolute left-0 top-0 h-full w-16 z-20 bg-linear-to-r from-[#e7eadc] via-[#e7eadc]/20 to-transparent pointer-events-none"></div>
+                <div className="absolute right-0 top-0 h-full w-16 z-20 bg-linear-to-l from-[#cce4ec] via-[#cce4ec]/80 to-transparent pointer-events-none"></div>
 
                 {/* Cards container */}
                 <div
@@ -123,7 +123,7 @@ export default function EventsHighlights() {
                         <div
                             key={event.id}
                             onClick={() => event.fb && window.open(event.fb, '_blank')}
-                            className="group event-slider-card flex-shrink-0 w-72 bg-white/40 rounded-2xl shadow-md border border-gray-100 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-3 transition-all duration-500 relative"
+                            className="group event-slider-card shrink-0 w-72 bg-white/40 rounded-2xl shadow-md border border-gray-100 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-3 transition-all duration-500 relative"
                             style={{
                                 animationDelay: `${index * 100}ms`,
                                 animation: 'slideInUp 0.6s ease-out forwards'
@@ -137,7 +137,7 @@ export default function EventsHighlights() {
                                     height={300}
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                                 {/* Date badge */}
                                 <div className="absolute top-4 right-4 bg-white/50 backdrop-blur-sm rounded-xl px-3 py-2 shadow-lg border border-primary-black/10">
@@ -166,7 +166,7 @@ export default function EventsHighlights() {
                             </div>
 
                             {/* Hover glow effect */}
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-tr from-sky-100/10 via-transparent to-blue-100/10 pointer-events-none"></div>
+                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-linear-to-tr from-sky-100/10 via-transparent to-blue-100/10 pointer-events-none"></div>
                         </div>
                     ))}
                 </div>

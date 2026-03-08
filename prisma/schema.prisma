@@ -952,18 +952,44 @@ model VerificationCode {
 }
 
 model Event {
-  id        String   @id @default(cuid()) @db.VarChar(255)
-  title     String   @db.VarChar(255)
-  desc      String   @db.LongText
-  date      DateTime @db.Date
-  category  String   @db.VarChar(100)
-  img       String   @db.VarChar(500)
-  fb        String?  @db.VarChar(500)
-  createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @updatedAt @db.DateTime(0)
+  id          String   @id @default(cuid()) @db.VarChar(255)
+  title       String   @db.VarChar(255)
+  desc        String   @db.LongText
+  date        DateTime @db.Date
+  time        String?  @db.VarChar(50) // Time in HH:MM format
+  islamicDate String?  @db.VarChar(100) // Islamic calendar date as text
+  venue       String?  @db.VarChar(500) // Event venue/location
+  category    String   @db.VarChar(100)
+  img         String   @db.VarChar(500)
+  fb          String?  @db.VarChar(500)
+  createdAt   DateTime @default(now()) @db.DateTime(0)
+  updatedAt   DateTime @updatedAt @db.DateTime(0)
+
+  registrations EventRegistration[]
 
   @@index([date])
   @@index([category])
+}
+
+model EventRegistration {
+  id          String   @id @default(cuid()) @db.VarChar(255)
+  eventId     String   @db.VarChar(255)
+  memberId    String   @db.VarChar(255) // Member computer ID
+  memberName  String   @db.VarChar(255)
+  memberEmail String?  @db.VarChar(255)
+  isHead      Boolean  @default(false) // Whether this member is the head of the family registration
+  groupId     String   @db.VarChar(255) // Groups family members together for one registration
+  status      String   @default("pending") @db.VarChar(50) // pending, approved, rejected, cancelled
+  notes       String?  @db.LongText
+  createdAt   DateTime @default(now()) @db.DateTime(0)
+  updatedAt   DateTime @updatedAt @db.DateTime(0)
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([memberId])
+  @@index([status])
+  @@index([groupId])
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
