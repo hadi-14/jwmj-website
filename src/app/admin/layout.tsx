@@ -15,6 +15,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Head from 'next/head';
 
 // ==================== PROTECTED ROUTE ====================
 
@@ -102,7 +103,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
           fixed left-0 z-40 flex flex-col
           bg-white border-r border-slate-200
           transition-transform duration-300 ease-in-out
-          ${collapsed ? 'w-[72px]' : 'w-64'}
+          ${collapsed ? 'w-18' : 'w-64'}
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
         style={{
@@ -259,17 +260,23 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   if (pathname === '/admin/login') return <>{children}</>;
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-slate-50">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        {/* Offset content by sidebar width; public header is handled by sticky positioning */}
-        <div className="lg:pl-64 transition-all duration-300">
-          <main className="p-5 sm:p-6 lg:p-8">
-            {children}
-          </main>
+    <>
+      <Head>
+        <meta name="robots" content="noindex, nofollow" />
+        <meta name="googlebot" content="noindex, nofollow" />
+      </Head>
+      <ProtectedRoute>
+        <div className="min-h-screen bg-slate-50">
+          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          {/* Offset content by sidebar width; public header is handled by sticky positioning */}
+          <div className="lg:pl-64 transition-all duration-300">
+            <main className="p-5 sm:p-6 lg:p-8">
+              {children}
+            </main>
+          </div>
         </div>
-      </div>
-    </ProtectedRoute>
+      </ProtectedRoute>
+    </>
   );
 }
 

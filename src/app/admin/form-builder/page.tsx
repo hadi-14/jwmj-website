@@ -334,7 +334,7 @@ export default function FormBuilder() {
 
             <div className="p-7 space-y-7">
               {/* PDF Upload */}
-              <div className="rounded-xl border border-dashed border-[#038DCD]/30 bg-[#038DCD]/[0.03] p-6">
+              <div className="rounded-xl border border-dashed border-[#038DCD]/30 bg-[#038DCD]/3 p-6">
                 <div className="flex items-start gap-4">
                   <div className="w-11 h-11 rounded-xl bg-[#038DCD]/10 flex items-center justify-center shrink-0">
                     <Upload className="w-5 h-5 text-[#038DCD]" />

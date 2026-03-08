@@ -126,7 +126,7 @@ export default function ForgotPassword() {
                         {error && (
                             <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
                                 <div className="flex items-start">
-                                    <div className="flex-shrink-0">
+                                    <div className="shrink-0">
                                         <span className="text-red-500 text-xl">⚠</span>
                                     </div>
                                     <div className="ml-3">

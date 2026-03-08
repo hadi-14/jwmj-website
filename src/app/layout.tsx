@@ -16,8 +16,75 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "JWMJ",
-  description: "Jamnagar Wehvaria Memon Jamat",
+  title: {
+    default: "Jamnagar Wehvaria Memon Jamat - Together for a Better Tomorrow",
+    template: "%s | JWMJ"
+  },
+  description: "Jamnagar Wehvaria Memon Jamat (JWMJ), established in 1949, is a non-profit organization providing education, healthcare, housing, and community support to its members in Karachi, Pakistan.",
+  keywords: [
+    "Jamnagar Wehvaria Memon Jamat",
+    "JWMJ",
+    "Memon community",
+    "Karachi",
+    "Pakistan",
+    "non-profit",
+    "education",
+    "healthcare",
+    "community support",
+    "JWMYO",
+    "youth organization"
+  ],
+  authors: [{ name: "Jamnagar Wehvaria Memon Jamat" }],
+  creator: "Jamnagar Wehvaria Memon Jamat",
+  publisher: "Jamnagar Wehvaria Memon Jamat",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://your-domain.com'), // Replace with your actual domain
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://your-domain.com',
+    title: 'Jamnagar Wehvaria Memon Jamat - Together for a Better Tomorrow',
+    description: 'Jamnagar Wehvaria Memon Jamat (JWMJ), established in 1949, is a non-profit organization providing education, healthcare, housing, and community support to its members.',
+    siteName: 'Jamnagar Wehvaria Memon Jamat',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Jamnagar Wehvaria Memon Jamat Logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Jamnagar Wehvaria Memon Jamat - Together for a Better Tomorrow',
+    description: 'Jamnagar Wehvaria Memon Jamat (JWMJ), established in 1949, is a non-profit organization providing education, healthcare, housing, and community support to its members.',
+    images: ['/logo.png'],
+    creator: '@jwmj_official', // Replace with actual Twitter handle if available
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-site-verification-code', // Replace with actual code
+  },
 };
 
 export default function RootLayout({
@@ -35,7 +102,7 @@ export default function RootLayout({
         </div>
         {/* Children and Footer start from 0 */}
         <div className="pt-23">
-        {children}
+          {children}
         </div>
         <Footer />
         <Graphode />

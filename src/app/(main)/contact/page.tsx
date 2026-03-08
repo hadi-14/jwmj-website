@@ -1,10 +1,16 @@
 import Image from "next/image";
 
+export const metadata = {
+    title: 'Contact Us - Jamnagar Wehvaria Memon Jamat',
+    description: 'Get in touch with Jamnagar Wehvaria Memon Jamat. Find our contact information and reach out for support and inquiries.',
+    keywords: 'contact, support, Jamnagar Wehvaria Memon Jamat, inquiries',
+};
+
 export default function SupportPage() {
     return (
         <main className="w-full min-h-screen bg-gray-50">
             {/* Hero Section */}
-            <section className="max-w-5xl mx-auto mt-10 mb-12 bg-gradient-to-br from-[#f3f6f9] to-[#fff6e6] rounded-2xl border border-slate-200 shadow-sm p-8 flex flex-col md:flex-row items-center gap-10">
+            <section className="max-w-5xl mx-auto mt-10 mb-12 bg-linear-to-br from-[#f3f6f9] to-[#fff6e6] rounded-2xl border border-slate-200 shadow-sm p-8 flex flex-col md:flex-row items-center gap-10">
                 <div className="flex-1 flex flex-col justify-center">
                     <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-4">Support</h1>
                     <p className="text-lg md:text-xl text-gray-600 mb-4">
@@ -44,7 +50,7 @@ export default function SupportPage() {
                     </div>
                     <div>
                         <label className="block text-gray-700 font-semibold mb-2">Message</label>
-                        <textarea className="w-full border border-gray-300 rounded-lg px-4 py-2 min-h-[120px] focus:outline-none focus:ring-2 focus:ring-[#038DCD]" placeholder="How can we help you?" required />
+                        <textarea className="w-full border border-gray-300 rounded-lg px-4 py-2 min-h-30 focus:outline-none focus:ring-2 focus:ring-[#038DCD]" placeholder="How can we help you?" required />
                     </div>
                     <div className="flex justify-center">
                         <button type="submit" className="bg-[#038DCD] text-white font-bold px-8 py-3 rounded-full shadow-md transition hover:bg-[#026fa1] hover:scale-105 duration-200">
