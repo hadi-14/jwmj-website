@@ -23,6 +23,8 @@ export const metadata: Metadata = {
   description: "Jamnagar Wehvaria Memon Jamat (JWMJ), established in 1949, is a non-profit organization providing education, healthcare, housing, and community support to its members in Karachi, Pakistan.",
   keywords: [
     "Jamnagar Wehvaria Memon Jamat",
+    "Jamnagar",
+    "Jamnagar Memon",
     "JWMJ",
     "Memon community",
     "Karachi",
@@ -42,14 +44,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://your-domain.com'), // Replace with your actual domain
+  metadataBase: new URL('https://jwmj.org'), // Replace with your actual domain
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://your-domain.com',
+    url: 'https://jwmj.org',
     title: 'Jamnagar Wehvaria Memon Jamat - Together for a Better Tomorrow',
     description: 'Jamnagar Wehvaria Memon Jamat (JWMJ), established in 1949, is a non-profit organization providing education, healthcare, housing, and community support to its members.',
     siteName: 'Jamnagar Wehvaria Memon Jamat',

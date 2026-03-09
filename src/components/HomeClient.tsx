@@ -473,11 +473,13 @@ export default function HomeClient() {
 
                     {/* See All Button */}
                     <div className="flex justify-center mt-2 lg:mt-4">
-                        <button className="w-32 sm:w-36 lg:w-40 h-10 sm:h-12 lg:h-14 opacity-60 bg-stone-300/75 rounded-[25px] sm:rounded-[30px] border border-neutral-500 hover:opacity-80 transition-opacity duration-200">
-                            <span className="text-black text-sm sm:text-base lg:text-lg font-bold font-inter">
-                                See All
-                            </span>
-                        </button>
+                        <Link href="/events">
+                            <button className="w-32 sm:w-36 lg:w-40 h-10 sm:h-12 lg:h-14 opacity-60 bg-stone-300/75 rounded-[25px] sm:rounded-[30px] border border-neutral-500 hover:opacity-80 transition-opacity duration-200">
+                                <span className="text-black text-sm sm:text-base lg:text-lg font-bold font-inter">
+                                    See All
+                                </span>
+                            </button>
+                        </Link>
                     </div>
                 </div>
 

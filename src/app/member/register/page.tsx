@@ -21,14 +21,78 @@ interface RegistrationFormData {
   emailVerified: boolean;
 }
 
+// Phone number formatting utility
+const formatPhoneNumber = (value: string): string => {
+  // Remove all non-digit characters
+  const digits = value.replace(/\D/g, '');
+
+  // Handle different input formats
+  if (digits.startsWith('92') && digits.length > 2) {
+    // +92 format - convert to 0 format
+    const localNumber = digits.slice(2);
+    if (localNumber.length <= 10) {
+      return `0${localNumber}`;
+    }
+  } else if (digits.startsWith('0') && digits.length > 1) {
+    // Already in 0 format
+    return digits.slice(0, 11); // Max 11 digits for Pakistani numbers
+  } else if (digits.length >= 10) {
+    // International format without +92, assume it's a local number
+    return `0${digits.slice(-10)}`;
+  }
+
+  return digits;
+};
+
+const validatePhoneNumber = (phone: string): { isValid: boolean; formatted: string; error?: string } => {
+  const digits = phone.replace(/\D/g, '');
+
+  if (!phone.trim()) {
+    return { isValid: false, formatted: phone, error: 'Phone number is required' };
+  }
+
+  if (digits.length < 10) {
+    return { isValid: false, formatted: phone, error: 'Phone number must be at least 10 digits' };
+  }
+
+  if (digits.length > 11) {
+    return { isValid: false, formatted: phone, error: 'Phone number is too long' };
+  }
+
+  // Pakistani mobile numbers typically start with 03, 3, or landlines with other prefixes
+  if (!digits.match(/^0[0-9]{9,10}$/)) {
+    return { isValid: false, formatted: phone, error: 'Invalid Pakistani phone number format' };
+  }
+
+  return { isValid: true, formatted: phone };
+};
+
 // Step 1: Initial verification with membership details
 function Step1_Verification({ onNext, formData, setFormData }: { onNext: () => void, formData: RegistrationFormData, setFormData: (data: RegistrationFormData) => void }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [verificationMethod, setVerificationMethod] = useState('membership');
+  const [phoneError, setPhoneError] = useState('');
+
+  const handlePhoneChange = (value: string) => {
+    const formatted = formatPhoneNumber(value);
+    setFormData({ ...formData, phone: formatted });
+
+    // Clear phone error when user starts typing
+    if (phoneError) setPhoneError('');
+  };
 
   const handleVerify = async () => {
     setError('');
+    setPhoneError('');
+
+    // Validate phone number
+    const phoneValidation = validatePhoneNumber(formData.phone);
+    if (!phoneValidation.isValid) {
+      setPhoneError(phoneValidation.error || 'Invalid phone number');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -174,10 +238,17 @@ function Step1_Verification({ onNext, formData, setFormData }: { onNext: () => v
         <input
           type="tel"
           value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          className="w-full px-3 py-2.5 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-[#038DCD] focus:border-[#038DCD] transition-all text-sm"
-          placeholder="+92 XXX XXXXXXX"
+          onChange={(e) => handlePhoneChange(e.target.value)}
+          className={`w-full px-3 py-2.5 border-2 rounded-xl focus:ring-2 focus:ring-[#038DCD] transition-all text-sm ${phoneError ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-[#038DCD]'
+            }`}
+          placeholder="03XX XXXXXXX or +92 3XX XXXXXXX"
         />
+        {phoneError && (
+          <p className="text-xs text-red-600 font-medium mt-1">{phoneError}</p>
+        )}
+        <p className="text-xs text-gray-500 mt-1">
+          Enter your Pakistani mobile number (e.g., 0300 1234567 or +92 300 1234567)
+        </p>
       </div>
 
       {/* Submit Button */}
@@ -458,13 +529,35 @@ function Step4_CreatePassword({ onNext, onBack, formData }: { onNext: () => void
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  const validatePassword = (pwd: string): { isValid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+
+    if (pwd.length < 8) {
+      errors.push('At least 8 characters long');
+    }
+    if (!/[a-z]/.test(pwd)) {
+      errors.push('At least one lowercase letter');
+    }
+    if (!/[A-Z]/.test(pwd)) {
+      errors.push('At least one uppercase letter');
+    }
+    if (!/\d/.test(pwd)) {
+      errors.push('At least one number');
+    }
+    if (!/[^a-zA-Z0-9]/.test(pwd)) {
+      errors.push('At least one special character (!@#$%^&*)');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  };
+
   const passwordStrength = () => {
     if (!password) return { strength: 0, label: '', color: '' };
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-    if (/\d/.test(password)) strength++;
-    if (/[^a-zA-Z0-9]/.test(password)) strength++;
+    const validation = validatePassword(password);
+    const strength = 4 - validation.errors.length;
 
     const labels = ['Weak', 'Fair', 'Good', 'Strong'];
     const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-green-500'];
@@ -474,7 +567,8 @@ function Step4_CreatePassword({ onNext, onBack, formData }: { onNext: () => void
       strength,
       label: labels[strength - 1] || '',
       color: colors[strength - 1] || '',
-      textColor: textColors[strength - 1] || ''
+      textColor: textColors[strength - 1] || '',
+      errors: validation.errors
     };
   };
 
@@ -482,12 +576,13 @@ function Step4_CreatePassword({ onNext, onBack, formData }: { onNext: () => void
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('Passwords do not match. Please make sure both password fields are identical.');
       return;
     }
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters long');
+    const validation = validatePassword(password);
+    if (!validation.isValid) {
+      setError(`Password requirements not met: ${validation.errors.join(', ')}`);
       return;
     }
 
@@ -509,10 +604,10 @@ function Step4_CreatePassword({ onNext, onBack, formData }: { onNext: () => void
         onNext();
       } else {
         const errorData = await response.json();
-        setError(errorData.message || 'Registration failed');
+        setError(errorData.message || 'Registration failed. Please try again.');
       }
     } catch {
-      setError('An error occurred. Please try again.');
+      setError('An error occurred during registration. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -524,7 +619,7 @@ function Step4_CreatePassword({ onNext, onBack, formData }: { onNext: () => void
     <div className="space-y-5">
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Password</h2>
-        <p className="text-gray-600 text-sm">Choose a strong password</p>
+        <p className="text-gray-600 text-sm">Choose a strong password for your account</p>
       </div>
 
       {/* Error Alert */}
@@ -548,7 +643,7 @@ function Step4_CreatePassword({ onNext, onBack, formData }: { onNext: () => void
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-3 py-2.5 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-[#038DCD] focus:border-[#038DCD] transition-all text-sm"
-            placeholder="Enter password"
+            placeholder="Enter a strong password"
           />
           <button
             type="button"
@@ -573,9 +668,33 @@ function Step4_CreatePassword({ onNext, onBack, formData }: { onNext: () => void
                 {strength.label}
               </span>
             </div>
-            <p className="text-[10px] text-gray-600">
-              Use 8+ characters with letters, numbers & symbols
-            </p>
+
+            {/* Password Requirements */}
+            <div className="mt-2 space-y-1">
+              <p className="text-[10px] text-gray-600 font-semibold uppercase tracking-wide">Requirements:</p>
+              <div className="grid grid-cols-1 gap-1">
+                <div className={`flex items-center gap-1 text-[10px] ${password.length >= 8 ? 'text-green-600' : 'text-gray-500'}`}>
+                  <span>{password.length >= 8 ? '✓' : '○'}</span>
+                  <span>At least 8 characters</span>
+                </div>
+                <div className={`flex items-center gap-1 text-[10px] ${/[a-z]/.test(password) ? 'text-green-600' : 'text-gray-500'}`}>
+                  <span>{/[a-z]/.test(password) ? '✓' : '○'}</span>
+                  <span>One lowercase letter (a-z)</span>
+                </div>
+                <div className={`flex items-center gap-1 text-[10px] ${/[A-Z]/.test(password) ? 'text-green-600' : 'text-gray-500'}`}>
+                  <span>{/[A-Z]/.test(password) ? '✓' : '○'}</span>
+                  <span>One uppercase letter (A-Z)</span>
+                </div>
+                <div className={`flex items-center gap-1 text-[10px] ${/\d/.test(password) ? 'text-green-600' : 'text-gray-500'}`}>
+                  <span>{/\d/.test(password) ? '✓' : '○'}</span>
+                  <span>One number (0-9)</span>
+                </div>
+                <div className={`flex items-center gap-1 text-[10px] ${/[^a-zA-Z0-9]/.test(password) ? 'text-green-600' : 'text-gray-500'}`}>
+                  <span>{/[^a-zA-Z0-9]/.test(password) ? '✓' : '○'}</span>
+                  <span>One special character (!@#$%^&*)</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -594,7 +713,7 @@ function Step4_CreatePassword({ onNext, onBack, formData }: { onNext: () => void
         />
         {confirmPassword && (
           <p className={`text-[10px] mt-1.5 font-semibold ${password === confirmPassword ? 'text-green-600' : 'text-red-600'}`}>
-            {password === confirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
+            {password === confirmPassword ? '✓ Passwords match' : '✗ Passwords do not match - please re-enter'}
           </p>
         )}
       </div>
@@ -609,7 +728,7 @@ function Step4_CreatePassword({ onNext, onBack, formData }: { onNext: () => void
         </button>
         <button
           onClick={handleSubmit}
-          disabled={loading || password !== confirmPassword || password.length < 8}
+          disabled={loading || password !== confirmPassword || !validatePassword(password).isValid}
           className="flex-1 bg-linear-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 uppercase tracking-wide text-sm"
         >
           {loading ? (
@@ -693,7 +812,7 @@ export default function MemberRegistration() {
             {/* Logo and Header */}
             <Link href="/" className="inline-block mb-8">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 p-1 bg-white rounded-xl flex items-center justify-center">
                   <Image
                     src="/logo.png"
                     alt="JWMJ Logo"
@@ -755,7 +874,7 @@ export default function MemberRegistration() {
             <div className="mt-10 p-4 bg-white/10 backdrop-blur-sm rounded-xl">
               <p className="text-white/90 text-xs font-medium mb-1">Need Help?</p>
               <p className="text-white/70 text-xs">
-                Contact support at <span className="font-bold">support@jwmj.com</span>
+                Contact support at <span className="font-bold">info@jwmj.org</span>
               </p>
             </div>
           </div>
