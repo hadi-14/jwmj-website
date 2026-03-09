@@ -28,14 +28,21 @@ function trimStr(value: string | null | undefined): string | null {
  * Helper to convert Buffer/Bytes to base64 data URL
  */
 function bufferToBase64Image(buffer: Buffer | null | undefined): string | null {
-  if (!buffer || buffer.length === 0) {
-    return null;
-  }
+  if (!buffer || buffer.length === 0) return null;
 
   try {
-    const base64 = buffer.toString('base64');
-    // Assume JPEG format - adjust if your images are different
-    return `data:image/jpeg;base64,${base64}`;
+    // Image is stored as hex string e.g. "ffd8ffe0..."
+    // Convert the buffer to a hex string first, then to real binary
+    const hexString = buffer.toString('ascii'); // reads the text "ffd8ffe0..."
+    const realBuffer = Buffer.from(hexString, 'hex'); // converts hex → real bytes
+
+    // Now detect type from real bytes
+    let mimeType = 'image/jpeg';
+    if (realBuffer[0] === 0x89 && realBuffer[1] === 0x50) mimeType = 'image/png';
+    else if (realBuffer[0] === 0x47 && realBuffer[1] === 0x49) mimeType = 'image/gif';
+    else if (realBuffer[0] === 0xFF && realBuffer[1] === 0xD8) mimeType = 'image/jpeg';
+
+    return `data:${mimeType};base64,${realBuffer.toString('base64')}`;
   } catch (error) {
     console.error('Error converting image to base64:', error);
     return null;
