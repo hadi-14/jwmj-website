@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Trash2, Edit, X, Upload, Eye } from 'lucide-react';
 import { useNotification, ConfirmationModal } from '@/components/Notification';
@@ -76,7 +76,7 @@ export default function EventManagement() {
     fb: '',
   });
 
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       const response = await fetch('/api/events');
       const data = await response.json();
@@ -87,9 +87,9 @@ export default function EventManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showNotification]);
 
-  const fetchRegistrations = async () => {
+  const fetchRegistrations = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/events/registrations');
       const data = await response.json();
@@ -100,7 +100,7 @@ export default function EventManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showNotification]);
 
   useEffect(() => {
     if (activeTab === 'events') {
@@ -108,7 +108,7 @@ export default function EventManagement() {
     } else {
       fetchRegistrations();
     }
-  }, [activeTab]);
+  }, [activeTab, fetchEvents, fetchRegistrations]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

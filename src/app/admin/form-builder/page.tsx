@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Plus, Trash2, Eye, Download, X, GripVertical, Save, Edit, Copy,
   FileText, Users, Settings, ArrowLeft,
@@ -133,7 +133,7 @@ export default function FormBuilder() {
   const [formToDelete, setFormToDelete] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const fetchForms = async () => {
+  const fetchForms = useCallback(async () => {
     try {
       setIsLoading(true);
       const res = await fetch('/api/forms');
@@ -142,7 +142,7 @@ export default function FormBuilder() {
       setForms(response.data || []);
     } catch { showNotification('Failed to load forms', 'error'); }
     finally { setIsLoading(false); }
-  };
+  }, [showNotification]);
 
   const fetchTemplates = async () => {
     try {

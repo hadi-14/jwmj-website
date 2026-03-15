@@ -351,32 +351,50 @@ export default function HomeClient() {
                                 </div>
 
                                 {/* Business Logos Grid */}
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-                                    {allCommunityBusinesses.slice(0, 5).map((business) => (
-                                        <div
-                                            key={business.id}
-                                            className="group cursor-pointer"
-                                        >
-                                            <div className="bg-white/60 rounded-xl border border-gray-300 p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 hover:bg-white/80">
-                                                {/* Business Logo */}
-                                                <div className="flex items-center justify-center mb-3">
-                                                    <div className="w-12 h-12 lg:w-16 lg:h-16 bg-linear-to-br from-[#038DCD] to-[#F9C856] rounded-lg flex items-center justify-center">
-                                                        <span className="text-white font-bold text-sm lg:text-lg">
-                                                            {business.name.split(' ').map(word => word[0]).join('').slice(0, 2)}
-                                                        </span>
+                                {allCommunityBusinesses.length === 0 ? (
+                                    <div className="text-center py-8 mb-8">
+                                        <div className="max-w-md mx-auto">
+                                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                                </svg>
+                                            </div>
+                                            <h3 className="text-lg font-bold text-gray-800 mb-2">
+                                                No Businesses Yet
+                                            </h3>
+                                            <p className="text-gray-600 text-sm mb-4">
+                                                Be the first to showcase your business in our community directory!
+                                            </p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                                        {allCommunityBusinesses.slice(0, 5).map((business) => (
+                                            <div
+                                                key={business.id}
+                                                className="group cursor-pointer"
+                                            >
+                                                <div className="bg-white/60 rounded-xl border border-gray-300 p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 hover:bg-white/80">
+                                                    {/* Business Logo */}
+                                                    <div className="flex items-center justify-center mb-3">
+                                                        <div className="w-12 h-12 lg:w-16 lg:h-16 bg-linear-to-br from-[#038DCD] to-[#F9C856] rounded-lg flex items-center justify-center">
+                                                            <span className="text-white font-bold text-sm lg:text-lg">
+                                                                {business.name.split(' ').map(word => word[0]).join('').slice(0, 2)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Business Name */}
+                                                    <div className="text-center">
+                                                        <h3 className="font-semibold text-sm lg:text-base text-gray-800 line-clamp-2 group-hover:text-[#038DCD] transition-colors">
+                                                            {business.name}
+                                                        </h3>
                                                     </div>
                                                 </div>
-
-                                                {/* Business Name */}
-                                                <div className="text-center">
-                                                    <h3 className="font-semibold text-sm lg:text-base text-gray-800 line-clamp-2 group-hover:text-[#038DCD] transition-colors">
-                                                        {business.name}
-                                                    </h3>
-                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                        ))}
+                                    </div>
+                                )}
 
                                 {/* Bottom Section with CTA */}
                                 <div className="bg-white/50 rounded-xl border border-gray-300 p-6 text-center">

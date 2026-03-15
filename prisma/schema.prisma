@@ -155,6 +155,7 @@ model Member_Information {
   parentOfParents      Parents_List?              @relation("MemberAsParent")
   parentsOf            Parents_List[]             @relation("ParentOfMember")
   spousesAsParent      Spouse_List?
+  businessAdRequests   Business_Ad_Request[]
 }
 
 model Affiliated_Mambers {
@@ -1147,4 +1148,46 @@ model tmp_member_tree_spouse {
   spouse_membership_no String?   @db.VarChar(50)
   spouse_name          String?   @db.VarChar(100)
   Spu_DeactiveDate     DateTime? @db.DateTime(0)
+}
+
+model Business_Ad_Request {
+  id                  Int                    @id @default(autoincrement())
+  memberId            Decimal                @db.Decimal(18, 0)
+  businessName        String                 @db.VarChar(200)
+  category            String                 @db.VarChar(100)
+  phone               String                 @db.VarChar(20)
+  email               String                 @db.VarChar(150)
+  website             String?                @db.VarChar(200)
+  address             String                 @db.VarChar(300)
+  established         String                 @db.VarChar(10)
+  owner               String                 @db.VarChar(150)
+  specialOffers       String?                @db.VarChar(500)
+  services            String // JSON string of services array
+  description         String                 @db.Text
+  detailedDescription String                 @db.Text
+  logo                String?                @db.VarChar(500) // URL or path to logo image
+  requestedStartDate  DateTime               @db.Date
+  requestedEndDate    DateTime               @db.Date
+  status              String                 @default("pending") @db.VarChar(20) // pending, approved, rejected
+  submittedAt         DateTime               @default(now()) @db.DateTime(0)
+  updatedAt           DateTime               @updatedAt @db.DateTime(0)
+  member              Member_Information     @relation(fields: [memberId], references: [MemComputerID])
+  approvals           Business_Ad_Approval[]
+
+  @@index([memberId])
+  @@index([status])
+}
+
+model Business_Ad_Approval {
+  id                Int                 @id @default(autoincrement())
+  requestId         Int
+  approvedBy        String              @db.VarChar(100) // Admin user ID or name
+  approvedStartDate DateTime            @db.Date
+  approvedEndDate   DateTime            @db.Date
+  adminNotes        String?             @db.Text
+  approvedAt        DateTime            @default(now()) @db.DateTime(0)
+  request           Business_Ad_Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId]) // One approval per request
+  @@index([requestId])
 }

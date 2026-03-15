@@ -56,6 +56,7 @@ const navigation = [
   { name: 'Form Builder', href: '/admin/form-builder', icon: FileText },
   { name: 'Submissions', href: '/admin/submissions', icon: Database },
   { name: 'Events', href: '/admin/events', icon: FileText },
+  { name: 'Business Ads', href: '/admin/business-ads', icon: Database },
   // { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 

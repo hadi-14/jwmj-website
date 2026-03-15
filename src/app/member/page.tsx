@@ -107,6 +107,40 @@ interface Event {
   updatedAt: string;
 }
 
+interface BusinessAdRequest {
+  id: number;
+  memberId: number;
+  businessName: string;
+  category: string;
+  phone: string;
+  email: string;
+  website: string | null;
+  address: string;
+  established: string;
+  owner: string;
+  specialOffers: string | null;
+  services: string;
+  description: string;
+  detailedDescription: string;
+  logo: string | null;
+  requestedStartDate: Date;
+  requestedEndDate: Date;
+  status: string;
+  submittedAt: Date;
+  member: {
+    MemName: string;
+    MemMembershipNo: string;
+    MemFatherName: string;
+  };
+  approvals: Array<{
+    id: number;
+    approvedStartDate: Date;
+    approvedEndDate: Date;
+    adminNotes?: string;
+    approvedAt: Date;
+  }>;
+}
+
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
 export default function MemberDashboard() {
@@ -199,6 +233,7 @@ export default function MemberDashboard() {
     { id: 'family', label: 'Family Tree' },
     { id: 'fees', label: 'Fee Status' },
     { id: 'applications', label: 'Applications' },
+    { id: 'business-ads', label: 'Business Ads' },
   ];
 
   return (
@@ -321,6 +356,7 @@ export default function MemberDashboard() {
           {activeTab === 'family' && <FamilyTreeTab familyTree={familyTree} />}
           {activeTab === 'fees' && <FeeStatusTab feeData={feeData} />}
           {activeTab === 'applications' && <ApplicationsTab applications={applications} />}
+          {activeTab === 'business-ads' && <BusinessAdsTab />}
         </div>
 
       </main>
@@ -1078,6 +1114,207 @@ function EventsTab({
         }}
         type="danger"
       />
+    </div>
+  );
+}
+
+// ─── Business Ads ──────────────────────────────────────────────────────────────
+function BusinessAdsTab() {
+  const [requests, setRequests] = useState<BusinessAdRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchBusinessAdRequests();
+  }, []);
+
+  const fetchBusinessAdRequests = async () => {
+    try {
+      const response = await fetch('/api/member/business-ads');
+      if (response.ok) {
+        const data = await response.json();
+        setRequests(data);
+      }
+    } catch (error) {
+      console.error('Error fetching business ad requests:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusInfo = (request: BusinessAdRequest) => {
+    const now = new Date();
+
+    if (request.status === 'rejected') {
+      return {
+        label: 'Rejected',
+        color: 'bg-red-100 text-red-800',
+        icon: '❌',
+        description: 'Your request was not approved'
+      };
+    }
+
+    if (request.status === 'pending') {
+      return {
+        label: 'Pending Review',
+        color: 'bg-yellow-100 text-yellow-800',
+        icon: '⏳',
+        description: 'Waiting for administrator approval'
+      };
+    }
+
+    if (request.status === 'approved') {
+      if (request.approvals && request.approvals.length > 0) {
+        const approvedStart = new Date(request.approvals[0].approvedStartDate);
+        const approvedEnd = new Date(request.approvals[0].approvedEndDate);
+
+        if (now >= approvedStart && now <= approvedEnd) {
+          return {
+            label: 'Live',
+            color: 'bg-green-100 text-green-800',
+            icon: '🟢',
+            description: `Active until ${approvedEnd.toLocaleDateString()}`
+          };
+        } else if (now > approvedEnd) {
+          return {
+            label: 'Completed',
+            color: 'bg-blue-100 text-blue-800',
+            icon: '✅',
+            description: `Ran from ${approvedStart.toLocaleDateString()} to ${approvedEnd.toLocaleDateString()}`
+          };
+        } else {
+          return {
+            label: 'Approved - Scheduled',
+            color: 'bg-emerald-100 text-emerald-800',
+            icon: '📅',
+            description: `Will go live on ${approvedStart.toLocaleDateString()}`
+          };
+        }
+      }
+    }
+
+    return {
+      label: request.status,
+      color: 'bg-gray-100 text-gray-800',
+      icon: '❓',
+      description: 'Unknown status'
+    };
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-[#038DCD]/20 border-t-[#038DCD] rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading business ad requests...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h3 className="text-xl font-bold text-gray-900 mb-1">Business Advertisement Requests</h3>
+          <p className="text-sm text-gray-400">Manage your business advertisement requests</p>
+        </div>
+        <button
+          onClick={() => window.location.href = '/member/business-ads'}
+          className="px-4 py-2 bg-[#038DCD] text-white text-sm font-bold rounded-xl hover:bg-[#026fa0] transition-colors"
+        >
+          Submit New Request
+        </button>
+      </div>
+
+      {/* Status Summary */}
+      {requests.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          {[
+            { label: 'Total', count: requests.length, color: 'bg-gray-100 text-gray-800', icon: '📊' },
+            { label: 'Pending', count: requests.filter(r => r.status === 'pending').length, color: 'bg-yellow-100 text-yellow-800', icon: '⏳' },
+            { label: 'Live', count: requests.filter(r => getStatusInfo(r).label === 'Live').length, color: 'bg-green-100 text-green-800', icon: '🟢' },
+            { label: 'Completed', count: requests.filter(r => getStatusInfo(r).label === 'Completed').length, color: 'bg-blue-100 text-blue-800', icon: '✅' },
+          ].map((stat) => (
+            <div key={stat.label} className={`${stat.color} rounded-xl p-4 text-center`}>
+              <div className="text-2xl mb-1">{stat.icon}</div>
+              <p className="text-2xl font-bold">{stat.count}</p>
+              <p className="text-sm font-medium">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {requests.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+          </div>
+          <h4 className="text-lg font-semibold text-gray-900 mb-2">No Business Ad Requests</h4>
+          <p className="text-gray-600 mb-6">You haven&apos;t submitted any business advertisement requests yet.</p>
+          <button
+            onClick={() => window.location.href = '/member/business-ads'}
+            className="px-6 py-3 bg-[#038DCD] text-white font-semibold rounded-xl hover:bg-[#026fa0] transition-colors"
+          >
+            Submit Your First Request
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {requests.map((request) => (
+            <div key={request.id} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-900">{request.businessName}</h4>
+                  <p className="text-gray-600">{request.category}</p>
+                  <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                    <span>Submitted: {new Date(request.submittedAt).toLocaleDateString()}</span>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusInfo(request).color}`}>
+                      <span>{getStatusInfo(request).icon}</span>
+                      {getStatusInfo(request).label}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">{getStatusInfo(request).description}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="font-medium text-gray-700">Requested Period:</span>
+                  <p className="text-gray-600">
+                    {new Date(request.requestedStartDate).toLocaleDateString()} - {new Date(request.requestedEndDate).toLocaleDateString()}
+                  </p>
+                </div>
+                {request.approvals && request.approvals.length > 0 && (
+                  <div>
+                    <span className="font-medium text-gray-700">Approved Period:</span>
+                    <p className="text-gray-600">
+                      {new Date(request.approvals[0].approvedStartDate).toLocaleDateString()} - {new Date(request.approvals[0].approvedEndDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {request.status === 'rejected' && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-800 text-sm">This request was rejected. You can submit a new request with updated information.</p>
+                </div>
+              )}
+
+              {request.status === 'approved' && request.approvals && request.approvals.length > 0 && (
+                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-green-800 text-sm">
+                    <span className="font-medium">✓ Approved!</span> Your business ad is scheduled to run from{' '}
+                    {new Date(request.approvals[0].approvedStartDate).toLocaleDateString()} to{' '}
+                    {new Date(request.approvals[0].approvedEndDate).toLocaleDateString()}.
+                  </p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from "next/image";
@@ -19,18 +19,7 @@ export default function ResetPassword() {
     const searchParams = useSearchParams();
     const token = searchParams.get('token');
 
-    useEffect(() => {
-        if (!token) {
-            setTokenValid(false);
-            setError('Invalid reset link. Please request a new password reset.');
-            return;
-        }
-
-        // Validate token on page load
-        validateToken();
-    }, [token]);
-
-    const validateToken = async () => {
+    const validateToken = useCallback(async () => {
         try {
             const response = await fetch('/api/auth/validate-reset-token', {
                 method: 'POST',
@@ -44,11 +33,22 @@ export default function ResetPassword() {
                 setTokenValid(false);
                 setError('This password reset link is invalid or has expired. Please request a new one.');
             }
-        } catch (err) {
+        } catch {
             setTokenValid(false);
             setError('Failed to validate reset link. Please try again.');
         }
-    };
+    }, [token]);
+
+    useEffect(() => {
+        if (!token) {
+            setTokenValid(false);
+            setError('Invalid reset link. Please request a new password reset.');
+            return;
+        }
+
+        // Validate token on page load
+        validateToken();
+    }, [token, validateToken]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
