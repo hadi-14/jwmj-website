@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { submitBusinessAdRequest } from '@/actions/business';
 import { useMemberAuth } from '@/contexts/MemberAuthContext';
+import { useNotification } from '@/components/Notification';
 
 interface MemberInfo {
     MemComputerID: number;
@@ -23,6 +24,7 @@ interface MemberInfo {
 
 export default function BusinessAdSubmission() {
     const { member: authMember } = useMemberAuth();
+    const { showNotification } = useNotification();
     const [member, setMember] = useState<MemberInfo | null>(null);
     const router = useRouter();
     const [loading, setLoading] = useState(true);
@@ -72,12 +74,12 @@ export default function BusinessAdSubmission() {
         if (file) {
             // Validate file type
             if (!file.type.startsWith('image/')) {
-                alert('Please select a valid image file.');
+                showNotification('Please select a valid image file.', 'error');
                 return;
             }
             // Validate file size (max 2MB)
             if (file.size > 2 * 1024 * 1024) {
-                alert('File size must be less than 2MB.');
+                showNotification('File size must be less than 2MB.', 'error');
                 return;
             }
             setLogoFile(file);
@@ -122,7 +124,7 @@ export default function BusinessAdSubmission() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!member) {
-            alert('Member information not available. Please try again.');
+            showNotification('Member information not available. Please try again.', 'error');
             return;
         }
 
@@ -153,14 +155,14 @@ export default function BusinessAdSubmission() {
             });
 
             if (result.success) {
-                alert('Business ad request submitted successfully! It will be reviewed by our administrators.');
+                showNotification('Business ad request submitted successfully! It will be reviewed by our administrators.', 'success');
                 router.push('/member');
             } else {
-                alert('Failed to submit request. Please try again.');
+                showNotification('Failed to submit request. Please try again.', 'error');
             }
         } catch (error) {
             console.error('Error submitting request:', error);
-            alert('An error occurred. Please try again.');
+            showNotification('An error occurred. Please try again.', 'error');
         } finally {
             setIsSubmitting(false);
         }

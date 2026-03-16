@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { getBusinessAdRequests, approveBusinessAdRequest, rejectBusinessAdRequest } from '@/actions/business';
+import { useNotification } from '@/components/Notification';
+import { ConfirmationModal } from '@/components/ConfirmationModal';
 
 interface BusinessAdApproval {
   id: number;
@@ -40,11 +42,14 @@ interface BusinessAdRequest {
 }
 
 export default function BusinessAdsManagement() {
+  const { showNotification } = useNotification();
   const [requests, setRequests] = useState<BusinessAdRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
   const [selectedRequest, setSelectedRequest] = useState<BusinessAdRequest | null>(null);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [showRejectConfirm, setShowRejectConfirm] = useState(false);
+  const [requestToReject, setRequestToReject] = useState<number | null>(null);
   const [approvalData, setApprovalData] = useState({
     startDate: '',
     endDate: '',
@@ -81,33 +86,41 @@ export default function BusinessAdsManagement() {
       );
 
       if (result.success) {
-        alert('Request approved successfully!');
+        showNotification('Request approved successfully!', 'success');
         setShowApprovalModal(false);
         setSelectedRequest(null);
         loadRequests();
       } else {
-        alert('Failed to approve request');
+        showNotification('Failed to approve request', 'error');
       }
     } catch (error) {
       console.error('Error approving request:', error);
-      alert('An error occurred');
+      showNotification('An error occurred', 'error');
     }
   };
 
   const handleReject = async (requestId: number) => {
-    if (!confirm('Are you sure you want to reject this request?')) return;
+    setRequestToReject(requestId);
+    setShowRejectConfirm(true);
+  };
+
+  const confirmReject = async () => {
+    if (!requestToReject) return;
 
     try {
-      const result = await rejectBusinessAdRequest(requestId);
+      const result = await rejectBusinessAdRequest(requestToReject);
       if (result.success) {
-        alert('Request rejected successfully!');
+        showNotification('Request rejected successfully!', 'success');
         loadRequests();
       } else {
-        alert('Failed to reject request');
+        showNotification('Failed to reject request', 'error');
       }
     } catch (error) {
       console.error('Error rejecting request:', error);
-      alert('An error occurred');
+      showNotification('An error occurred', 'error');
+    } finally {
+      setShowRejectConfirm(false);
+      setRequestToReject(null);
     }
   };
 
@@ -339,6 +352,20 @@ export default function BusinessAdsManagement() {
           </div>
         </div>
       )}
+
+      <ConfirmationModal
+        isOpen={showRejectConfirm}
+        title="Reject Business Ad Request"
+        message="Are you sure you want to reject this business advertisement request? This action cannot be undone."
+        confirmText="Reject"
+        cancelText="Cancel"
+        onConfirm={confirmReject}
+        onCancel={() => {
+          setShowRejectConfirm(false);
+          setRequestToReject(null);
+        }}
+        type="danger"
+      />
     </div>
   );
 }
