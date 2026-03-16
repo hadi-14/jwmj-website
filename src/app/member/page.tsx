@@ -819,13 +819,6 @@ function EventsTab({
     );
   }
 
-  const fetchRegistrations = async () => {
-    try {
-      const response = await fetch('/api/events/register', { credentials: 'include' });
-      if (response.ok) { const data = await response.json(); setRegistrations(data); }
-    } catch (error) { console.error('Error fetching registrations:', error); }
-  };
-
   const handleRegister = async (eventId: string) => {
     const familyMembers = {
       spouse: selectedSpouse,
