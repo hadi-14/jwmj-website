@@ -59,7 +59,7 @@ export default function MemberLogin() {
             {error && (
               <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
                 <div className="flex items-start">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <span className="text-red-500 text-xl">⚠</span>
                   </div>
                   <div className="ml-3">
@@ -150,7 +150,7 @@ export default function MemberLogin() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-4 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 uppercase tracking-wide"
+              className="w-full bg-linear-to-r from-[#038DCD] to-[#03BDCD] text-white font-bold py-4 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 uppercase tracking-wide"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">
@@ -165,7 +165,7 @@ export default function MemberLogin() {
         </div>
 
         {/* Register Section */}
-        <div className="bg-gradient-to-br from-[#F9C856]/10 to-[#F9D98F]/10 rounded-2xl border-2 border-[#F9C856]/30 p-6 mb-6">
+        <div className="bg-linear-to-br from-[#F9C856]/10 to-[#F9D98F]/10 rounded-2xl border-2 border-[#F9C856]/30 p-6 mb-6">
           <div className="text-center">
             <p className="text-gray-700 font-semibold mb-4">New to JWMJ?</p>
             <Link

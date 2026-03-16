@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useMemberAuth } from '@/contexts/MemberAuthContext';
 import { useNotification, ConfirmationModal } from '@/components/Notification';
 import Image from "next/image";
@@ -150,6 +151,7 @@ export default function MemberDashboard() {
   const [feeData, setFeeData] = useState<FeeData | null>(null);
   const [familyTree, setFamilyTree] = useState<FamilyTree | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
+  const [availableForms, setAvailableForms] = useState<{ id: string; name: string; formType: string }[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
@@ -165,7 +167,9 @@ export default function MemberDashboard() {
     else if (activeTab === 'events' && events.length === 0) fetchEvents();
     // Also load family tree for events tab since it's needed for registration
     if (activeTab === 'events' && !familyTree) fetchFamilyTree();
-  }, [activeTab, applications.length, familyTree, feeData, events.length]);
+
+    if (activeTab === 'applications' && availableForms.length === 0) fetchAvailableForms();
+  }, [activeTab, applications.length, availableForms.length, familyTree, feeData, events.length]);
 
   const fetchMemberInfo = async () => {
     try {
@@ -195,6 +199,18 @@ export default function MemberDashboard() {
       const response = await fetch('/api/member/applications');
       if (response.ok) { const data = await response.json(); setApplications(data.applications || []); }
     } catch (error) { console.error('Error fetching applications:', error); }
+  };
+
+  const fetchAvailableForms = async () => {
+    try {
+      const response = await fetch('/api/forms?isActive=true&limit=50');
+      if (response.ok) {
+        const data = await response.json();
+        setAvailableForms(data.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching available forms:', error);
+    }
   };
 
   const fetchEvents = async () => {
@@ -244,8 +260,14 @@ export default function MemberDashboard() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           {/* Logo / brand */}
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-[#038DCD] to-[#F9C856] flex items-center justify-center">
-              <span className="text-white font-bold text-sm">J</span>
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center mx-auto">
+              <Image
+                src="/logo.png"
+                alt="JWMJ Logo"
+                width={40}
+                height={40}
+                className="object-contain"
+              />
             </div>
             <span className="font-bold text-gray-900 text-sm hidden sm:block">Member Portal</span>
           </div>
@@ -355,7 +377,7 @@ export default function MemberDashboard() {
           {activeTab === 'events' && <EventsTab events={events} member={member} familyTree={familyTree} showNotification={showNotification} showDeleteConfirm={showDeleteConfirm} setShowDeleteConfirm={setShowDeleteConfirm} eventToDelete={eventToDelete} setEventToDelete={setEventToDelete} />}
           {activeTab === 'family' && <FamilyTreeTab familyTree={familyTree} />}
           {activeTab === 'fees' && <FeeStatusTab feeData={feeData} />}
-          {activeTab === 'applications' && <ApplicationsTab applications={applications} />}
+          {activeTab === 'applications' && <ApplicationsTab applications={applications} availableForms={availableForms} />}
           {activeTab === 'business-ads' && <BusinessAdsTab />}
         </div>
 
@@ -649,7 +671,17 @@ function FeeStatusTab({ feeData }: { feeData: FeeData | null }) {
 }
 
 // ─── Applications ─────────────────────────────────────────────────────────────
-function ApplicationsTab({ applications }: { applications: Application[] }) {
+function ApplicationsTab({ applications, availableForms }: { applications: Application[]; availableForms: { id: string; name: string; formType: string }[] }) {
+  // Show loading if data hasn't been fetched yet
+  if (applications.length === 0 && availableForms.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 gap-3">
+        <div className="w-8 h-8 border-[3px] border-[#038DCD]/20 border-t-[#038DCD] rounded-full animate-spin" />
+        <p className="text-sm font-semibold text-gray-400">Loading applications…</p>
+      </div>
+    );
+  }
+
   const statusCls = (s: string) => {
     switch (s.toLowerCase()) {
       case 'approved': return 'bg-emerald-100 text-emerald-700';
@@ -666,19 +698,46 @@ function ApplicationsTab({ applications }: { applications: Application[] }) {
           <h3 className="text-xl font-bold text-gray-900 mb-1">My Applications</h3>
           <p className="text-sm text-gray-400">Track your submitted applications and their status</p>
         </div>
-        <button className="px-4 py-2 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-gray-800 transition-colors">
+        <Link
+          href="/forms"
+          className="px-4 py-2 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-gray-800 transition-colors"
+        >
           + New Application
-        </button>
+        </Link>
       </div>
+
+      {availableForms.length > 0 && (
+        <div className="mb-6">
+          <p className="text-sm font-semibold text-gray-700 mb-2">Available Forms</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {availableForms.map((form) => (
+              <Link
+                key={form.id}
+                href={`/forms/${encodeURIComponent(form.formType)}`}
+                className="flex items-center justify-between border border-gray-100 bg-gray-50 rounded-xl p-4 hover:border-gray-200 hover:shadow-sm transition"
+              >
+                <div>
+                  <p className="font-semibold text-gray-900">{form.name}</p>
+                  <p className="text-xs text-gray-400">{form.formType}</p>
+                </div>
+                <span className="text-xs font-bold text-[#038DCD]">Fill →</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {!applications || applications.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-5xl mb-3 opacity-50">📝</p>
           <p className="font-bold text-gray-900 text-lg mb-2">No Applications Yet</p>
           <p className="text-sm text-gray-400 mb-5">You haven&apos;t submitted any applications yet.</p>
-          <button className="px-5 py-2.5 bg-[#038DCD] text-white text-sm font-bold rounded-full hover:bg-[#026fa0] transition-colors">
+          <Link
+            href="/forms"
+            className="px-5 py-2.5 bg-[#038DCD] text-white text-sm font-bold rounded-full hover:bg-[#026fa0] transition-colors"
+          >
             Submit New Application
-          </button>
+          </Link>
         </div>
       ) : (
         <div className="space-y-3">
@@ -742,6 +801,23 @@ function EventsTab({
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   useEffect(() => { fetchRegistrations(); }, []);
+
+  const fetchRegistrations = async () => {
+    try {
+      const response = await fetch('/api/events/register', { credentials: 'include' });
+      if (response.ok) { const data = await response.json(); setRegistrations(data); }
+    } catch (error) { console.error('Error fetching registrations:', error); }
+  };
+
+  // Show loading if events haven't been fetched yet
+  if (events.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 gap-3">
+        <div className="w-8 h-8 border-[3px] border-[#038DCD]/20 border-t-[#038DCD] rounded-full animate-spin" />
+        <p className="text-sm font-semibold text-gray-400">Loading events…</p>
+      </div>
+    );
+  }
 
   const fetchRegistrations = async () => {
     try {
@@ -1202,11 +1278,9 @@ function BusinessAdsTab() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-[#038DCD]/20 border-t-[#038DCD] rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading business ad requests...</p>
-        </div>
+      <div className="flex flex-col items-center justify-center py-16 gap-3">
+        <div className="w-8 h-8 border-[3px] border-[#038DCD]/20 border-t-[#038DCD] rounded-full animate-spin" />
+        <p className="text-sm font-semibold text-gray-400">Loading business ads…</p>
       </div>
     );
   }

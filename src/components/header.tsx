@@ -13,7 +13,7 @@ export default function Header() {
     return (
         <header className="w-full top-0 left-0 z-50">
             {/* Blue Ribbon */}
-            <div className="h-8 bg-gradient-to-r from-primary-blue to-accent-navy relative overflow-hidden justify-between">
+            <div className="h-8 bg-linear-to-r from-primary-blue to-accent-navy relative overflow-hidden justify-between">
                 {/* First animated text */}
                 <span
                     className="absolute left-0 top-1/2 -translate-y-1/2 text-white italic text-base whitespace-nowrap"
