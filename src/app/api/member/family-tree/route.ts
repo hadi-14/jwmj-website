@@ -28,6 +28,7 @@ interface MemberNode {
 interface FamilyTreeResponse {
   self: MemberNode;
   spouse: MemberNode[];
+  spouseParents: MemberNode[];
   children: MemberNode[];
   grandchildren: MemberNode[];
   parents: MemberNode[];
@@ -75,6 +76,24 @@ function toMemberNode(member: {
   };
 }
 
+function createUnregisteredNameNode(name: string, relation: string): MemberNode {
+  const idSafe = name.replace(/[\s\\/\\#\?\%]/g, '-').toLowerCase().slice(0, 40);
+  return {
+    id: `unreg-${relation.toLowerCase().replace(/\s+/g, '-')}-${idSafe}`,
+    name: name.trim() || null,
+    membershipNo: null,
+    dob: null,
+    cnic: null,
+    genderCode: null,
+    fatherName: null,
+    motherName: null,
+    isDeceased: false,
+    deceasedDate: null,
+    relationToSelf: relation,
+    isRegisteredMember: false,
+  };
+}
+
 /**
  * Get member's basic info
  */
@@ -99,24 +118,43 @@ async function getMemberInfo(memberId: Decimal) {
  * Get all spouses of a member
  */
 async function getSpouses(memberId: Decimal): Promise<MemberNode[]> {
-  // Find where this member is listed as spouse
+  // Find spouse records where member is either side of spouse relationship
   const spouseRecords = await prisma.spouse_List.findMany({
     where: {
-      Spu_WehvariaNo: memberId,
-      OR: [
-        { Spu_Deactive: null },
-        { Spu_Deactive: 0 }
+      AND: [
+        {
+          OR: [
+            { Spu_ParentMemberID: memberId },
+            { Spu_MemberId: memberId }
+          ]
+        },
+        {
+          OR: [
+            { Spu_Deactive: null },
+            { Spu_Deactive: 0 }
+          ]
+        }
       ]
     },
     select: {
+      Spu_ParentMemberID: true,
       Spu_MemberId: true,
+      Spu_WehvariaNo: true,
     }
   });
 
   if (spouseRecords.length === 0) return [];
 
-  // Get full member info for spouses
-  const spouseIds = spouseRecords.map(s => s.Spu_MemberId);
+  // Map the related spouse ID (the opposite side of the relationship)
+  const spouseIds = spouseRecords
+    .map(r => {
+      if (r.Spu_ParentMemberID?.toString() === memberId.toString()) return r.Spu_MemberId || r.Spu_WehvariaNo;
+      if (r.Spu_MemberId?.toString() === memberId.toString()) return r.Spu_ParentMemberID || r.Spu_WehvariaNo;
+      return null;
+    })
+    .filter((id): id is Decimal => id !== null);
+
+  // console.log('Spouse IDs:', spouseIds, spouseRecords);
   const spouses = await prisma.member_Information.findMany({
     where: {
       MemComputerID: { in: spouseIds }
@@ -135,6 +173,47 @@ async function getSpouses(memberId: Decimal): Promise<MemberNode[]> {
   });
 
   return spouses.map(s => toMemberNode(s, 'Spouse'));
+}
+
+/**
+ * Get all parents of spouse members
+ */
+async function getSpouseParents(spouseIds: Decimal[]): Promise<MemberNode[]> {
+  if (spouseIds.length === 0) return [];
+
+  const spouseParents: MemberNode[] = [];
+  const addedParentIds = new Set<string>();
+
+  // Lookup spouse info for fallback names if no parent rows.
+  if (spouseIds.length > 0 && spouseParents.length === 0) {
+    const spouseInfos = await prisma.member_Information.findMany({
+      where: { MemComputerID: { in: spouseIds } },
+      select: {
+        MemComputerID: true,
+        MemFatherName: true,
+        MemMotherName: true,
+      },
+    });
+
+    spouseInfos.forEach(sp => {
+      if (sp.MemFatherName) {
+        const node = createUnregisteredNameNode(sp.MemFatherName, 'Father-in-law');
+        if (!addedParentIds.has(node.id)) {
+          spouseParents.push(node);
+          addedParentIds.add(node.id);
+        }
+      }
+      if (sp.MemMotherName) {
+        const node = createUnregisteredNameNode(sp.MemMotherName, 'Mother-in-law');
+        if (!addedParentIds.has(node.id)) {
+          spouseParents.push(node);
+          addedParentIds.add(node.id);
+        }
+      }
+    });
+  }
+
+  return spouseParents;
 }
 
 /**
@@ -169,208 +248,31 @@ async function getChildren(memberId: Decimal): Promise<MemberNode[]> {
 }
 
 /**
- * Create a parent node from name strings (when parent is not a registered member)
- */
-function createUnregisteredParentNode(
-  name: string | null,
-  relation: 'Father' | 'Mother',
-  genderCode?: string
-): MemberNode | null {
-  if (!name || name.trim() === '' || name.trim() === '-' || name.trim().toLowerCase() === 'n/a') {
-    return null;
-  }
-
-  return {
-    id: `unregistered-${relation.toLowerCase()}-${Date.now()}`,
-    name: name.trim(),
-    membershipNo: null,
-    dob: null,
-    cnic: null,
-    genderCode: genderCode || (relation === 'Father' ? '1' : '2'),
-    fatherName: null,
-    motherName: null,
-    isDeceased: false,
-    deceasedDate: null,
-    relationToSelf: relation,
-    isRegisteredMember: false,
-  };
-}
-
-/**
- * Get all parents of a member - Enhanced to get data from Member_Information
+ * Get all parents of a member - Only registered relationships
  */
 async function getParents(memberId: Decimal): Promise<MemberNode[]> {
   const parents: MemberNode[] = [];
   const addedParentIds = new Set<string>();
 
-  // Get the member's own record to extract father/mother names
-  const memberInfo = await prisma.member_Information.findUnique({
-    where: { MemComputerID: memberId },
-    select: {
-      MemFatherName: true,
-      MemMotherName: true,
-    }
-  });
-
-  // Method 1: Try Parents_List table
-  const parentRelations = await prisma.parents_List.findMany({
-    where: {
-      Par_MemberID: memberId,
-      OR: [
-        { Par_Deactive: null },
-        { Par_Deactive: 0 }
-      ]
-    },
-    include: {
-      parent: {
-        select: {
-          MemComputerID: true,
-          MemName: true,
-          MemMembershipNo: true,
-          MemDOB: true,
-          MemCNIC: true,
-          MemGenderCode: true,
-          MemFatherName: true,
-          MemMotherName: true,
-          Mem_DeceasedDate: true,
-        },
-      },
-    },
-  });
-
-  parentRelations
-    .filter(p => p.parent !== null)
-    .forEach(p => {
-      const parentId = p.parent!.MemComputerID.toString();
-      if (!addedParentIds.has(parentId)) {
-        const relation = p.parent!.MemGenderCode?.toString() === '2' ? 'Mother' : 'Father';
-        parents.push(toMemberNode(p.parent!, relation));
-        addedParentIds.add(parentId);
-      }
-    });
-
-  // Method 2: Check Children_List table (where current member is the child)
-  const childRecord = await prisma.children_List.findFirst({
-    where: {
-      Chd_memberId: memberId,
-      OR: [
-        { Chd_deactive: null },
-        { Chd_deactive: 0 }
-      ]
-    },
-    select: {
-      Chd_MotherMemberID: true,
-      Chd_FatherMemberID: true,
-    }
-  });
-
-  if (childRecord) {
-    const parentIds: Decimal[] = [];
-    if (childRecord.Chd_MotherMemberID) parentIds.push(childRecord.Chd_MotherMemberID);
-    if (childRecord.Chd_FatherMemberID) parentIds.push(childRecord.Chd_FatherMemberID);
-
-    if (parentIds.length > 0) {
-      const parentMembers = await prisma.member_Information.findMany({
-        where: {
-          MemComputerID: { in: parentIds }
-        },
-        select: {
-          MemComputerID: true,
-          MemName: true,
-          MemMembershipNo: true,
-          MemDOB: true,
-          MemCNIC: true,
-          MemGenderCode: true,
-          MemFatherName: true,
-          MemMotherName: true,
-          Mem_DeceasedDate: true,
+  // Lookup member info for fallback names if no parent rows.
+  // console.log('Parents found from relationships:', parents, memberId.toString());
+  if (memberId && parents.length === 0) {
+    const memberInfo = await getMemberInfo(memberId);
+    // console.log('Member info for parent fallback:', memberInfo);
+    if (memberInfo) {
+      if (memberInfo.MemFatherName) {
+        const node = createUnregisteredNameNode(memberInfo.MemFatherName, 'Father');
+        if (!addedParentIds.has(node.id)) {
+          parents.push(node);
+          addedParentIds.add(node.id);
         }
-      });
-
-      parentMembers.forEach(pm => {
-        const parentId = pm.MemComputerID.toString();
-        if (!addedParentIds.has(parentId)) {
-          const relation = pm.MemGenderCode?.toString() === '2' ? 'Mother' : 'Father';
-          parents.push(toMemberNode(pm, relation));
-          addedParentIds.add(parentId);
+      }
+      if (memberInfo.MemMotherName) {
+        const node = createUnregisteredNameNode(memberInfo.MemMotherName, 'Mother');
+        if (!addedParentIds.has(node.id)) {
+          parents.push(node);
+          addedParentIds.add(node.id);
         }
-      });
-    }
-  }
-
-  // Method 3: If parents still not found, use father/mother names from Member_Information
-  // Check if we have a father in the list
-  const hasFather = parents.some(p => p.relationToSelf === 'Father');
-  const hasMother = parents.some(p => p.relationToSelf === 'Mother');
-
-  if (!hasFather && memberInfo?.MemFatherName) {
-    // Try to find father by name in the database
-    const fatherByName = await prisma.member_Information.findFirst({
-      where: {
-        MemName: memberInfo.MemFatherName,
-        MemGenderCode: 1, // Male
-      },
-      select: {
-        MemComputerID: true,
-        MemName: true,
-        MemMembershipNo: true,
-        MemDOB: true,
-        MemCNIC: true,
-        MemGenderCode: true,
-        MemFatherName: true,
-        MemMotherName: true,
-        Mem_DeceasedDate: true,
-      }
-    });
-
-    if (fatherByName && !addedParentIds.has(fatherByName.MemComputerID.toString())) {
-      parents.push(toMemberNode(fatherByName, 'Father'));
-      addedParentIds.add(fatherByName.MemComputerID.toString());
-    } else {
-      // Create unregistered parent node
-      const unregisteredFather = createUnregisteredParentNode(
-        memberInfo.MemFatherName,
-        'Father',
-        '1'
-      );
-      if (unregisteredFather) {
-        parents.push(unregisteredFather);
-      }
-    }
-  }
-
-  if (!hasMother && memberInfo?.MemMotherName) {
-    // Try to find mother by name in the database
-    const motherByName = await prisma.member_Information.findFirst({
-      where: {
-        MemName: memberInfo.MemMotherName,
-        MemGenderCode: 2, // Female
-      },
-      select: {
-        MemComputerID: true,
-        MemName: true,
-        MemMembershipNo: true,
-        MemDOB: true,
-        MemCNIC: true,
-        MemGenderCode: true,
-        MemFatherName: true,
-        MemMotherName: true,
-        Mem_DeceasedDate: true,
-      }
-    });
-
-    if (motherByName && !addedParentIds.has(motherByName.MemComputerID.toString())) {
-      parents.push(toMemberNode(motherByName, 'Mother'));
-      addedParentIds.add(motherByName.MemComputerID.toString());
-    } else {
-      // Create unregistered parent node
-      const unregisteredMother = createUnregisteredParentNode(
-        memberInfo.MemMotherName,
-        'Mother',
-        '2'
-      );
-      if (unregisteredMother) {
-        parents.push(unregisteredMother);
       }
     }
   }
@@ -467,13 +369,13 @@ async function getGrandchildren(childrenIds: Decimal[]): Promise<MemberNode[]> {
 }
 
 /**
- * Get grandparents (parents of parents) - Enhanced to get more data
+ * Get grandparents (parents of parents) - Only registered relationships
  */
 async function getGrandparents(parentIds: Decimal[], parents: MemberNode[]): Promise<MemberNode[]> {
   const grandparents: MemberNode[] = [];
   const addedGrandparentIds = new Set<string>();
 
-  // Get registered grandparents from Parents_List
+  // Get registered grandparents from Parents_List only
   if (parentIds.length > 0) {
     const grandparentRelations = await prisma.parents_List.findMany({
       where: {
@@ -492,8 +394,6 @@ async function getGrandparents(parentIds: Decimal[], parents: MemberNode[]): Pro
             MemDOB: true,
             MemCNIC: true,
             MemGenderCode: true,
-            MemFatherName: true,
-            MemMotherName: true,
             Mem_DeceasedDate: true,
           },
         },
@@ -505,37 +405,43 @@ async function getGrandparents(parentIds: Decimal[], parents: MemberNode[]): Pro
       .forEach(gp => {
         const gpId = gp.parent!.MemComputerID.toString();
         if (!addedGrandparentIds.has(gpId)) {
-          grandparents.push(toMemberNode(gp.parent!, 'Grandparent'));
+          // Create node without fatherName/motherName (those are just unverified text)
+          const grandparentNode: MemberNode = {
+            id: gpId,
+            name: gp.parent!.MemName?.trim() || null,
+            membershipNo: gp.parent!.MemMembershipNo?.trim() || null,
+            dob: gp.parent!.MemDOB || null,
+            cnic: gp.parent!.MemCNIC?.toString() || null,
+            genderCode: gp.parent!.MemGenderCode?.toString() || null,
+            fatherName: null,
+            motherName: null,
+            isDeceased: gp.parent!.Mem_DeceasedDate !== null || false,
+            deceasedDate: gp.parent!.Mem_DeceasedDate || null,
+            relationToSelf: 'Grandparent',
+            isRegisteredMember: true,
+          };
+          grandparents.push(grandparentNode);
           addedGrandparentIds.add(gpId);
         }
       });
   }
 
-  // Get grandparent names from registered parents' records
-  for (const parent of parents) {
-    if (parent.isRegisteredMember && parent.fatherName) {
-      const unregisteredGrandfather = createUnregisteredParentNode(
-        parent.fatherName,
-        'Father',
-        '1'
-      );
-      if (unregisteredGrandfather && !addedGrandparentIds.has(unregisteredGrandfather.id)) {
-        unregisteredGrandfather.relationToSelf = 'Grandparent';
-        grandparents.push(unregisteredGrandfather);
-        addedGrandparentIds.add(unregisteredGrandfather.id);
+  // If no registered grandparents found, fallback to parent name fields from input parent nodes
+  if (grandparents.length === 0 && parents.length > 0) {
+    for (const parent of parents) {
+      if (parent.fatherName) {
+        const gp = createUnregisteredNameNode(parent.fatherName, 'Grandparent');
+        if (!addedGrandparentIds.has(gp.id)) {
+          grandparents.push(gp);
+          addedGrandparentIds.add(gp.id);
+        }
       }
-    }
-
-    if (parent.isRegisteredMember && parent.motherName) {
-      const unregisteredGrandmother = createUnregisteredParentNode(
-        parent.motherName,
-        'Mother',
-        '2'
-      );
-      if (unregisteredGrandmother && !addedGrandparentIds.has(unregisteredGrandmother.id)) {
-        unregisteredGrandmother.relationToSelf = 'Grandparent';
-        grandparents.push(unregisteredGrandmother);
-        addedGrandparentIds.add(unregisteredGrandmother.id);
+      if (parent.motherName) {
+        const gp = createUnregisteredNameNode(parent.motherName, 'Grandparent');
+        if (!addedGrandparentIds.has(gp.id)) {
+          grandparents.push(gp);
+          addedGrandparentIds.add(gp.id);
+        }
       }
     }
   }
@@ -588,6 +494,11 @@ export async function GET() {
       getParents(memberDecimal),
     ]);
 
+    // Get spouse IDs for further queries
+    const spouseIds = spouses
+      .filter(s => s.isRegisteredMember)
+      .map(s => new Decimal(s.id));
+
     // Get IDs for next generation queries (only registered members)
     const childrenIds = children
       .filter(c => c.isRegisteredMember)
@@ -597,9 +508,10 @@ export async function GET() {
       .map(p => new Decimal(p.id));
 
     // Fetch extended family
-    const [grandchildren, siblings] = await Promise.all([
+    const [grandchildren, siblings, spouseParents] = await Promise.all([
       getGrandchildren(childrenIds),
       getSiblings(memberDecimal, parentIds),
+      getSpouseParents(spouseIds),
     ]);
 
     // Get grandparents (pass parents array for name extraction)
@@ -609,6 +521,7 @@ export async function GET() {
     const familyTree: FamilyTreeResponse = {
       self: toMemberNode(member, 'Self'),
       spouse: spouses,
+      spouseParents: spouseParents,
       children: children,
       grandchildren: grandchildren,
       parents: parents,

@@ -92,8 +92,8 @@ export default function Sidebar({
 
             {/* Sidebar */}
             <aside
-                className={`fixed left-0 z-40 w-72 ${themeConfig.bg} border-r-2 ${themeConfig.border} transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:${heightClass} ${isOpen ? 'translate-x-0' : '-translate-x-full'
-                    } ${topOffset ? `${topClass} h-[calc(100vh-4rem)]` : 'top-0 h-full'}`}
+                className={`fixed left-0 z-40 w-72 ${themeConfig.bg} border-r-2 ${themeConfig.border} transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:${heightClass} flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'
+                    } ${topOffset ? `${topClass} h-[calc(100vh-4rem)]` : 'top-0 h-screen'}`}
             >
                 {/* Logo */}
                 <div className="h-16 flex items-center justify-between px-5 sm:px-6 border-b-2 border-inherit">
@@ -173,8 +173,8 @@ export default function Sidebar({
                     </ul>
                 </nav>
 
-                {/* Logout Button */}
-                <div className={`p-4 border-t-2 border-inherit`}>
+                {/* Logout Button - Sticky at bottom */}
+                <div className={`sticky bottom-0 p-4 border-t-2 border-inherit ${themeConfig.bg}`}>
                     <button
                         onClick={onLogout}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${themeConfig.logoutText}`}
