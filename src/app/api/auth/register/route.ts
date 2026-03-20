@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
             const user = await tx.user.create({
                 data: {
                     email: sanitizedEmail,
-                    name: memberComputerId,
+                    name: member.MemName || 'Member',
                     password: hashedPassword,
                     role: 'MEMBER'
                 }
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
                         }
                     }
                 });
-                
+
                 await tx.member_Emailid.create({
                     data: {
                         MEM_MemComputerID: new Decimal(memberComputerId),

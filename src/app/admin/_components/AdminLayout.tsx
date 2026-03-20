@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import Sidebar from '@/components/Sidebar';
 import {
   LayoutDashboard,
   Users,
@@ -170,7 +171,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 // ==================== SIDEBAR ====================
 
-const navigation = [
+const adminNavigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Members', href: '/admin/members', icon: Users },
   { name: 'Events', href: '/admin/events', icon: Bell },
@@ -180,86 +181,29 @@ const navigation = [
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
-function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const pathname = usePathname();
+const adminSidebarLogo = (
+  <div className="flex items-center gap-2" key="admin-logo">
+    <div className="w-8 h-8 bg-gradient-to-br from-[#038DCD] to-[#0369A1] rounded-lg flex items-center justify-center">
+      <Shield className="w-5 h-5 text-white" />
+    </div>
+  </div>
+);
+
+function AdminSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { user, logout } = useAuth();
 
   return (
-    <>
-      {/* Mobile overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
-          onClick={onClose}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] w-64 bg-white border-r-2 border-slate-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:top-0 lg:h-full ${isOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
-      >
-        {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-6 border-b-2 border-slate-200">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#038DCD] to-[#0369A1] rounded-lg flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-lg text-slate-900">JWMJ Admin</span>
-          </div>
-          <button onClick={onClose} className="lg:hidden p-1 hover:bg-slate-100 rounded-lg">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* User Info */}
-        <div className="p-4 border-b-2 border-slate-200">
-          <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-amber-50 rounded-xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#038DCD] to-[#0369A1] rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-slate-900 truncate">{user?.name || 'Admin User'}</p>
-              <p className="text-xs text-slate-600 truncate">{user?.email || 'admin@jwmj.com'}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
-          {navigation.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
-
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={() => onClose()}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${isActive
-                  ? 'bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white shadow-lg'
-                  : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span>{item.name}</span>
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Logout Button */}
-        <div className="p-4 border-t-2 border-slate-200">
-          <button
-            onClick={logout}
-            className="w-full flex items-center gap-3 px-4 py-3 text-rose-700 hover:bg-rose-50 rounded-xl font-semibold transition-all"
-          >
-            <LogOut className="w-5 h-5" />
-            <span>Logout</span>
-          </button>
-        </div>
-      </aside>
-    </>
+    <Sidebar
+      isOpen={isOpen}
+      onClose={onClose}
+      title="JWMJ Admin"
+      items={adminNavigation}
+      user={user ? { name: user.name, email: user.email } : null}
+      onLogout={logout}
+      theme="admin"
+      topOffset={true}
+      logoIcon={adminSidebarLogo}
+    />
   );
 }
 
@@ -370,7 +314,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <AuthProvider>
       <ProtectedRoute>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-amber-50/20 flex flex-col lg:flex-row">
-          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
           <div className="flex-1 flex flex-col">
             <Header onMenuClick={() => setSidebarOpen(true)} />

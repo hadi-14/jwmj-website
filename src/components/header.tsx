@@ -13,7 +13,7 @@ export default function Header() {
     const [announcement, setAnnouncement] = useState<AnnouncementData>({
         messages: ["Welcome to JWMJ! • Website Under Construction!"],
         enabled: true
-});
+    });
 
     useEffect(() => {
         const fetchAnnouncement = async () => {
@@ -56,7 +56,7 @@ export default function Header() {
 
                     {/* Second animated text - offset by half the animation duration */}
                     <span
-                        className="absolute left-0 top-1/2 -translate-y-1/2 text-white italic text-base whitespace-nowrap"
+                        className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 text-white italic text-base whitespace-nowrap"
                         style={{
                             animation: "marquee 16s linear infinite",
                             animationDelay: "-8s"
@@ -69,14 +69,14 @@ export default function Header() {
 
             <div className="w-full relative flex items-center justify-between shadow-lg shadow-primary-black opacity-80">
                 {/* Circle */}
-                <div className="bg-primary-silver h-30 w-30 rounded-full absolute left-5 top-1 p-2 shadow-lg shadow-primary-black z-10">
+                <div className="bg-primary-silver h-20 w-20 md:h-30 md:w-30 rounded-full absolute left-5 top-1 p-2 shadow-lg shadow-primary-black z-10">
                 </div>
-                <Link className="flex items-center gap-2 z-50 absolute left-7.5 top-4" href={"/"}>
-                    <Image src="/logo.png" alt="Logo" width={100} height={100} />
+                <Link className="flex items-center gap-2 z-50 absolute left-7 md:left-7.5 top-3 md:top-4" href={"/"}>
+                    <Image src="/logo.png" alt="Logo" width={80} height={80} className="w-16 h-16 md:w-24 md:h-24" />
                 </Link>
 
                 {/* Background Grey Box */}
-                <div className="w-full bg-primary-silver h-15 flex items-center justify-end z-40">
+                <div className="w-full bg-primary-silver h-12 md:h-15 flex items-center justify-end z-40">
                     {/* Desktop Navigation */}
                     <nav className="hidden lg:flex items-center mx-10">
                         <ul className="flex gap-6 text-primary-black/60 text-lg font-semibold">
