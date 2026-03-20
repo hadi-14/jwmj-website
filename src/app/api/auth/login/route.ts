@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { prisma } from '@/lib/prisma'; // Adjust to your prisma client path
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+import { prisma } from '@/lib/prisma';
+import { 
+  createToken, 
+  setAuthCookie, 
+  applyRateLimit, 
+  sanitizeEmail,
+  logSecurityEvent 
+} from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json();
+    // Rate limiting: 5 attempts per minute per IP for login
+    const rateLimitResponse = applyRateLimit(request, 5, 60000);
+    if (rateLimitResponse) {
+      await logSecurityEvent('LOGIN_RATE_LIMITED', null, {}, request);
+      return rateLimitResponse;
+    }
+
+    const body = await request.json();
+    const { email, password } = body;
 
     // Validate input
     if (!email || !password) {
@@ -18,9 +29,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Sanitize and validate email
+    const sanitizedEmail = sanitizeEmail(email);
+    if (!sanitizedEmail) {
+      return NextResponse.json(
+        { message: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
+
     // Find user in database
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: sanitizedEmail },
       select: {
         id: true,
         email: true,
@@ -30,16 +50,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    if (!user) {
-      return NextResponse.json(
-        { message: 'Invalid credentials' },
-        { status: 401 }
-      );
-    }
+    // Use constant-time comparison to prevent timing attacks
+    // Even if user doesn't exist, still do password comparison
+    const storedHash = user?.password || '$2a$10$invalidhashforsecuritypurposes';
+    const isValidPassword = await bcrypt.compare(password, storedHash);
 
-    // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
+    if (!user || !isValidPassword) {
+      await logSecurityEvent('LOGIN_FAILED', null, { email: sanitizedEmail }, request);
       return NextResponse.json(
         { message: 'Invalid credentials' },
         { status: 401 }
@@ -47,23 +64,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Create JWT token
-    const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    const token = createToken(user);
 
-    // Set cookie
-    const cookieStore = await cookies();
-    cookieStore.set('auth-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/',
-    });
+    // Set secure cookie
+    await setAuthCookie(token);
 
-    // Return user data (without password)
+    // Log successful login
+    await logSecurityEvent('LOGIN_SUCCESS', user.id, {}, request);
+
     // Return user data (without password)
     const { password: _password, ...userWithoutPassword } = user;
     void _password;

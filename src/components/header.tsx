@@ -1,41 +1,71 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface AnnouncementData {
+    messages: string[];
+    enabled: boolean;
+}
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [announcement, setAnnouncement] = useState<AnnouncementData>({
+        messages: ["Welcome to JWMJ! • Website Under Construction!"],
+        enabled: true
+});
+
+    useEffect(() => {
+        const fetchAnnouncement = async () => {
+            try {
+                const response = await fetch('/api/settings/announcement');
+                if (response.ok) {
+                    const data = await response.json();
+                    setAnnouncement(data);
+                }
+            } catch (error) {
+                // Use default announcement on error
+                console.log('Using default announcement');
+            }
+        };
+        fetchAnnouncement();
+    }, []);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
 
+    // Combine messages for the marquee
+    const marqueeText = announcement.messages.join(' • ');
+
     return (
         <header className="w-full top-0 left-0 z-50">
-            {/* Blue Ribbon */}
-            <div className="h-8 bg-linear-to-r from-primary-blue to-accent-navy relative overflow-hidden justify-between">
-                {/* First animated text */}
-                <span
-                    className="absolute left-0 top-1/2 -translate-y-1/2 text-white italic text-base whitespace-nowrap"
-                    style={{
-                        animation: "marquee 16s linear infinite",
-                        animationDelay: "0s"
-                    }}
-                >
-                    Welcome to JWMJ! • Upcoming Eid Milan Party!
-                </span>
+            {/* Blue Ribbon - Only show if enabled */}
+            {announcement.enabled && (
+                <div className="h-8 bg-linear-to-r from-primary-blue to-accent-navy relative overflow-hidden justify-between">
+                    {/* First animated text */}
+                    <span
+                        className="absolute left-0 top-1/2 -translate-y-1/2 text-white italic text-base whitespace-nowrap"
+                        style={{
+                            animation: "marquee 16s linear infinite",
+                            animationDelay: "0s"
+                        }}
+                    >
+                        {marqueeText}
+                    </span>
 
-                {/* Second animated text - offset by half the animation duration */}
-                <span
-                    className="absolute left-0 top-1/2 -translate-y-1/2 text-white italic text-base whitespace-nowrap"
-                    style={{
-                        animation: "marquee 16s linear infinite",
-                        animationDelay: "-8s"
-                    }}
-                >
-                    Welcome to JWMJ! • Website Under Construction!
-                </span>
-            </div>
+                    {/* Second animated text - offset by half the animation duration */}
+                    <span
+                        className="absolute left-0 top-1/2 -translate-y-1/2 text-white italic text-base whitespace-nowrap"
+                        style={{
+                            animation: "marquee 16s linear infinite",
+                            animationDelay: "-8s"
+                        }}
+                    >
+                        {marqueeText}
+                    </span>
+                </div>
+            )}
 
             <div className="w-full relative flex items-center justify-between shadow-lg shadow-primary-black opacity-80">
                 {/* Circle */}

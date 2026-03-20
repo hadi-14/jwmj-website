@@ -12,7 +12,8 @@ import {
   X,
   ChevronDown,
   Database,
-  ChevronRight
+  ChevronRight,
+  Settings
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
@@ -57,7 +58,7 @@ const navigation = [
   { name: 'Submissions', href: '/admin/submissions', icon: Database },
   { name: 'Events', href: '/admin/events', icon: FileText },
   { name: 'Business Ads', href: '/admin/business-ads', icon: Database },
-  // { name: 'Settings', href: '/admin/settings', icon: Settings },
+  { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
 // ==================== SIDEBAR ====================

@@ -1,14 +1,13 @@
 // app/api/member/route.ts
-import { NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
-import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getMemberIdFromPayload, verifyMemberExists } from '@/lib/memberHelpers';
 import { Decimal } from '@prisma/client/runtime/client';
+import { requireMember, applyRateLimit } from '@/lib/auth';
+import { cookies } from 'next/headers';
+import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'your-secret-key-change-in-production'
-);
+const JWT_SECRET = process.env.JWT_SECRET;
 
 /**
  * Helper to safely convert Decimal to string
@@ -31,12 +30,9 @@ function bufferToBase64Image(buffer: Buffer | null | undefined): string | null {
   if (!buffer || buffer.length === 0) return null;
 
   try {
-    // Image is stored as hex string e.g. "ffd8ffe0..."
-    // Convert the buffer to a hex string first, then to real binary
-    const hexString = buffer.toString('ascii'); // reads the text "ffd8ffe0..."
-    const realBuffer = Buffer.from(hexString, 'hex'); // converts hex → real bytes
+    const hexString = buffer.toString('ascii');
+    const realBuffer = Buffer.from(hexString, 'hex');
 
-    // Now detect type from real bytes
     let mimeType = 'image/jpeg';
     if (realBuffer[0] === 0x89 && realBuffer[1] === 0x50) mimeType = 'image/png';
     else if (realBuffer[0] === 0x47 && realBuffer[1] === 0x49) mimeType = 'image/gif';
@@ -49,31 +45,33 @@ function bufferToBase64Image(buffer: Buffer | null | undefined): string | null {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Verify authentication
+    // Rate limiting
+    const rateLimitResponse = applyRateLimit(request, 30, 60000);
+    if (rateLimitResponse) return rateLimitResponse;
+
+    // Require member or admin authentication
+    const authResult = await requireMember();
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+
+    // Get full payload from token for member data
     const cookieStore = await cookies();
     const token = cookieStore.get('auth-token');
-
-    if (!token) {
+    
+    if (!token || !JWT_SECRET) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    let payload;
-    try {
-      const verified = await jwtVerify(token.value, JWT_SECRET);
-      payload = verified.payload;
-    } catch (jwtError) {
-      console.error('JWT verification failed:', jwtError);
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-    }
-
-    if (payload.role !== 'MEMBER') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
+    const payload = jwt.verify(token.value, JWT_SECRET) as { 
+      memberData?: { MemComputerID?: string | number }; 
+      email?: string 
+    };
 
     // Get member computer ID from payload
-    const memberComputerId = await getMemberIdFromPayload(payload as { memberData?: { MemComputerID?: string | number }, email?: string });
+    const memberComputerId = await getMemberIdFromPayload(payload);
 
     if (!memberComputerId) {
       return NextResponse.json({ error: 'Member data not found' }, { status: 404 });
@@ -85,7 +83,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Member not found or inactive' }, { status: 404 });
     }
 
-    // Fetch complete member information including profile picture
+    // Fetch complete member information
     const member = await prisma.member_Information.findUnique({
       where: { MemComputerID: memberComputerId },
       include: {
@@ -149,54 +147,34 @@ export async function GET() {
     // Convert profile picture to base64 if available
     const profileImage = bufferToBase64Image(member.Mem_Pic ? Buffer.from(member.Mem_Pic) : null);
 
-    // Format member data
+    // Format member data - only return non-sensitive information
     const memberData = {
-      // Basic Information
       MemComputerID: toStr(member.MemComputerID),
       MemWehvariaNo: toStr(member.MemWehvariaNo),
       MemMembershipNo: trimStr(member.MemMembershipNo),
       MemName: trimStr(member.MemName),
       MemFatherName: trimStr(member.MemFatherName),
       MemMotherName: trimStr(member.MemMotherName),
-
-      // Identification
-      MemCNIC: toStr(member.MemCNIC),
       MemDOB: member.MemDOB?.toISOString() || null,
       MemRegistrationDate: member.MemRegistrationDate?.toISOString() || null,
       MemComputerDate: member.MemComputerDate?.toISOString() || null,
-
-      // Contact Information
       MemPostalAddress: trimStr(member.MemPostalAddress),
       email: member.emails[0]?.MEM_Emailid?.trim() || (typeof payload.email === 'string' ? payload.email : null),
       cellNumbers: member.cellNumbers.map(cell => toStr(cell.MCL_CellNumber)).filter(Boolean) as string[],
-
-      // Profile Image
       profileImage: profileImage,
       hasProfileImage: profileImage !== null,
-
-      // Lookup Values
       surname: trimStr(surname?.surName),
       surnameNick: trimStr(surname?.surNick),
       gender: trimStr(gender?.GndName),
       area: trimStr(area?.AreName),
       country: trimStr(country?.CtrName),
-
-      // Current Status Information
       maritalStatus: trimStr(member.maritalStatus[0]?.maritalStatus?.MrtName),
       occupation: trimStr(member.occupations[0]?.occupation?.OccName),
       qualification: trimStr(member.qualifications[0]?.qualification?.QuaName),
       memberStatus: trimStr(member.statuses[0]?.status?.Sts_Name),
-
-      // Additional Information
       remarks: trimStr(member.Remarks),
       isDeceased: member.Mem_DeceasedDate !== null,
-      deceasedDate: member.Mem_DeceasedDate?.toISOString() || null,
-      deceasedDetails: trimStr(member.Mem_DeceasedDetails),
       isDeActive: member.Mem_DeActive || false,
-      deActiveDate: member.Mem_DeActive_Date?.toISOString() || null,
-      deActiveDetails: trimStr(member.Mem_DeActive_Details),
-
-      // Flags
       deathCertificateRequired: member.Mem_Dth_Cert_Req === 1,
     };
 
@@ -205,21 +183,16 @@ export async function GET() {
     console.error('Member info error:', error);
 
     if (error instanceof Error) {
-      if (error.message.includes('verification')) {
+      if (error.message.includes('verification') || error.message.includes('jwt')) {
         return NextResponse.json(
           { error: 'Token verification failed' },
           { status: 401 }
         );
       }
-
-      console.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
-      });
     }
 
     return NextResponse.json(
-      { error: 'An error occurred while searching members' },
+      { error: 'An error occurred while fetching member data' },
       { status: 500 }
     );
   }

@@ -1,13 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { requireAdmin, sanitizeInput, sanitizeEmail, logSecurityEvent } from '@/lib/auth';
+
+// Validate UUID format to prevent injection
+function isValidUUID(id: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(id);
+}
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Require admin authentication
+    const authResult = await requireAdmin();
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+
     const { id } = await params;
+
+    // Validate ID format
+    if (!isValidUUID(id)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid user ID format' },
+        { status: 400 }
+      );
+    }
+
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
@@ -45,7 +67,22 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Require admin authentication
+    const authResult = await requireAdmin();
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+
     const { id } = await params;
+
+    // Validate ID format
+    if (!isValidUUID(id)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid user ID format' },
+        { status: 400 }
+      );
+    }
+
     const body = await request.json();
     const { email, name, password, role } = body;
 
@@ -62,30 +99,55 @@ export async function PUT(
     }
 
     // Check if email is being changed and if it's already taken
-    if (email && email !== existingUser.email) {
-      const emailTaken = await prisma.user.findUnique({
-        where: { email },
-      });
-      if (emailTaken) {
+    if (email) {
+      const sanitizedEmail = sanitizeEmail(email);
+      if (!sanitizedEmail) {
         return NextResponse.json(
-          { success: false, error: 'Email already in use' },
-          { status: 409 }
+          { success: false, error: 'Invalid email format' },
+          { status: 400 }
         );
+      }
+      
+      if (sanitizedEmail !== existingUser.email) {
+        const emailTaken = await prisma.user.findUnique({
+          where: { email: sanitizedEmail },
+        });
+        if (emailTaken) {
+          return NextResponse.json(
+            { success: false, error: 'Email already in use' },
+            { status: 409 }
+          );
+        }
       }
     }
 
-    // Build update data
+    // Validate role if provided
+    if (role && !['ADMIN', 'USER', 'MEMBER'].includes(role)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid role' },
+        { status: 400 }
+      );
+    }
+
+    // Build update data with sanitization
     const updateData: {
       email?: string;
       name?: string;
       role?: string;
       password?: string;
     } = {};
-    if (email) updateData.email = email;
-    if (name !== undefined) updateData.name = name;
+    
+    if (email) updateData.email = sanitizeEmail(email) || undefined;
+    if (name !== undefined) updateData.name = name ? sanitizeInput(name) : null;
     if (role) updateData.role = role;
     if (password) {
-      updateData.password = await bcrypt.hash(password, 10);
+      if (password.length < 8) {
+        return NextResponse.json(
+          { success: false, error: 'Password must be at least 8 characters' },
+          { status: 400 }
+        );
+      }
+      updateData.password = await bcrypt.hash(password, 12);
     }
 
     // Update user
@@ -102,13 +164,16 @@ export async function PUT(
       },
     });
 
+    // Log the update
+    await logSecurityEvent('USER_UPDATED', authResult.user.userId, { targetUserId: id }, request);
+
     return NextResponse.json({
       success: true,
       data: user,
       message: 'User updated successfully',
     });
   } catch (error: unknown) {
-    console.error('Error updating profile:', error);
+    console.error('Error updating user:', error);
     return NextResponse.json(
       { error: 'Failed to update user' },
       { status: 500 }
@@ -121,7 +186,29 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Require admin authentication
+    const authResult = await requireAdmin();
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+
     const { id } = await params;
+
+    // Validate ID format
+    if (!isValidUUID(id)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid user ID format' },
+        { status: 400 }
+      );
+    }
+
+    // Prevent self-deletion
+    if (id === authResult.user.userId) {
+      return NextResponse.json(
+        { success: false, error: 'Cannot delete your own account' },
+        { status: 400 }
+      );
+    }
 
     // Check if user exists
     const user = await prisma.user.findUnique({
@@ -139,6 +226,9 @@ export async function DELETE(
     await prisma.user.delete({
       where: { id },
     });
+
+    // Log the deletion
+    await logSecurityEvent('USER_DELETED', authResult.user.userId, { deletedUserId: id }, request);
 
     return NextResponse.json({
       success: true,

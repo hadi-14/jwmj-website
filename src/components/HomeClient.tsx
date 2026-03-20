@@ -20,8 +20,15 @@ export default function HomeClient() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getBusinesses();
-            setAllCommunityBusinesses(data);
+            try {
+                const data = await getBusinesses();
+                if (data) {
+                    setAllCommunityBusinesses(data);
+                }
+            } catch (error) {
+                // Silently handle error - database may not be configured
+                console.log("[v0] Business fetch skipped - database not configured");
+            }
         };
         fetchData();
     }, []);
@@ -39,6 +46,7 @@ export default function HomeClient() {
                             src="/building_front.jpeg"
                             alt="Building Hero"
                             fill
+                            sizes="100vw"
                             style={{ objectFit: "cover" }}
                             className="rounded-b-4xl"
                             priority
@@ -107,6 +115,7 @@ export default function HomeClient() {
                                 src="/building_front.jpeg"
                                 alt="Building Hero"
                                 fill
+                                sizes="100vw"
                                 style={{ objectFit: "cover" }}
                                 className="rounded-b-[3rem]"
                                 priority

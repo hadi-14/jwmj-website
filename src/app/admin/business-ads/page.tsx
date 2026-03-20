@@ -159,11 +159,10 @@ export default function BusinessAdsManagement() {
             <button
               key={status}
               onClick={() => setFilter(status)}
-              className={`px-4 py-2 rounded-md text-sm font-medium capitalize transition-colors ${
-                filter === status
+              className={`px-4 py-2 rounded-md text-sm font-medium capitalize transition-colors ${filter === status
                   ? 'bg-white text-gray-900 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
-              }`}
+                }`}
             >
               {status}
             </button>

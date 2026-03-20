@@ -68,7 +68,7 @@ export default function EventsHighlights() {
                 <div className="flex-1 h-px bg-linear-to-r from-gray-300 to-transparent ml-4"></div>
             </div>
 
-            {error && (
+            {error && !error.includes('Database not configured') && (
                 <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-red-700 font-medium">{error}</p>
                 </div>

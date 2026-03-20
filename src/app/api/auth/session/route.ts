@@ -1,32 +1,21 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import jwt from 'jsonwebtoken';
+import { verifyAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth-token')?.value;
+    const auth = await verifyAuth();
 
-    if (!token) {
+    if (!auth.success || !auth.user) {
       return NextResponse.json(
-        { message: 'Not authenticated' },
+        { message: auth.error || 'Not authenticated' },
         { status: 401 }
       );
     }
 
-    // Verify token
-    const decoded = jwt.verify(token, JWT_SECRET) as {
-      userId: string;
-      email: string;
-      role: string;
-    };
-
-    // Get user from database
+    // Get full user data from database
     const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+      where: { id: auth.user.userId },
       select: {
         id: true,
         email: true,
@@ -37,7 +26,7 @@ export async function GET() {
 
     if (!user) {
       return NextResponse.json(
-        { message: 'Not authenticated' },
+        { message: 'User not found' },
         { status: 401 }
       );
     }

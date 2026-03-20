@@ -1,14 +1,34 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { Schemas } from '@/lib/schemas/form.schema';
+import { requireAuth, requireAdmin, logSecurityEvent } from '@/lib/auth';
 
-// GET: Fetch single submission
+// Validate UUID format
+function isValidUUID(id: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(id);
+}
+
+// GET: Fetch single submission - requires authentication
 export async function GET(
   req: NextRequest,
   props: { params: Promise<{ submissionId: string }> }
 ) {
   const params = await props.params;
   try {
+    // Require authentication
+    const authResult = await requireAuth();
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+
+    if (!isValidUUID(params.submissionId)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid submission ID format' },
+        { status: 400 }
+      );
+    }
+
     const submission = await prisma.formSubmission.findUnique({
       where: { id: params.submissionId },
       include: {
@@ -32,7 +52,17 @@ export async function GET(
       );
     }
 
-    // Validate with parsed schema to handle JSON string fields
+    // Members can only view their own submissions
+    if (authResult.user.role === 'MEMBER') {
+      if (submission.submittedBy !== authResult.user.email && 
+          submission.submittedBy !== authResult.user.userId) {
+        return NextResponse.json(
+          { success: false, error: 'Access denied' },
+          { status: 403 }
+        );
+      }
+    }
+
     const validatedSubmission = Schemas.FormSubmission.parse(submission);
 
     return NextResponse.json({
@@ -48,18 +78,39 @@ export async function GET(
   }
 }
 
-// PATCH: Update submission (approve, reject, add notes)
+// PATCH: Update submission - admin only
 export async function PATCH(
   req: NextRequest,
   props: { params: Promise<{ submissionId: string }> }
 ) {
   const params = await props.params;
   try {
+    // Require admin authentication
+    const authResult = await requireAdmin();
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+
+    if (!isValidUUID(params.submissionId)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid submission ID format' },
+        { status: 400 }
+      );
+    }
+
     const body = await req.json();
-    const { status, notes, approvedBy, fieldValues } = body;
+    const { status, notes, fieldValues } = body;
 
     // Validate update data
     Schemas.UpdateFormSubmission.parse(body);
+
+    // Validate status if provided
+    if (status && !['pending', 'approved', 'rejected', 'draft'].includes(status)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid status' },
+        { status: 400 }
+      );
+    }
 
     const updateData: {
       status?: string;
@@ -67,10 +118,11 @@ export async function PATCH(
       approvedBy?: string;
       approvedDate?: Date | null;
     } = {};
+    
     if (status) updateData.status = status;
-    if (notes) updateData.notes = notes;
-    if (approvedBy) {
-      updateData.approvedBy = approvedBy;
+    if (notes !== undefined) updateData.notes = notes;
+    if (status === 'approved' || status === 'rejected') {
+      updateData.approvedBy = authResult.user.email;
       updateData.approvedDate = status === 'approved' ? new Date() : null;
     }
 
@@ -119,19 +171,21 @@ export async function PATCH(
     }
 
     // Log audit
-    if (status || notes || fieldValues) {
-      await prisma.formAuditLog.create({
-        data: {
-          submissionId: params.submissionId,
-          action: status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'updated',
-          changedBy: approvedBy || req.headers.get('x-user-email') || 'anonymous',
-          changes: JSON.stringify({ status, notes, updatedFields: fieldValues ? Object.keys(fieldValues) : [] }),
-          ipAddress: req.headers.get('x-forwarded-for') || undefined
-        }
-      });
-    }
+    await prisma.formAuditLog.create({
+      data: {
+        submissionId: params.submissionId,
+        action: status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'updated',
+        changedBy: authResult.user.email,
+        changes: JSON.stringify({ status, notes, updatedFields: fieldValues ? Object.keys(fieldValues) : [] }),
+        ipAddress: req.headers.get('x-forwarded-for') || undefined
+      }
+    });
 
-    // Validate response with parsed schema
+    await logSecurityEvent('SUBMISSION_UPDATED', authResult.user.userId, { 
+      submissionId: params.submissionId, 
+      status 
+    }, req);
+
     const validatedSubmission = Schemas.FormSubmission.parse(submission);
 
     return NextResponse.json({
@@ -142,7 +196,6 @@ export async function PATCH(
   } catch (error: unknown) {
     console.error('PATCH /api/submissions/[submissionId] error:', error);
 
-    // Return validation errors if applicable
     if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json(
         {
@@ -161,14 +214,26 @@ export async function PATCH(
   }
 }
 
-// DELETE: Delete submission (soft delete)
+// DELETE: Delete submission (soft delete) - admin only
 export async function DELETE(
   req: NextRequest,
   props: { params: Promise<{ submissionId: string }> }
 ) {
   const params = await props.params;
   try {
-    // Verify submission exists first
+    // Require admin authentication
+    const authResult = await requireAdmin();
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+
+    if (!isValidUUID(params.submissionId)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid submission ID format' },
+        { status: 400 }
+      );
+    }
+
     const submission = await prisma.formSubmission.findUnique({
       where: { id: params.submissionId }
     });
@@ -189,10 +254,14 @@ export async function DELETE(
       data: {
         submissionId: params.submissionId,
         action: 'deleted',
-        changedBy: req.headers.get('x-user-email') || 'anonymous',
+        changedBy: authResult.user.email,
         ipAddress: req.headers.get('x-forwarded-for') || undefined
       }
     });
+
+    await logSecurityEvent('SUBMISSION_DELETED', authResult.user.userId, { 
+      submissionId: params.submissionId 
+    }, req);
 
     return NextResponse.json({
       success: true,

@@ -2,26 +2,25 @@ import { prisma } from "@/lib/prisma";
 import { Schemas } from "@/lib/schemas/form.schema";
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
+import { requireAdmin, applyRateLimit, sanitizeInput } from "@/lib/auth";
 
 /**
  * Helper function to transform form data from database format to API format
- * Parses JSON strings for options and validationRule back into objects
- * IMPORTANT: Also includes pdfFileName and pdfFileUrl from the form
  */
 interface FormWithFields {
   pdfFileName: string | null;
   pdfFileUrl: string | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fields: any[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  fields: Array<{
+    options: string | null;
+    validationRule: string | null;
+    [key: string]: unknown;
+  }>;
+  [key: string]: unknown;
 }
 
 function transformFormData(form: FormWithFields) {
-  // console.log("Transforming form data:", form);
   return {
     ...form,
-    // Keep the PDF file fields at the form level
     pdfFileName: form.pdfFileName,
     pdfFileUrl: form.pdfFileUrl,
     fields: form.fields.map((field) => ({
@@ -43,28 +42,28 @@ function ensureString(value: unknown): string | null {
 
 /**
  * GET /api/forms
- * Fetch all forms with pagination
- * Query params: page, limit, formType, isActive
+ * Public endpoint with rate limiting
  */
 export async function GET(req: NextRequest) {
   try {
+    // Rate limit
+    const rateLimitResponse = applyRateLimit(req, 60, 60000);
+    if (rateLimitResponse) return rateLimitResponse;
+
     const { searchParams } = new URL(req.url);
 
-    // Validate pagination
-    const pagination = Schemas.Pagination.parse({
-      page: searchParams.get("page")
-        ? parseInt(searchParams.get("page")!)
-        : 1,
-      limit: searchParams.get("limit")
-        ? parseInt(searchParams.get("limit")!)
-        : 10,
-    });
-
-    const skip = (pagination.page - 1) * pagination.limit;
+    // Validate pagination with limits
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
+    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "10")));
+    const skip = (page - 1) * limit;
 
     const where: { formType?: string; isActive?: boolean } = {};
     if (searchParams.has("formType")) {
-      where.formType = searchParams.get("formType");
+      const formType = searchParams.get("formType");
+      // Validate formType to prevent injection
+      if (formType && /^[a-zA-Z0-9_-]+$/.test(formType)) {
+        where.formType = formType;
+      }
     }
     if (searchParams.has("isActive")) {
       where.isActive = searchParams.get("isActive") === "true";
@@ -82,23 +81,22 @@ export async function GET(req: NextRequest) {
           },
         },
         skip,
-        take: pagination.limit,
+        take: limit,
         orderBy: { createdAt: "desc" },
       }),
       prisma.form.count({ where }),
     ]);
 
-    // Transform forms to parse JSON strings and include PDF fields
     const transformedForms = forms.map(transformFormData);
 
     const response = Schemas.GetFormsResponse.parse({
       success: true,
       data: transformedForms,
       pagination: {
-        page: pagination.page,
-        limit: pagination.limit,
+        page,
+        limit,
         total,
-        pages: Math.ceil(total / pagination.limit),
+        pages: Math.ceil(total / limit),
       },
     });
 
@@ -126,19 +124,31 @@ export async function GET(req: NextRequest) {
 
 /**
  * POST /api/forms
- * Create a new form with fields
+ * Admin only - Create a new form
  */
 export async function POST(req: NextRequest) {
   try {
+    // Require admin authentication
+    const authResult = await requireAdmin();
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+
     const body = await req.json();
 
     // Validate request body
     const validatedData = Schemas.CreateForm.parse(body);
 
+    // Sanitize text fields
+    const sanitizedName = sanitizeInput(validatedData.name);
+    const sanitizedDescription = validatedData.description 
+      ? sanitizeInput(validatedData.description) 
+      : null;
+
     const form = await prisma.form.create({
       data: {
-        name: validatedData.name,
-        description: validatedData.description,
+        name: sanitizedName,
+        description: sanitizedDescription,
         formType: validatedData.formType,
         version: validatedData.version,
         isActive: true,
@@ -146,16 +156,15 @@ export async function POST(req: NextRequest) {
         pdfFileName: validatedData.pdfFileName || null,
         fields: {
           create: validatedData.fields.map((field) => ({
-            fieldName: field.fieldName,
-            fieldLabel: field.fieldLabel,
+            fieldName: sanitizeInput(field.fieldName),
+            fieldLabel: sanitizeInput(field.fieldLabel),
             fieldType: field.fieldType,
             fieldOrder: field.fieldOrder,
             isRequired: field.isRequired,
             isHidden: field.isHidden,
-            placeholder: field.placeholder,
-            helpText: field.helpText,
-            defaultValue: field.defaultValue,
-            // Ensure options and validationRule are always strings in DB
+            placeholder: field.placeholder ? sanitizeInput(field.placeholder) : null,
+            helpText: field.helpText ? sanitizeInput(field.helpText) : null,
+            defaultValue: field.defaultValue ? sanitizeInput(field.defaultValue) : null,
             options: ensureString(field.options),
             validationRule: ensureString(field.validationRule),
             columnWidth: field.columnWidth,
@@ -169,7 +178,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Transform form to parse JSON strings and include PDF fields
     const transformedForm = transformFormData(form);
 
     const response = Schemas.CreateFormResponse.parse({

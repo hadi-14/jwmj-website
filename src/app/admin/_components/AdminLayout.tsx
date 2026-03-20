@@ -173,6 +173,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Members', href: '/admin/members', icon: Users },
+  { name: 'Events', href: '/admin/events', icon: Bell },
+  { name: 'Business Ads', href: '/admin/business-ads', icon: Shield },
   { name: 'Form Builder', href: '/admin/form-builder', icon: FileText },
   { name: 'Submissions', href: '/admin/submissions', icon: Database },
   { name: 'Settings', href: '/admin/settings', icon: Settings },

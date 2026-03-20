@@ -1,9 +1,29 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import Graphode from "@/components/graphode";
+
+// Structured data for Organization
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Jamnagar Wehvaria Memon Jamat",
+  "alternateName": "JWMJ",
+  "url": "https://jwmj.org",
+  "logo": "https://jwmj.org/logo.png",
+  "foundingDate": "1949",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Karachi",
+    "addressCountry": "Pakistan"
+  },
+  "description": "A non-profit organization providing education, healthcare, housing, and community support since 1949.",
+  "sameAs": [
+    "https://www.facebook.com/jwmj.official"
+  ]
+};
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,6 +34,17 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#038DCD' },
+    { media: '(prefers-color-scheme: dark)', color: '#024767' },
+  ],
+};
 
 export const metadata: Metadata = {
   title: {
@@ -96,6 +127,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground relative`}
       >
