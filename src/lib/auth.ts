@@ -79,14 +79,14 @@ export async function verifyAuth(): Promise<AuthResult> {
  */
 export async function requireAuth(): Promise<{ user: AuthUser } | NextResponse> {
   const auth = await verifyAuth();
-  
+
   if (!auth.success || !auth.user) {
     return NextResponse.json(
       { success: false, error: auth.error || 'Not authenticated' },
       { status: 401 }
     );
   }
-  
+
   return { user: auth.user };
 }
 
@@ -96,21 +96,21 @@ export async function requireAuth(): Promise<{ user: AuthUser } | NextResponse> 
  */
 export async function requireAdmin(): Promise<{ user: AuthUser } | NextResponse> {
   const auth = await verifyAuth();
-  
+
   if (!auth.success || !auth.user) {
     return NextResponse.json(
       { success: false, error: auth.error || 'Not authenticated' },
       { status: 401 }
     );
   }
-  
+
   if (auth.user.role !== 'ADMIN') {
     return NextResponse.json(
       { success: false, error: 'Admin access required' },
       { status: 403 }
     );
   }
-  
+
   return { user: auth.user };
 }
 
@@ -119,21 +119,21 @@ export async function requireAdmin(): Promise<{ user: AuthUser } | NextResponse>
  */
 export async function requireMember(): Promise<{ user: AuthUser } | NextResponse> {
   const auth = await verifyAuth();
-  
+
   if (!auth.success || !auth.user) {
     return NextResponse.json(
       { success: false, error: auth.error || 'Not authenticated' },
       { status: 401 }
     );
   }
-  
+
   if (auth.user.role !== 'MEMBER' && auth.user.role !== 'ADMIN') {
     return NextResponse.json(
       { success: false, error: 'Member access required' },
       { status: 403 }
     );
   }
-  
+
   return { user: auth.user };
 }
 
@@ -177,16 +177,16 @@ export function applyRateLimit(
   limit: number = 100,
   windowMs: number = 60000
 ): NextResponse | null {
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
-             request.headers.get('x-real-ip') || 
-             'unknown';
-  
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
+    request.headers.get('x-real-ip') ||
+    'unknown';
+
   const result = checkRateLimit(ip, limit, windowMs);
-  
+
   if (!result.allowed) {
     return NextResponse.json(
       { success: false, error: 'Too many requests. Please try again later.' },
-      { 
+      {
         status: 429,
         headers: {
           'Retry-After': String(Math.ceil(result.resetIn / 1000)),
@@ -197,7 +197,7 @@ export function applyRateLimit(
       }
     );
   }
-  
+
   return null;
 }
 
@@ -219,11 +219,11 @@ export function sanitizeInput(input: string): string {
 export function sanitizeEmail(email: string): string | null {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const trimmed = email.trim().toLowerCase();
-  
+
   if (!emailRegex.test(trimmed) || trimmed.length > 254) {
     return null;
   }
-  
+
   return trimmed;
 }
 
@@ -234,7 +234,7 @@ export function createToken(user: { id: string; email: string; role: string }): 
   if (!JWT_SECRET) {
     throw new Error('JWT_SECRET not configured');
   }
-  
+
   return jwt.sign(
     { userId: user.id, email: user.email, role: user.role },
     JWT_SECRET,
@@ -272,11 +272,11 @@ export function generateSecureToken(length: number = 32): string {
   let result = '';
   const randomValues = new Uint8Array(length);
   crypto.getRandomValues(randomValues);
-  
+
   for (let i = 0; i < length; i++) {
     result += chars[randomValues[i] % chars.length];
   }
-  
+
   return result;
 }
 
@@ -284,16 +284,16 @@ export function generateSecureToken(length: number = 32): string {
  * Log security event for audit trail
  */
 export async function logSecurityEvent(
-  event: string,
-  userId: string | null,
-  details: Record<string, unknown>,
-  request: NextRequest
+  _event: string,
+  _userId: string | null,
+  _details: Record<string, unknown>,
+  _request: NextRequest
 ): Promise<void> {
   try {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
-               request.headers.get('x-real-ip') || 
-               'unknown';
-    
+    // const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
+    //            request.headers.get('x-real-ip') || 
+    //            'unknown';
+
     // await prisma.auditLog.create({
     //   data: {
     //     action: event,

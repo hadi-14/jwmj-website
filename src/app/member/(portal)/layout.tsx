@@ -14,10 +14,7 @@ import {
   Receipt,
   FileText,
   Briefcase,
-  LogOut,
   Menu,
-  X,
-  ChevronRight,
   User
 } from 'lucide-react';
 

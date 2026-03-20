@@ -23,7 +23,7 @@ export default function Header() {
                     const data = await response.json();
                     setAnnouncement(data);
                 }
-            } catch (error) {
+            } catch {
                 // Use default announcement on error
                 console.log('Using default announcement');
             }

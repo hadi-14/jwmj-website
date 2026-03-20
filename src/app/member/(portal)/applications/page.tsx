@@ -9,7 +9,6 @@ import {
   Check,
   X,
   AlertCircle,
-  ChevronRight,
   Filter,
   Search,
   ExternalLink
@@ -139,8 +138,8 @@ export default function ApplicationsPage() {
             setSearchQuery('');
           }}
           className={`px-4 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'inprogress'
-              ? 'border-primary-blue text-primary-blue'
-              : 'border-transparent text-foreground-300 hover:text-foreground'
+            ? 'border-primary-blue text-primary-blue'
+            : 'border-transparent text-foreground-300 hover:text-foreground'
             }`}
         >
           <div className="flex items-center gap-2">
@@ -156,8 +155,8 @@ export default function ApplicationsPage() {
             setSearchQuery('');
           }}
           className={`px-4 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'history'
-              ? 'border-primary-blue text-primary-blue'
-              : 'border-transparent text-foreground-300 hover:text-foreground'
+            ? 'border-primary-blue text-primary-blue'
+            : 'border-transparent text-foreground-300 hover:text-foreground'
             }`}
         >
           <div className="flex items-center gap-2">
@@ -169,8 +168,8 @@ export default function ApplicationsPage() {
         <button
           onClick={() => setActiveTab('new')}
           className={`px-4 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'new'
-              ? 'border-primary-blue text-primary-blue'
-              : 'border-transparent text-foreground-300 hover:text-foreground'
+            ? 'border-primary-blue text-primary-blue'
+            : 'border-transparent text-foreground-300 hover:text-foreground'
             }`}
         >
           <div className="flex items-center gap-2">
@@ -332,7 +331,7 @@ export default function ApplicationsPage() {
                     )}
                     <button
                       className="w-full py-2 px-3 bg-primary-blue text-primary-white text-xs font-bold rounded-lg hover:bg-primary-blue-600 transition-colors"
-                      onClick={(e) => {
+                      onClick={() => {
                         // Link click will handle navigation
                       }}
                     >

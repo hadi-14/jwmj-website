@@ -25,7 +25,7 @@ export default function HomeClient() {
                 if (data) {
                     setAllCommunityBusinesses(data);
                 }
-            } catch (error) {
+            } catch {
                 // Silently handle error - database may not be configured
                 console.log("[v0] Business fetch skipped - database not configured");
             }

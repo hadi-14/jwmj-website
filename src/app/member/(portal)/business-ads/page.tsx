@@ -13,7 +13,6 @@ import {
   Calendar,
   Building2,
   ChevronRight,
-  ExternalLink,
   Upload,
   Loader2
 } from 'lucide-react';
@@ -56,8 +55,6 @@ interface MemberInfo {
   MemComputerID: number;
   MemName?: string;
 }
-
-const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 const categories = [
   'Textile & Fashion', 'Electronics', 'Food & Dining', 'Automotive',
   'Grocery & Food', 'Construction', 'Education', 'Events & Venues',
@@ -312,8 +309,8 @@ export default function BusinessAdsPage() {
         <button
           onClick={() => setActiveTab('list')}
           className={`px-4 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'list'
-              ? 'border-primary-blue text-primary-blue'
-              : 'border-transparent text-foreground-300 hover:text-foreground'
+            ? 'border-primary-blue text-primary-blue'
+            : 'border-transparent text-foreground-300 hover:text-foreground'
             }`}
         >
           <div className="flex items-center gap-2">
@@ -324,8 +321,8 @@ export default function BusinessAdsPage() {
         <button
           onClick={() => setActiveTab('new')}
           className={`px-4 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'new'
-              ? 'border-primary-blue text-primary-blue'
-              : 'border-transparent text-foreground-300 hover:text-foreground'
+            ? 'border-primary-blue text-primary-blue'
+            : 'border-transparent text-foreground-300 hover:text-foreground'
             }`}
         >
           <div className="flex items-center gap-2">
@@ -364,9 +361,9 @@ export default function BusinessAdsPage() {
                 >
                   {/* Status Bar */}
                   <div className={`h-1.5 bg-gradient-to-r ${statusInfo.color.includes('green') ? 'from-primary-green to-primary-green-600' :
-                      statusInfo.color.includes('yellow') ? 'from-primary-yellow to-primary-yellow-600' :
-                        statusInfo.color.includes('red') ? 'from-red-400 to-red-600' :
-                          'from-gray-400 to-gray-600'
+                    statusInfo.color.includes('yellow') ? 'from-primary-yellow to-primary-yellow-600' :
+                      statusInfo.color.includes('red') ? 'from-red-400 to-red-600' :
+                        'from-gray-400 to-gray-600'
                     }`} />
 
                   <div className="p-5 sm:p-6">

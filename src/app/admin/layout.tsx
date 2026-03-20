@@ -13,7 +13,8 @@ import {
   ChevronDown,
   Database,
   ChevronRight,
-  Settings
+  Settings,
+  Menu
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
@@ -219,8 +220,8 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
           })}
         </nav>
 
-        {/* Logout */}
-        <div className="p-2.5 border-t border-slate-100 shrink-0">
+        {/* Logout - Sticky */}
+        <div className="sticky bottom-0 p-2.5 border-t border-slate-100 shrink-0 bg-white">
           <button
             onClick={logout}
             title={collapsed ? 'Logout' : undefined}
@@ -254,6 +255,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  useAuth();
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -268,13 +270,27 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         <meta name="googlebot" content="noindex, nofollow" />
       </Head>
       <ProtectedRoute>
-        <div className="min-h-screen bg-slate-50">
-          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          {/* Offset content by sidebar width; public header is handled by sticky positioning */}
-          <div className="lg:pl-64 transition-all duration-300">
-            <main className="p-5 sm:p-6 lg:p-8">
-              {children}
-            </main>
+        <div className="min-h-screen bg-slate-50 flex flex-col">
+          {/* Mobile Header */}
+          <header className="lg:hidden h-16 bg-white border-b border-slate-200 sticky top-0 z-30 flex items-center justify-between px-4">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            >
+              <Menu className="w-5 h-5 text-slate-600" />
+            </button>
+            <span className="text-sm font-bold text-[#038DCD] uppercase tracking-wider">Admin Panel</span>
+            <div className="w-10" /> {/* Spacer for alignment */}
+          </header>
+
+          <div className="flex-1 flex">
+            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+            {/* Offset content by sidebar width on desktop */}
+            <div className="lg:pl-64 transition-all duration-300 flex-1">
+              <main className="p-4 sm:p-6 lg:p-8">
+                {children}
+              </main>
+            </div>
           </div>
         </div>
       </ProtectedRoute>

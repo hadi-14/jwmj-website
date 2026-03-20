@@ -60,7 +60,7 @@ interface MemberInfo {
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
 export default function EventsPage() {
-  const { member: authMember } = useMemberAuth();
+  useMemberAuth();
   const { showNotification } = useNotification();
   const [events, setEvents] = useState<Event[]>([]);
   const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
@@ -168,21 +168,11 @@ export default function EventsPage() {
     .filter(event => new Date(event.date) >= new Date())
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  const pastEvents = events
-    .filter(event => new Date(event.date) < new Date())
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
   const categories = ['all', ...new Set(events.map(e => e.category))];
 
   const filteredUpcoming = filterCategory === 'all'
     ? upcomingEvents
     : upcomingEvents.filter(e => e.category === filterCategory);
-
-  const filteredPast = filterCategory === 'all'
-    ? pastEvents
-    : pastEvents.filter(e => e.category === filterCategory);
-
-  const isAdmin = authMember?.role === 'admin';
 
   if (loading) {
     return (
@@ -324,8 +314,8 @@ export default function EventsPage() {
             setFilterCategory('all');
           }}
           className={`px-4 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'available'
-              ? 'border-primary-blue text-primary-blue'
-              : 'border-transparent text-foreground-300 hover:text-foreground'
+            ? 'border-primary-blue text-primary-blue'
+            : 'border-transparent text-foreground-300 hover:text-foreground'
             }`}
         >
           <div className="flex items-center gap-2">
@@ -340,8 +330,8 @@ export default function EventsPage() {
             setFilterCategory('all');
           }}
           className={`px-4 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'myregistrations'
-              ? 'border-primary-blue text-primary-blue'
-              : 'border-transparent text-foreground-300 hover:text-foreground'
+            ? 'border-primary-blue text-primary-blue'
+            : 'border-transparent text-foreground-300 hover:text-foreground'
             }`}
         >
           <div className="flex items-center gap-2">
@@ -435,7 +425,7 @@ export default function EventsPage() {
                 <Check className="w-8 h-8 text-foreground-200" />
               </div>
               <h3 className="font-bold text-foreground mb-2">No Registrations Yet</h3>
-              <p className="text-sm text-foreground-300 mb-6">You haven't registered for any events yet.</p>
+              <p className="text-sm text-foreground-300 mb-6">You haven&apos;t registered for any events yet.</p>
               <button
                 onClick={() => setActiveTab('available')}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-blue text-primary-white text-sm font-bold rounded-xl hover:bg-primary-blue-600 transition-colors"
