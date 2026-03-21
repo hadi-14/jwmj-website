@@ -63,17 +63,29 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate category
-    const validCategories = ['religious', 'social', 'educational', 'community', 'other'];
+    const validCategories = [
+      'sports events',
+      'islamic events',
+      'cultural events',
+      'community events',
+      'youth programs',
+      'religious',
+      'social',
+      'educational',
+      'community',
+      'other'
+    ];
     if (!validCategories.includes(category.toLowerCase())) {
       return NextResponse.json({ error: 'Invalid category' }, { status: 400 });
     }
 
-    // Validate URL format for img and fb
-    const urlRegex = /^https?:\/\/.+/i;
-    if (!urlRegex.test(img)) {
+    // Validate URL format for img and fb (absolute or root-relative paths)
+    const absoluteUrlRegex = /^https?:\/\/.+/i;
+    const relativeRootRegex = /^\/.+/;
+    if (!(absoluteUrlRegex.test(img) || relativeRootRegex.test(img))) {
       return NextResponse.json({ error: 'Invalid image URL' }, { status: 400 });
     }
-    if (fb && !urlRegex.test(fb)) {
+    if (fb && !(absoluteUrlRegex.test(fb) || relativeRootRegex.test(fb))) {
       return NextResponse.json({ error: 'Invalid Facebook URL' }, { status: 400 });
     }
 

@@ -10,7 +10,7 @@ export default function Graphode() {
                 height={13}
             />
             <p className="text-center text-white text-sm py-2">
-                Powered by Graphode
+                Designed & Developed by Graphode - Your IT Partner
             </p>
         </div>
     );

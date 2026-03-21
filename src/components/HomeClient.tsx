@@ -183,8 +183,55 @@ export default function HomeClient() {
 
             <div className="top-[90vh] w-full py-16 bg-gray-50">
 
+                {/* Faculty Members (Presidency) - Mobile */}
+                <section className="md:hidden bg-jwmj p-4 rounded-2xl border border-gray-200 shadow-lg mx-auto">
+                    <h2 className="text-center text-[#038DCD] font-bold text-xl mb-4">
+                        MANAGEMENT TEAM
+                    </h2>
+                    <div className="flex flex-col gap-4">
+                        {/* President */}
+                        <div className="bg-white/30 rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col items-center">
+                            <Image
+                                src="/Presidency/JWMJ/1.png"
+                                alt="President"
+                                width={120}
+                                height={120}
+                                className="object-cover mb-3 transition-transform duration-300 ease-in-out hover:scale-105 rounded-lg"
+                            />
+                            <p className="text-base font-bold text-gray-800 text-center">
+                                President <br />Muhammad Yousuf Rangoonwala
+                            </p>
+                        </div>
+
+                        {/* Group Photo */}
+                        <div className="bg-white/30 rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-center">
+                            <Image
+                                src="/Presidency/JWMJ group.jpg"
+                                alt="Group Photo"
+                                width={400}
+                                height={200}
+                                className="object-contain rounded-xl transition-transform duration-300 ease-in-out hover:scale-105"
+                            />
+                        </div>
+
+                        {/* Honorary General Secretary */}
+                        <div className="bg-white/30 rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col items-center">
+                            <Image
+                                src="/Presidency/JWMJ/4.png"
+                                alt="Honorary General Secretary"
+                                width={120}
+                                height={120}
+                                className="object-cover mb-3 transition-transform duration-300 ease-in-out hover:scale-105 rounded-lg"
+                            />
+                            <p className="text-base font-bold text-gray-800 text-center">
+                                Honorary General Secretary <br />Muhammad Imran Wehvaria
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
                 {/* Faculty Members (Presidency) - Desktop */}
-                <section className="bg-jwmj p-8 max-w-7xl rounded-3xl border border-gray-200 shadow-lg mx-auto">
+                <section className="hidden md:block bg-jwmj p-8 max-w-7xl rounded-3xl border border-gray-200 shadow-lg mx-auto">
 
                     <div className="flex flex-row gap-6 items-center">
 
@@ -238,8 +285,55 @@ export default function HomeClient() {
                     </div>
                 </section>
 
+                {/* Faculty Members (Presidency) JWMYO - Mobile */}
+                <section className="md:hidden mt-8 mb-8 bg-jwmj p-4 rounded-2xl border border-gray-200 shadow-lg mx-auto">
+                    <h2 className="text-center text-[#F9C856] font-bold text-xl mb-4">
+                        JWMYO MANAGEMENT TEAM
+                    </h2>
+                    <div className="flex flex-col gap-4">
+                        {/* President */}
+                        <div className="bg-primary-yellow/30 rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col items-center">
+                            <Image
+                                src="/Presidency/JWMYO/1.png"
+                                alt="President"
+                                width={120}
+                                height={120}
+                                className="object-cover mb-3 transition-transform duration-300 ease-in-out hover:scale-105 rounded-lg"
+                            />
+                            <p className="text-base font-bold text-gray-800 text-center">
+                                President <br />Uzair Munawar
+                            </p>
+                        </div>
+
+                        {/* Group Photo */}
+                        <div className="bg-primary-yellow/30 rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-center">
+                            <Image
+                                src="/Presidency/JWMYO group.jpg"
+                                alt="Group Photo"
+                                width={400}
+                                height={200}
+                                className="object-contain rounded-xl transition-transform duration-300 ease-in-out hover:scale-105"
+                            />
+                        </div>
+
+                        {/* General Secretary */}
+                        <div className="bg-primary-yellow/30 rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col items-center">
+                            <Image
+                                src="/Presidency/JWMYO/4.png"
+                                alt="General Secretary"
+                                width={120}
+                                height={120}
+                                className="object-cover mb-3 transition-transform duration-300 ease-in-out hover:scale-105 rounded-lg"
+                            />
+                            <p className="text-base font-bold text-gray-800 text-center">
+                                General Secretary <br />Saqib Yousuf Rangoonwala
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
                 {/* Faculty Members (Presidency) JWMYO - Desktop */}
-                <section className="mt-10 mb-10 bg-jwmj p-8 rounded-3xl border border-gray-200 shadow-lg mx-auto max-w-7xl">
+                <section className="hidden md:block mt-10 mb-10 bg-jwmj p-8 rounded-3xl border border-gray-200 shadow-lg mx-auto max-w-7xl">
 
                     <div className="flex flex-row  gap-6 items-center">
 
@@ -293,10 +387,10 @@ export default function HomeClient() {
 
                 </section>
                 {/* Centered Button Below JWMYO Section */}
-                <div className="flex justify-center mt-10 mb-10">
+                <div className="flex justify-center mt-6 md:mt-10 mb-6 md:mb-10">
                     <Link
                         href="/presidency"
-                        className="px-8 py-3 rounded-full font-semibold text-lg bg-gray-200/70 text-gray-700 border-2 border-gray-400 shadow-md backdrop-blur-md transition hover:bg-gray-400 hover:text-white hover:border-gray-600 hover:scale-105 duration-200"
+                        className="px-6 md:px-8 py-2 md:py-3 rounded-full font-semibold text-sm md:text-lg bg-gray-200/70 text-gray-700 border-2 border-gray-400 shadow-md backdrop-blur-md transition hover:bg-gray-400 hover:text-white hover:border-gray-600 hover:scale-105 duration-200"
                         style={{ boxShadow: '0 2px 8px rgba(120,120,120,0.10)' }}
                     >
                         See all teams
@@ -307,36 +401,36 @@ export default function HomeClient() {
                 <div className="bg-linear-to-b from-zinc-300/0 to-yellow-500/25 backdrop-blur-sm">
                     {/* Hero Section with Three Cards */}
                     <section className="relative px-3 py-4 md:px-6 lg:px-10">
-                        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
+                        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4 max-w-7xl mx-auto">
                             {/* About Us Card */}
-                            <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-6 min-h-70 flex flex-col">
-                                <h2 className="text-sky-600 text-xl lg:text-2xl font-bold mb-4">About Us</h2>
-                                <div className="text-black/60 text-xs lg:text-sm font-medium leading-relaxed grow">
+                            <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-4 md:p-6 min-h-70 flex flex-col">
+                                <h2 className="text-sky-600 text-lg md:text-xl lg:text-2xl font-bold mb-3 md:mb-4">About Us</h2>
+                                <div className="text-black/60 text-xs md:text-sm lg:text-sm font-medium leading-relaxed grow">
                                     Jamnagar Wehvaria Memon Jamat (JWMJ), established in 1949 in Karachi, is a non-profit community organization dedicated to fostering unity, brotherhood, and welfare among its members. Guided by its constitution, JWMJ actively supports education, healthcare, housing, employment, and social services while ensuring dignity and upliftment for all. Through various committees and initiatives, it continues to strengthen the community, provide essential facilities, and work for the collective progress of its members.
                                 </div>
-                                <Link href="/about" className="mt-4 self-center bg-sky-600/95 hover:bg-sky-700 text-black font-bold text-sm px-4 py-2 rounded-full border border-sky-700 transition-colors">
+                                <Link href="/about" className="mt-3 md:mt-4 self-center bg-sky-600/95 hover:bg-sky-700 text-black font-bold text-xs md:text-sm px-4 py-2 rounded-full border border-sky-700 transition-colors">
                                     See All
                                 </Link>
                             </div>
 
                             {/* Aims & Objectives Card */}
-                            <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-6 min-h-70 flex flex-col">
-                                <h2 className="text-emerald-400 text-xl lg:text-2xl font-bold mb-4">Aims & Objectives</h2>
-                                <div className="text-black/60 text-xs lg:text-sm font-medium leading-relaxed grow">
+                            <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-4 md:p-6 min-h-70 flex flex-col">
+                                <h2 className="text-emerald-400 text-lg md:text-xl lg:text-2xl font-bold mb-3 md:mb-4">Aims & Objectives</h2>
+                                <div className="text-black/60 text-xs md:text-sm lg:text-sm font-medium leading-relaxed grow">
                                     Jamnagar Wehvaria Memon Jamat, established in 1949 as a non-profit organization, aims to foster unity, brotherhood, and welfare among its members by supporting their educational, religious, social, and economic needs. The community raises funds through donations and contributions to provide essential services such as burial facilities, Jamat Khana, libraries, training centers, healthcare, and welfare institutions. It also works to strengthen social bonds, promote collective progress, and collaborate with other Memon organizations across Pakistan, while remaining strictly non-political.
                                 </div>
-                                <Link href="/about#aims" className="mt-4 self-center bg-emerald-400/75 hover:bg-emerald-500 text-black font-bold text-sm px-4 py-2 rounded-full border border-emerald-800 transition-colors">
+                                <Link href="/about#aims" className="mt-3 md:mt-4 self-center bg-emerald-400/75 hover:bg-emerald-500 text-black font-bold text-xs md:text-sm px-4 py-2 rounded-full border border-emerald-800 transition-colors">
                                     See All
                                 </Link>
                             </div>
 
                             {/* Vision Card */}
-                            <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-6 min-h-70 flex flex-col">
-                                <h2 className="text-amber-300 text-xl lg:text-2xl font-bold mb-4">Vision</h2>
-                                <div className="text-black/60 text-xs lg:text-sm font-medium leading-relaxed grow">
+                            <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-4 md:p-6 min-h-70 flex flex-col">
+                                <h2 className="text-amber-300 text-lg md:text-xl lg:text-2xl font-bold mb-3 md:mb-4">Vision</h2>
+                                <div className="text-black/60 text-xs md:text-sm lg:text-sm font-medium leading-relaxed grow">
                                     The vision of Jamat is to holistically support its members by promoting education, reducing unemployment through training, providing interest-free business loans, ensuring healthcare with Islamic Takaful, offering 24/7 emergency services, facilitating Hajj/Umrah for the needy, assisting in housing, expanding and transparently distributing zakat and welfare funds, empowering sub-committees, granting voting rights to overseas members, maintaining updated member data with digital tools, updating the constitution, seeking guidance from senior members, and ensuring transparency through annual financial and performance reports.
                                 </div>
-                                <Link href="/about#vision" className="mt-4 self-center bg-amber-300/60 hover:bg-amber-400 text-black font-bold text-sm px-4 py-2 rounded-full border border-orange-400 transition-colors">
+                                <Link href="/about#vision" className="mt-3 md:mt-4 self-center bg-amber-300/60 hover:bg-amber-400 text-black font-bold text-xs md:text-sm px-4 py-2 rounded-full border border-orange-400 transition-colors">
                                     See All
                                 </Link>
                             </div>
@@ -347,47 +441,47 @@ export default function HomeClient() {
                     <section className="relative px-3 py-8 md:px-6 lg:px-10">
                         <div className="max-w-7xl mx-auto">
                             {/* Section Background Card */}
-                            <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-6 lg:p-8">
+                            <div className="bg-zinc-300/40 rounded-2xl border border-neutral-400 p-4 md:p-6 lg:p-8">
 
                                 {/* Section Header */}
-                                <div className="text-center mb-8">
-                                    <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-3">
+                                <div className="text-center mb-6 md:mb-8">
+                                    <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800 mb-2 md:mb-3">
                                         Our Community Businesses
                                     </h2>
-                                    <p className="text-gray-600 text-sm lg:text-base max-w-2xl mx-auto">
+                                    <p className="text-gray-600 text-xs md:text-sm lg:text-base max-w-2xl mx-auto">
                                         Supporting our community members by showcasing their businesses and services.
                                     </p>
                                 </div>
 
                                 {/* Business Logos Grid */}
                                 {allCommunityBusinesses.length === 0 ? (
-                                    <div className="text-center py-8 mb-8">
+                                    <div className="text-center py-6 md:py-8 mb-6 md:mb-8">
                                         <div className="max-w-md mx-auto">
-                                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <div className="w-12 md:w-16 h-12 md:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                                                <svg className="w-6 md:w-8 h-6 md:h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                                 </svg>
                                             </div>
-                                            <h3 className="text-lg font-bold text-gray-800 mb-2">
+                                            <h3 className="text-base md:text-lg font-bold text-gray-800 mb-2">
                                                 No Businesses Yet
                                             </h3>
-                                            <p className="text-gray-600 text-sm mb-4">
+                                            <p className="text-gray-600 text-xs md:text-sm mb-3 md:mb-4">
                                                 Be the first to showcase your business in our community directory!
                                             </p>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-4 mb-6 md:mb-8">
                                         {allCommunityBusinesses.slice(0, 5).map((business) => (
                                             <div
                                                 key={business.id}
                                                 className="group cursor-pointer"
                                             >
-                                                <div className="bg-white/60 rounded-xl border border-gray-300 p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 hover:bg-white/80">
+                                                <div className="bg-white/60 rounded-xl border border-gray-300 p-2 md:p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 hover:bg-white/80">
                                                     {/* Business Logo */}
-                                                    <div className="flex items-center justify-center mb-3">
-                                                        <div className="w-12 h-12 lg:w-16 lg:h-16 bg-linear-to-br from-[#038DCD] to-[#F9C856] rounded-lg flex items-center justify-center">
-                                                            <span className="text-white font-bold text-sm lg:text-lg">
+                                                    <div className="flex items-center justify-center mb-2 md:mb-3">
+                                                        <div className="w-10 h-10 md:w-16 md:h-16 bg-linear-to-br from-[#038DCD] to-[#F9C856] rounded-lg flex items-center justify-center">
+                                                            <span className="text-white font-bold text-xs md:text-lg">
                                                                 {business.name.split(' ').map(word => word[0]).join('').slice(0, 2)}
                                                             </span>
                                                         </div>
@@ -395,7 +489,7 @@ export default function HomeClient() {
 
                                                     {/* Business Name */}
                                                     <div className="text-center">
-                                                        <h3 className="font-semibold text-sm lg:text-base text-gray-800 line-clamp-2 group-hover:text-[#038DCD] transition-colors">
+                                                        <h3 className="font-semibold text-xs md:text-base text-gray-800 line-clamp-2 group-hover:text-[#038DCD] transition-colors">
                                                             {business.name}
                                                         </h3>
                                                     </div>
@@ -406,22 +500,22 @@ export default function HomeClient() {
                                 )}
 
                                 {/* Bottom Section with CTA */}
-                                <div className="bg-white/50 rounded-xl border border-gray-300 p-6 text-center">
-                                    <h3 className="text-lg lg:text-xl font-bold text-gray-800 mb-3">
+                                <div className="bg-white/50 rounded-xl border border-gray-300 p-4 md:p-6 text-center">
+                                    <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-800 mb-2 md:mb-3">
                                         Discover More Community Businesses
                                     </h3>
-                                    <p className="text-gray-600 text-sm lg:text-base mb-4 max-w-xl mx-auto">
+                                    <p className="text-gray-600 text-xs md:text-sm lg:text-base mb-3 md:mb-4 max-w-xl mx-auto">
                                         Get special member discounts and support local entrepreneurs in our community.
                                     </p>
 
-                                    <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                                    <div className="flex flex-col sm:flex-row gap-2 md:gap-3 justify-center items-center">
                                         <Link
                                             href="/business"
-                                            className="bg-[#038DCD] hover:bg-[#038DCD]/90 text-white font-semibold px-6 py-2 rounded-full transition-all duration-200 hover:scale-105 text-sm lg:text-base"
+                                            className="w-full sm:w-auto bg-[#038DCD] hover:bg-[#038DCD]/90 text-white font-semibold px-4 md:px-6 py-2 rounded-full transition-all duration-200 hover:scale-105 text-xs md:text-sm lg:text-base"
                                         >
                                             View All Businesses
                                         </Link>
-                                        <button className="bg-white hover:bg-gray-50 text-[#038DCD] font-semibold px-6 py-2 rounded-full border-2 border-[#038DCD] transition-all duration-200 hover:scale-105 text-sm lg:text-base">
+                                        <button className="w-full sm:w-auto bg-white hover:bg-gray-50 text-[#038DCD] font-semibold px-4 md:px-6 py-2 rounded-full border-2 border-[#038DCD] transition-all duration-200 hover:scale-105 text-xs md:text-sm lg:text-base">
                                             List Your Business
                                         </button>
                                     </div>
@@ -434,23 +528,23 @@ export default function HomeClient() {
                     {/* President's Message Section */}
                     <section className="px-3 py-6 md:px-6 lg:px-10">
                         <div className="max-w-7xl mx-auto">
-                            <div className="flex flex-col md:flex-row gap-6 items-start">
-                                {/* President's Image Placeholder */}
-                                <div className="flex-1">
-                                    <div className="relative">
+                            <div className="flex flex-col gap-6 items-start">
+                                {/* President's Image */}
+                                <div className="w-full md:flex-1">
+                                    <div className="relative w-full md:max-w-xs">
                                         <Image
                                             src="/Presidency/JWMJ/1.png"
                                             alt="President"
                                             width={400}
                                             height={400}
-                                            className="object-cover mb-4 rounded-2xl"
+                                            className="object-cover w-full h-auto rounded-2xl"
                                         />
 
                                     </div>
                                 </div>
 
                                 {/* President's Message Content */}
-                                <div className="flex-1 md:flex-2">
+                                <div className="w-full md:flex-1">
                                     <h2 className="text-neutral-900 text-2xl lg:text-3xl font-bold mb-4">President&apos;s Message</h2>
                                     <div className="text-black text-sm lg:text-base leading-relaxed mb-6">
                                         As the President of Jamnagar Wehvaria Memon Jamat, I am very thankful to Almighty Allah for giving me and my team the opportunity to serve the members of Jamat. Alhamdulillah our team is the first team of Jamat which has been selected to serve Jamat through elections with the help and cooperation of the members of Jamat and I and my entire team are very grateful to all the members of Jamat for this cooperation and belief.
@@ -459,7 +553,7 @@ export default function HomeClient() {
                                         In the end, we will try our best to promote the atmosphere of brotherhood and fraternity in the congregation. Poverty should be eradicated from the Jamat and all members should be made independent and we need full support and cooperation of our members for this noble cause.
 
                                     </div>
-                                    <Link href="/presidency" className="bg-stone-300/75 hover:bg-stone-400 text-black font-bold text-xl px-12 py-6 rounded-full border border-neutral-500 transition-colors">
+                                    <Link href="/presidency" className="inline-block bg-stone-300/75 hover:bg-stone-400 text-black font-bold text-lg lg:text-xl px-6 lg:px-12 py-3 lg:py-6 rounded-full border border-neutral-500 transition-colors">
                                         Full Message
                                     </Link>
                                 </div>
@@ -468,23 +562,23 @@ export default function HomeClient() {
                     </section>
 
                     {/* About JWMYO and History Section - Compact Version */}
-                    <section className="relative px-4 py-8 md:px-8 lg:px-12">
+                    <section className="relative px-3 py-8 md:px-8 lg:px-12">
                         <div className="relative z-10 max-w-7xl mx-auto">
-                            <div className="bg-stone-300/25 rounded-2xl border border-blue-900 p-6 lg:p-10">
+                            <div className="bg-stone-300/25 rounded-2xl border border-blue-900 p-4 md:p-6 lg:p-10">
                                 <Link href="/about-jwmyo" className="block cursor-pointer hover:bg-blue-900/10 rounded-2xl transition duration-200">
                                     {/* About JWMYO */}
-                                    <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
-                                        <h2 className="text-sky-600 text-2xl lg:text-3xl font-bold">About JWMYO</h2>
-                                        <div className="text-sky-600 text-3xl lg:text-5xl font-black -mt-3">→</div>
+                                    <div className="flex flex-col lg:flex-row items-start lg:items-center gap-3 md:gap-4">
+                                        <h2 className="text-sky-600 text-xl md:text-2xl lg:text-3xl font-bold">About JWMYO</h2>
+                                        <div className="text-sky-600 text-2xl md:text-3xl lg:text-5xl font-black -mt-1 md:-mt-3">→</div>
                                     </div>
-                                    <p className="text-black text-base lg:text-lg leading-relaxed mt-2">
+                                    <p className="text-black text-sm md:text-base lg:text-lg leading-relaxed mt-3 md:mt-2">
                                         The primary aims of JWMYO are the development of youth with strong religious belief and positive approach towards the modern world, organization of a healthcare system to arrange blood donation camps and free of cost medical camps for the members of community to facilitate a healthy lifestyle. Providing the educational opportunities to the students in the community with an intention to promote and encourage the positive approach towards higher and professional qualifications in order to achieve better jobs and work opportunities in the market.
                                     </p>
-                                    <div className="bg-blue-900 max-w-6xl -mx-6 lg:-mx-10 my-8 h-px"></div>
+                                    <div className="bg-blue-900 -mx-4 md:-mx-6 lg:-mx-10 my-6 md:my-8 h-px"></div>
                                     {/* History */}
                                     <div>
-                                        <h2 className="text-neutral-900 text-2xl lg:text-3xl font-bold mb-4">History</h2>
-                                        <p className="text-black text-base lg:text-lg leading-relaxed">
+                                        <h2 className="text-neutral-900 text-xl md:text-2xl lg:text-3xl font-bold mb-3 md:mb-4">History</h2>
+                                        <p className="text-black text-sm md:text-base lg:text-lg leading-relaxed">
                                             The Jamnagar Wehvaria Memon Youth Organization is one of the esteemed social organization of the Memon communities serving since 1982 under the patronage of Jamnagar Wehvaria Memon Jamat.The strong foundation of Jamnagar Wehvaria Memon Youth Organization was laid by Mr. A.K Jamal, Mr. Abdul Nasir Rangoonwala, Mr Muhammad Saleem Durvesh, and Mr Muhammad Yousuf Rangoonwala under of leadership of then President of the Jamnagar Wehvaria Memon Jamat, Mr.Ahmed Abdul Ghaffar Rangoonwala.
                                         </p>
                                     </div>
@@ -494,15 +588,15 @@ export default function HomeClient() {
                     </section>
                 </div>
 
-                <div className="relative w-full max-w-7xl mx-auto py-8">
+                <div className="relative w-full max-w-7xl mx-auto py-6 md:py-8">
 
                     <EventsHighlights />
 
                     {/* See All Button */}
-                    <div className="flex justify-center mt-2 lg:mt-4">
+                    <div className="flex justify-center mt-2 md:mt-4">
                         <Link href="/events">
-                            <button className="w-32 sm:w-36 lg:w-40 h-10 sm:h-12 lg:h-14 opacity-60 bg-stone-300/75 rounded-[25px] sm:rounded-[30px] border border-neutral-500 hover:opacity-80 transition-opacity duration-200">
-                                <span className="text-black text-sm sm:text-base lg:text-lg font-bold font-inter">
+                            <button className="w-28 sm:w-32 md:w-36 lg:w-40 h-9 sm:h-10 md:h-12 lg:h-14 opacity-60 bg-stone-300/75 rounded-[25px] sm:rounded-[30px] border border-neutral-500 hover:opacity-80 transition-opacity duration-200">
+                                <span className="text-black text-xs sm:text-sm md:text-base lg:text-lg font-bold font-inter">
                                     See All
                                 </span>
                             </button>

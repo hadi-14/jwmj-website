@@ -80,7 +80,7 @@ function SidebarWrapper({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 // Header Component
 function Header({ onMenuClick, member }: { onMenuClick: () => void; member: { name?: string } | null }) {
   return (
-    <header className="h-16 bg-background border-b-2 border-primary-silver-400 sticky top-0 z-20">
+    <header className="hidden lg:block h-16 bg-background border-b-2 border-primary-silver-400 sticky top-0 z-20">
       <div className="h-full px-4 sm:px-6 flex items-center justify-between">
         {/* Left side */}
         <div className="flex items-center gap-4">

@@ -2,10 +2,15 @@ import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, sanitizeInput, applyRateLimit, logSecurityEvent } from "@/lib/auth";
 
-// Validate UUID format
+// Validate ID format (UUID or CUID-like ID)
 function isValidUUID(id: string): boolean {
+  if (!id || typeof id !== 'string' || !id.trim()) return false;
+
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(id);
+  const cuidRegex = /^c[0-9a-z]{24}$/i; // Prisma CUID v1 is 25 chars and starts with c
+  const genericIdRegex = /^[a-z0-9]{24,25}$/i; // fallback for other IDs used in the app
+
+  return uuidRegex.test(id) || cuidRegex.test(id) || genericIdRegex.test(id);
 }
 
 // GET single event - public with rate limiting
@@ -98,23 +103,36 @@ export async function PUT(
     if (islamicDate !== undefined) updateData.islamicDate = islamicDate ? sanitizeInput(islamicDate) : null;
     if (venue !== undefined) updateData.venue = venue ? sanitizeInput(venue) : null;
     if (category) {
-      const validCategories = ['religious', 'social', 'educational', 'community', 'other'];
+      const validCategories = [
+        'sports events',
+        'islamic events',
+        'cultural events',
+        'community events',
+        'youth programs',
+        'religious',
+        'social',
+        'educational',
+        'community',
+        'other'
+      ];
       if (!validCategories.includes(category.toLowerCase())) {
         return NextResponse.json({ error: 'Invalid category' }, { status: 400 });
       }
       updateData.category = category.toLowerCase();
     }
     if (img) {
-      const urlRegex = /^https?:\/\/.+/i;
-      if (!urlRegex.test(img)) {
+      const absoluteUrlRegex = /^https?:\/\/.+/i;
+      const relativeRootRegex = /^\/.+/;
+      if (!(absoluteUrlRegex.test(img) || relativeRootRegex.test(img))) {
         return NextResponse.json({ error: 'Invalid image URL' }, { status: 400 });
       }
       updateData.img = img;
     }
     if (fb !== undefined) {
       if (fb) {
-        const urlRegex = /^https?:\/\/.+/i;
-        if (!urlRegex.test(fb)) {
+        const absoluteUrlRegex = /^https?:\/\/.+/i;
+        const relativeRootRegex = /^\/.+/;
+        if (!(absoluteUrlRegex.test(fb) || relativeRootRegex.test(fb))) {
           return NextResponse.json({ error: 'Invalid Facebook URL' }, { status: 400 });
         }
       }
