@@ -1,6 +1,5 @@
 'use client';
 
-import { getBusinesses } from "@/actions/business";
 import EventsHighlights from "@/components/eventsHighlights";
 import { BusinessAds } from "@/types/businessAds";
 import Image from "next/image";
@@ -9,6 +8,7 @@ import { useState, useEffect } from "react";
 
 export default function HomeClient() {
     const [allCommunityBusinesses, setAllCommunityBusinesses] = useState<BusinessAds[]>([]);
+    const [logoLoadErrors, setLogoLoadErrors] = useState<Record<number, boolean>>({});
     const services = [
         { name: "HEALTHCARE", href: "/#" },
         { name: "EDUCATION", href: "/#" },
@@ -21,13 +21,28 @@ export default function HomeClient() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await getBusinesses();
-                if (data) {
-                    setAllCommunityBusinesses(data);
+                console.log('[HomeClient] Starting business fetch from /api/business');
+                const response = await fetch('/api/business');
+                console.log('[HomeClient] API response status:', response.status);
+                console.log('[HomeClient] API response ok:', response.ok);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-            } catch {
+
+                const data = await response.json();
+                console.log('[HomeClient] API response data:', data);
+                console.log('[HomeClient] Businesses in response:', data.businesses?.length || 0);
+
+                if (data.businesses && Array.isArray(data.businesses)) {
+                    console.log('[HomeClient] Setting businesses state with', data.businesses.length, 'businesses');
+                    setAllCommunityBusinesses(data.businesses);
+                } else {
+                    console.warn('[HomeClient] No businesses array in response or invalid format');
+                }
+            } catch (error) {
                 // Silently handle error - database may not be configured
-                console.log("[v0] Business fetch skipped - database not configured");
+                console.log("[HomeClient] Business fetch failed:", error instanceof Error ? error.message : 'Unknown error');
             }
         };
         fetchData();
@@ -480,10 +495,28 @@ export default function HomeClient() {
                                                 <div className="bg-white/60 rounded-xl border border-gray-300 p-2 md:p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 hover:bg-white/80">
                                                     {/* Business Logo */}
                                                     <div className="flex items-center justify-center mb-2 md:mb-3">
-                                                        <div className="w-10 h-10 md:w-16 md:h-16 bg-linear-to-br from-[#038DCD] to-[#F9C856] rounded-lg flex items-center justify-center">
-                                                            <span className="text-white font-bold text-xs md:text-lg">
-                                                                {business.name.split(' ').map(word => word[0]).join('').slice(0, 2)}
-                                                            </span>
+                                                        <div className="relative w-16 h-16 md:w-20 md:h-20 mx-auto">
+                                                            {business.logo && !logoLoadErrors[business.id] ? (
+                                                                <Image
+                                                                    src={business.logo}
+                                                                    alt={`${business.name} logo`}
+                                                                    width={80}
+                                                                    height={80}
+                                                                    className="rounded-full object-contain w-full h-full border border-white/30 bg-white/20"
+                                                                    onError={() => {
+                                                                        setLogoLoadErrors(prev => ({
+                                                                            ...prev,
+                                                                            [business.id]: true,
+                                                                        }));
+                                                                    }}
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full bg-gradient-to-br from-sky-600 to-emerald-500 rounded-full flex items-center justify-center border border-white/30">
+                                                                    <span className="text-white font-bold text-sm md:text-xl">
+                                                                        {business.name.split(' ').map(word => word[0]).join('').slice(0, 2)}
+                                                                    </span>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </div>
 
@@ -528,23 +561,23 @@ export default function HomeClient() {
                     {/* President's Message Section */}
                     <section className="px-3 py-6 md:px-6 lg:px-10">
                         <div className="max-w-7xl mx-auto">
-                            <div className="flex flex-col gap-6 items-start">
-                                {/* President's Image */}
-                                <div className="w-full md:flex-1">
-                                    <div className="relative w-full md:max-w-xs">
+                            <div className="flex flex-col md:flex-row gap-6 items-start">
+                                {/* President's Image Placeholder */}
+                                <div className="flex-1">
+                                    <div className="relative">
                                         <Image
                                             src="/Presidency/JWMJ/1.png"
                                             alt="President"
                                             width={400}
                                             height={400}
-                                            className="object-cover w-full h-auto rounded-2xl"
+                                            className="object-cover mb-4 rounded-2xl"
                                         />
 
                                     </div>
                                 </div>
 
                                 {/* President's Message Content */}
-                                <div className="w-full md:flex-1">
+                                <div className="flex-1 md:flex-2">
                                     <h2 className="text-neutral-900 text-2xl lg:text-3xl font-bold mb-4">President&apos;s Message</h2>
                                     <div className="text-black text-sm lg:text-base leading-relaxed mb-6">
                                         As the President of Jamnagar Wehvaria Memon Jamat, I am very thankful to Almighty Allah for giving me and my team the opportunity to serve the members of Jamat. Alhamdulillah our team is the first team of Jamat which has been selected to serve Jamat through elections with the help and cooperation of the members of Jamat and I and my entire team are very grateful to all the members of Jamat for this cooperation and belief.
@@ -553,13 +586,14 @@ export default function HomeClient() {
                                         In the end, we will try our best to promote the atmosphere of brotherhood and fraternity in the congregation. Poverty should be eradicated from the Jamat and all members should be made independent and we need full support and cooperation of our members for this noble cause.
 
                                     </div>
-                                    <Link href="/presidency" className="inline-block bg-stone-300/75 hover:bg-stone-400 text-black font-bold text-lg lg:text-xl px-6 lg:px-12 py-3 lg:py-6 rounded-full border border-neutral-500 transition-colors">
+                                    <Link href="/presidency" className="bg-stone-300/75 hover:bg-stone-400 text-black font-bold text-xl px-12 py-6 rounded-full border border-neutral-500 transition-colors">
                                         Full Message
                                     </Link>
                                 </div>
                             </div>
                         </div>
                     </section>
+
 
                     {/* About JWMYO and History Section - Compact Version */}
                     <section className="relative px-3 py-8 md:px-8 lg:px-12">

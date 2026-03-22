@@ -77,7 +77,7 @@ export default function Sidebar({
     };
 
     const topClass = topOffset ? 'top-16' : 'top-0';
-    const heightClass = topOffset ? 'h-[calc(100vh-4rem)]' : 'h-full';
+    const heightClass = topOffset ? 'h-[calc(100vh-4rem)]' : 'h-screen';
 
     return (
         <>
@@ -93,7 +93,7 @@ export default function Sidebar({
             {/* Sidebar */}
             <aside
                 className={`fixed left-0 z-40 w-72 ${themeConfig.bg} border-r-2 ${themeConfig.border} transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:${heightClass} flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'
-                    } ${topOffset ? `${topClass} h-[calc(100vh-4rem)]` : 'top-0 h-screen'}`}
+                    } ${topOffset ? `${topClass} ${heightClass}` : 'top-0 h-screen'}`}
             >
                 {/* Logo */}
                 <div className="h-16 flex items-center justify-between px-5 sm:px-6 border-b-2 border-inherit">

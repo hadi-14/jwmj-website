@@ -42,6 +42,7 @@ next-env.d.ts
 test.html
 
 public/uploads/pdfs/*
+public/uploads/business-logos/*
 public/Events/*
 
 sync/mysql_sync.build

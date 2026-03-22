@@ -29,6 +29,7 @@ export default function NewBusinessAdPage() {
   const [services, setServices] = useState<string[]>(['']);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [uploadedLogoUrl, setUploadedLogoUrl] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     businessName: '',
@@ -64,7 +65,7 @@ export default function NewBusinessAdPage() {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
@@ -75,16 +76,50 @@ export default function NewBusinessAdPage() {
         showNotification('File size must be less than 2MB.', 'error');
         return;
       }
+
       setLogoFile(file);
       const reader = new FileReader();
-      reader.onload = (e) => setLogoPreview(e.target?.result as string);
+      reader.onload = (event) => setLogoPreview(event.target?.result as string);
       reader.readAsDataURL(file);
+
+      const uploadedPath = await uploadLogoFile(file);
+      if (uploadedPath) {
+        setUploadedLogoUrl(uploadedPath);
+        showNotification('Logo uploaded successfully', 'success');
+      }
     }
   };
 
   const removeLogo = () => {
     setLogoFile(null);
     setLogoPreview(null);
+    setUploadedLogoUrl(null);
+  };
+
+  const uploadLogoFile = async (file: File) => {
+    const uploadForm = new FormData();
+    uploadForm.append('file', file);
+
+    const uploadResponse = await fetch('/api/member/business-ads/upload', {
+      method: 'POST',
+      body: uploadForm
+    });
+
+    if (!uploadResponse.ok) {
+      const errorBody = await uploadResponse.json().catch(() => ({}));
+      const message = (errorBody as { error?: string }).error || uploadResponse.statusText;
+      showNotification(`Logo upload failed: ${message}`, 'error');
+      return null;
+    }
+
+    const uploadResult = await uploadResponse.json();
+
+    if (!uploadResult.success || !uploadResult.path) {
+      showNotification('Logo upload failed', 'error');
+      return null;
+    }
+
+    return uploadResult.path as string;
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -117,15 +152,37 @@ export default function NewBusinessAdPage() {
 
     try {
       const filteredServices = services.filter(service => service.trim() !== '');
-      let logoUrl = undefined;
+      let logoUrl = uploadedLogoUrl;
 
-      if (logoFile) {
-        const base64 = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(logoFile);
+      if (logoFile && !uploadedLogoUrl) {
+        const uploadForm = new FormData();
+        uploadForm.append('file', logoFile);
+
+        const uploadResponse = await fetch('/api/member/business-ads/upload', {
+          method: 'POST',
+          body: uploadForm
         });
-        logoUrl = base64;
+
+        if (!uploadResponse.ok) {
+          const errorBody = await uploadResponse.json().catch(() => ({}));
+          showNotification(
+            `Logo upload failed: ${(errorBody as any).error || uploadResponse.statusText}`,
+            'error'
+          );
+          setIsSubmitting(false);
+          return;
+        }
+
+        const uploadResult = await uploadResponse.json();
+
+        if (!uploadResult.success || !uploadResult.path) {
+          showNotification('Logo upload failed', 'error');
+          setIsSubmitting(false);
+          return;
+        }
+
+        logoUrl = uploadResult.path;
+        setUploadedLogoUrl(logoUrl);
       }
 
       const result = await submitBusinessAdRequest({
@@ -139,6 +196,9 @@ export default function NewBusinessAdPage() {
 
       if (result.success) {
         showNotification('Business ad request submitted successfully!', 'success');
+        setLogoFile(null);
+        setLogoPreview(null);
+        setUploadedLogoUrl(null);
         router.push('/member/business-ads');
       } else {
         showNotification('Failed to submit request.', 'error');

@@ -189,13 +189,13 @@ function MemberPortalLayout({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-blue-50/30 via-background to-primary-yellow-50/30 flex flex-col lg:flex-row">
+    <div className="h-screen bg-gradient-to-br from-primary-blue-50/30 via-background to-primary-yellow-50/30 flex flex-col lg:flex-row">
       <SidebarWrapper isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col">
         <Header onMenuClick={() => setSidebarOpen(true)} member={member} />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 overflow-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8 overflow-auto">
           {children}
         </main>
       </div>

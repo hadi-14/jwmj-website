@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { submitBusinessAdRequest } from '@/actions/business';
 import { useNotification } from '@/components/Notification';
 import {
   Briefcase,
@@ -68,11 +67,13 @@ export default function BusinessAdsPage() {
   const [member, setMember] = useState<MemberInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState<string[]>([]);
 
   // Form states
   const [services, setServices] = useState<string[]>(['']);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [uploadedLogoUrl, setUploadedLogoUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     businessName: '',
     category: '',
@@ -115,7 +116,32 @@ export default function BusinessAdsPage() {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const uploadLogoFile = async (file: File) => {
+    const uploadForm = new FormData();
+    uploadForm.append('file', file);
+
+    const resp = await fetch('/api/member/business-ads/upload', {
+      method: 'POST',
+      body: uploadForm
+    });
+
+    if (!resp.ok) {
+      const body = await resp.json().catch(() => ({}));
+      const message = (body as { error?: string }).error || resp.statusText;
+      showNotification(`Logo upload failed: ${message}`, 'error');
+      return null;
+    }
+
+    const data = await resp.json();
+    if (!data.success || !data.path) {
+      showNotification('Logo upload failed', 'error');
+      return null;
+    }
+
+    return data.path as string;
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
@@ -126,21 +152,33 @@ export default function BusinessAdsPage() {
         showNotification('File size must be less than 2MB.', 'error');
         return;
       }
+
       setLogoFile(file);
       const reader = new FileReader();
-      reader.onload = (e) => setLogoPreview(e.target?.result as string);
+      reader.onload = (event) => setLogoPreview(event.target?.result as string);
       reader.readAsDataURL(file);
+
+      const path = await uploadLogoFile(file);
+      if (path) {
+        setUploadedLogoUrl(path);
+        showNotification('Logo uploaded successfully', 'success');
+      }
     }
   };
 
   const removeLogo = () => {
     setLogoFile(null);
     setLogoPreview(null);
+    setUploadedLogoUrl(null);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear errors when user starts editing
+    if (formErrors.length > 0) {
+      setFormErrors([]);
+    }
   };
 
   const handleServiceChange = (index: number, value: string) => {
@@ -168,37 +206,67 @@ export default function BusinessAdsPage() {
 
     try {
       const filteredServices = services.filter(service => service.trim() !== '');
-      let logoUrl = undefined;
+      let logoUrl = uploadedLogoUrl;
 
-      if (logoFile) {
-        const base64 = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(logoFile);
-        });
-        logoUrl = base64;
+      if (logoFile && !logoUrl) {
+        const path = await uploadLogoFile(logoFile);
+        if (path) {
+          logoUrl = path;
+          setUploadedLogoUrl(path);
+        } else {
+          setIsSubmitting(false);
+          return;
+        }
       }
 
-      const result = await submitBusinessAdRequest({
-        memberId: member.MemComputerID,
-        ...formData,
-        services: filteredServices,
-        logo: logoUrl,
-        requestedStartDate: new Date(formData.requestedStartDate),
-        requestedEndDate: new Date(formData.requestedEndDate)
+      const response = await fetch('/api/member/business-ads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          businessName: formData.businessName,
+          category: formData.category,
+          phone: formData.phone,
+          email: formData.email,
+          website: formData.website,
+          address: formData.address,
+          established: formData.established,
+          owner: formData.owner,
+          specialOffers: formData.specialOffers,
+          services: filteredServices,
+          description: formData.description,
+          detailedDescription: formData.detailedDescription,
+          logo: logoUrl,
+          requestedStartDate: formData.requestedStartDate,
+          requestedEndDate: formData.requestedEndDate
+        })
       });
 
-      if (result.success) {
+      const result = await response.json();
+
+      if (response.ok && result.success) {
         showNotification('Business ad request submitted successfully!', 'success');
+        setFormErrors([]);
         resetForm();
         setActiveTab('list');
         fetchData();
       } else {
-        showNotification('Failed to submit request.', 'error');
+        // Collect all errors from response
+        let errors: string[] = [];
+        if (Array.isArray(result.details) && result.details.length > 0) {
+          errors = result.details;
+        } else if (result.error) {
+          errors = [result.error];
+        } else {
+          errors = ['Failed to submit request. Please try again.'];
+        }
+        setFormErrors(errors);
+        showNotification(`${errors.length} error(s) found in the form`, 'error');
       }
     } catch (error) {
       console.error('Error submitting:', error);
-      showNotification('An error occurred.', 'error');
+      const errorMsg = error instanceof Error ? error.message : 'An error occurred';
+      setFormErrors([errorMsg]);
+      showNotification(errorMsg, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -222,7 +290,7 @@ export default function BusinessAdsPage() {
     });
     setServices(['']);
     setLogoFile(null);
-    setLogoPreview(null);
+    setLogoPreview(null); setUploadedLogoUrl(null); setFormErrors([]);
   };
 
   const getStatusInfo = (request: BusinessAdRequest) => {
@@ -307,7 +375,10 @@ export default function BusinessAdsPage() {
       {/* Tabs */}
       <div className="flex gap-2 border-b-2 border-primary-silver-400">
         <button
-          onClick={() => setActiveTab('list')}
+          onClick={() => {
+            setActiveTab('list');
+            setFormErrors([]);
+          }}
           className={`px-4 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'list'
             ? 'border-primary-blue text-primary-blue'
             : 'border-transparent text-foreground-300 hover:text-foreground'
@@ -319,7 +390,10 @@ export default function BusinessAdsPage() {
           </div>
         </button>
         <button
-          onClick={() => setActiveTab('new')}
+          onClick={() => {
+            setActiveTab('new');
+            setFormErrors([]);
+          }}
           className={`px-4 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'new'
             ? 'border-primary-blue text-primary-blue'
             : 'border-transparent text-foreground-300 hover:text-foreground'
@@ -431,6 +505,30 @@ export default function BusinessAdsPage() {
       ) : (
         // New Ad Tab
         <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
+          {/* Error Display Section */}
+          {formErrors.length > 0 && (
+            <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-5">
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 mt-0.5">
+                  <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-red-700 mb-2">Please fix the following errors:</h3>
+                  <ul className="space-y-1 text-sm text-red-600">
+                    {formErrors.map((error, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-red-400 mt-1">•</span>
+                        <span>{error}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Business Information Card */}
           <div className="bg-background rounded-2xl border-2 border-primary-silver-400 p-5 sm:p-6">
             <div className="flex items-center gap-3 mb-6">

@@ -25,6 +25,9 @@ const organizationSchema = {
   ]
 };
 
+// Keep stable JSON for SSR/CSR hydration.
+const organizationSchemaJSON = JSON.stringify(organizationSchema);
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -126,11 +129,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
         <script
+          id="organization-schema"
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: organizationSchemaJSON }}
         />
       </head>
       <body
