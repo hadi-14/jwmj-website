@@ -11,7 +11,7 @@ interface AnnouncementData {
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [announcement, setAnnouncement] = useState<AnnouncementData>({
-        messages: ["Welcome to JWMJ! • Website Under Construction!"],
+        messages: ["Welcome to JWMJ! • Built by Graphode!"],
         enabled: true
     });
 

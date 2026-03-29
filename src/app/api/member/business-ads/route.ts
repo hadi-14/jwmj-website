@@ -66,11 +66,11 @@ function validateFormData(data: unknown): { valid: boolean; errors: string[] } {
     if (!castData.requestedStartDate || typeof castData.requestedStartDate !== 'string') errors.push('Start date is required');
     if (!castData.requestedEndDate || typeof castData.requestedEndDate !== 'string') errors.push('End date is required');
 
-    if (data.category && !BUSINESS_CATEGORIES.includes(data.category)) {
+    if (castData.category && typeof castData.category === 'string' && !BUSINESS_CATEGORIES.includes(castData.category)) {
         errors.push('Invalid category selected');
     }
 
-    if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    if (castData.email && typeof castData.email === 'string' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(castData.email)) {
         errors.push('Invalid email format');
     }
 
@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
                 email: string;
                 role: string;
             };
-        } catch (error) {
+        } catch {
             return NextResponse.json({ error: 'Invalid authentication token' }, { status: 401 });
         }
 

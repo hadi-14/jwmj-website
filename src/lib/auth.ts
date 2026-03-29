@@ -290,8 +290,8 @@ export async function logSecurityEvent(
   _request: NextRequest
 ): Promise<void> {
   try {
-    // const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
-    //            request.headers.get('x-real-ip') || 
+    // const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
+    //            request.headers.get('x-real-ip') ||
     //            'unknown';
 
     // await prisma.auditLog.create({

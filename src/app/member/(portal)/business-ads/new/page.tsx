@@ -164,9 +164,9 @@ export default function NewBusinessAdPage() {
         });
 
         if (!uploadResponse.ok) {
-          const errorBody = await uploadResponse.json().catch(() => ({}));
+          const errorBody = await uploadResponse.json().catch(() => ({})) as { error?: string };
           showNotification(
-            `Logo upload failed: ${(errorBody as any).error || uploadResponse.statusText}`,
+            `Logo upload failed: ${errorBody.error || uploadResponse.statusText}`,
             'error'
           );
           setIsSubmitting(false);

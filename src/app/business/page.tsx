@@ -135,7 +135,7 @@ export default function BusinessPage() {
 
                         {/* ── HORIZONTAL SPLIT CARDS ── */}
                         <div className="flex flex-col gap-5">
-                            {businesses.map((business, idx) => (
+                            {businesses.map((business) => (
                                 <div
                                     key={business.id}
                                     className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex flex-col sm:flex-row"
