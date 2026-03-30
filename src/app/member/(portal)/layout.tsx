@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import Link from 'next/link';
 import Image from 'next/image';
 import { MemberAuthProvider, useMemberAuth } from '@/contexts/MemberAuthContext';
 import { NotificationProvider } from '@/components/Notification';
 import Sidebar from '@/components/Sidebar';
+import MobileNav from '@/components/MobileNav';
 import {
   LayoutDashboard,
   Calendar,
@@ -119,63 +119,14 @@ function Header({ onMenuClick, member }: { onMenuClick: () => void; member: { na
   );
 }
 
-// Bottom Navigation Component (Mobile)
-function BottomNav({ onMoreClick }: { onMoreClick: () => void }) {
-  const pathname = usePathname();
-
-  const bottomNavigation = [
-    { name: 'Home', href: '/member', icon: LayoutDashboard },
-    { name: 'Events', href: '/member/events', icon: Calendar },
-    { name: 'Family', href: '/member/family', icon: Users },
-    { name: 'Fees', href: '/member/fees', icon: Receipt },
-    { name: 'More', href: '#more', icon: Menu },
-  ];
-
-  return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-background border-t-2 border-primary-silver-400 lg:hidden z-20 pb-safe">
-      <ul className="flex items-center justify-around h-16">
-        {bottomNavigation.map((item) => {
-          const Icon = item.icon;
-          const isMore = item.href === '#more';
-          const isActive = !isMore && (
-            pathname === item.href ||
-            (item.href !== '/member' && pathname?.startsWith(item.href))
-          );
-
-          if (isMore) {
-            return (
-              <li key={item.name}>
-                <button
-                  onClick={onMoreClick}
-                  className="flex flex-col items-center justify-center gap-1 px-3 py-2 text-foreground-300"
-                  aria-label="More options"
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-xs font-medium">{item.name}</span>
-                </button>
-              </li>
-            );
-          }
-
-          return (
-            <li key={item.name}>
-              <Link
-                href={item.href}
-                className={`flex flex-col items-center justify-center gap-1 px-3 py-2 transition-colors ${isActive
-                  ? 'text-primary-blue'
-                  : 'text-foreground-300 hover:text-foreground'
-                  }`}
-              >
-                <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : ''}`} />
-                <span className="text-xs font-medium">{item.name}</span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
-  );
-}
+// Bottom Mobile Navigation Items
+const mobileNavItems = [
+  { name: 'Home', href: '/member', icon: LayoutDashboard },
+  { name: 'Events', href: '/member/events', icon: Calendar },
+  { name: 'Family', href: '/member/family', icon: Users },
+  { name: 'Fees', href: '/member/fees', icon: Receipt },
+  { name: 'More', href: '#more', icon: Menu },
+];
 
 // Main Member Portal Layout
 function MemberPortalLayout({ children }: { children: React.ReactNode }) {
@@ -200,7 +151,11 @@ function MemberPortalLayout({ children }: { children: React.ReactNode }) {
         </main>
       </div>
 
-      <BottomNav onMoreClick={() => setSidebarOpen(true)} />
+      <MobileNav
+        items={mobileNavItems}
+        onMoreClick={() => setSidebarOpen(true)}
+        theme="member"
+      />
     </div>
   );
 }

@@ -40,30 +40,40 @@ export default function ApplicationsPage() {
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        const [appRes, formsRes] = await Promise.all([
+          fetch('/api/member/applications'),
+          fetch('/api/forms?isActive=true&limit=50')
+        ]);
+
+        if (!isMounted) return;
+
+        if (appRes.ok) {
+          const data = await appRes.json();
+          setApplications(data.applications || []);
+        }
+        if (formsRes.ok) {
+          const data = await formsRes.json();
+          setAvailableForms(data.data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
     fetchData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
-
-  const fetchData = async () => {
-    try {
-      const [appRes, formsRes] = await Promise.all([
-        fetch('/api/member/applications'),
-        fetch('/api/forms?isActive=true&limit=50')
-      ]);
-
-      if (appRes.ok) {
-        const data = await appRes.json();
-        setApplications(data.applications || []);
-      }
-      if (formsRes.ok) {
-        const data = await formsRes.json();
-        setAvailableForms(data.data || []);
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (

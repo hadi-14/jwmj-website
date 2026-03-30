@@ -18,7 +18,10 @@ export default function Header() {
     useEffect(() => {
         const fetchAnnouncement = async () => {
             try {
-                const response = await fetch('/api/settings/announcement');
+                const response = await fetch('/api/settings/announcement', {
+                    cache: 'no-store',
+                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setAnnouncement(data);
@@ -28,7 +31,14 @@ export default function Header() {
                 console.log('Using default announcement');
             }
         };
+
+        // Fetch on mount
         fetchAnnouncement();
+
+        // Refresh every 30 seconds to pick up admin updates
+        const interval = setInterval(fetchAnnouncement, 30000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const toggleMenu = () => {

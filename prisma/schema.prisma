@@ -1193,9 +1193,9 @@ model Business_Ad_Approval {
 }
 
 model SiteSettings {
-  id              Int      @id @default(autoincrement())
-  key             String   @unique @db.VarChar(100)
-  value           String   @db.Text
-  updatedAt       DateTime @updatedAt @db.DateTime(0)
-  updatedBy       String?  @db.VarChar(100)
+  id        Int      @id @default(autoincrement())
+  key       String   @unique @db.VarChar(100)
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt @db.DateTime(0)
+  updatedBy String?  @db.VarChar(100)
 }

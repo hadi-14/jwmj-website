@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json(
                 {
                     message: 'Member not found. Please verify your member ID.',
-                    errors: { member: 'Invalid member ID' }
+                    errors: { memberComputerId: 'Invalid member ID' }
                 },
                 { status: 404 }
             );

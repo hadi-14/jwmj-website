@@ -19,6 +19,8 @@ export default function HomeClient() {
     ];
 
     useEffect(() => {
+        let isMounted = true;
+
         const fetchData = async () => {
             try {
                 console.log('[HomeClient] Starting business fetch from /api/business');
@@ -34,18 +36,26 @@ export default function HomeClient() {
                 console.log('[HomeClient] API response data:', data);
                 console.log('[HomeClient] Businesses in response:', data.businesses?.length || 0);
 
-                if (data.businesses && Array.isArray(data.businesses)) {
-                    console.log('[HomeClient] Setting businesses state with', data.businesses.length, 'businesses');
-                    setAllCommunityBusinesses(data.businesses);
-                } else {
-                    console.warn('[HomeClient] No businesses array in response or invalid format');
+                if (isMounted) {
+                    if (data.businesses && Array.isArray(data.businesses)) {
+                        console.log('[HomeClient] Setting businesses state with', data.businesses.length, 'businesses');
+                        setAllCommunityBusinesses(data.businesses);
+                    } else {
+                        console.warn('[HomeClient] No businesses array in response or invalid format');
+                    }
                 }
             } catch (error) {
                 // Silently handle error - database may not be configured
-                console.log("[HomeClient] Business fetch failed:", error instanceof Error ? error.message : 'Unknown error');
+                if (isMounted) {
+                    console.log("[HomeClient] Business fetch failed:", error instanceof Error ? error.message : 'Unknown error');
+                }
             }
         };
         fetchData();
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     return (

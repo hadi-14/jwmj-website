@@ -16,22 +16,29 @@ export async function GET() {
     // Check if prisma is available
     if (!prisma || typeof prisma.siteSettings === 'undefined') {
       // Return default announcement if database not configured
-      return NextResponse.json(JSON.parse(DEFAULT_ANNOUNCEMENT));
+      const response = NextResponse.json(JSON.parse(DEFAULT_ANNOUNCEMENT));
+      response.headers.set('Cache-Control', 'no-store');
+      return response;
     }
 
     const setting = await prisma.siteSettings.findUnique({
       where: { key: ANNOUNCEMENT_KEY }
     });
 
-    if (!setting) {
-      return NextResponse.json(JSON.parse(DEFAULT_ANNOUNCEMENT));
-    }
+    const data = setting ? JSON.parse(setting.value) : JSON.parse(DEFAULT_ANNOUNCEMENT);
+    const response = NextResponse.json(data);
 
-    return NextResponse.json(JSON.parse(setting.value));
+    // Set cache control to allow client-side refresh without server caching
+    response.headers.set('Cache-Control', 'no-store, must-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+
+    return response;
   } catch (error) {
     console.error('Failed to fetch announcement:', error);
     // Return default on error
-    return NextResponse.json(JSON.parse(DEFAULT_ANNOUNCEMENT));
+    const response = NextResponse.json(JSON.parse(DEFAULT_ANNOUNCEMENT));
+    response.headers.set('Cache-Control', 'no-store');
+    return response;
   }
 }
 
@@ -40,7 +47,7 @@ export async function PUT(request: NextRequest) {
   try {
     // Verify admin authentication using requireAdmin
     const authResult = await requireAdmin();
-    
+
     // If it's a NextResponse, it means auth failed - return it
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -65,7 +72,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Sanitize messages
-    const sanitizedMessages = messages.map((msg: string) => 
+    const sanitizedMessages = messages.map((msg: string) =>
       sanitizeInput(String(msg).slice(0, 200))
     );
 

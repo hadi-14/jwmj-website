@@ -28,6 +28,9 @@ interface FormSubmission {
   approvedDate: string | null;
   notes: string | null;
   fieldValues: FieldValue[];
+  memberName?: string | null;
+  memberMembershipNo?: string | null;
+  memberProfileImage?: string | null;
 }
 interface PaginationData { page: number; limit: number; total: number; pages: number; }
 interface SubmissionsResponse { success: boolean; data: FormSubmission[]; pagination: PaginationData; }
@@ -96,38 +99,74 @@ export default function SubmissionsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [submissionToDelete, setSubmissionToDelete] = useState<string | null>(null);
 
-  const fetchSubmissions = useCallback(async () => {
+  // Refetch submissions and stats
+  const refetch = useCallback(async (page: number) => {
     try {
       setLoading(true); setError(null);
       const params = new URLSearchParams();
-      params.set('page', currentPage.toString()); params.set('limit', limit.toString());
+      params.set('page', page.toString()); params.set('limit', limit.toString());
       if (filterStatus !== 'all') params.set('status', filterStatus);
       if (filterForm !== 'all' && filterForm !== '') params.set('formId', filterForm);
       const res = await fetch(`/api/submissions?${params}`);
       if (!res.ok) throw new Error('Failed to fetch submissions');
       const data: SubmissionsResponse = await res.json();
       setSubmissions(data.data); setPagination(data.pagination);
-      const np = new URLSearchParams();
-      np.set('page', currentPage.toString());
-      if (filterStatus !== 'all') np.set('status', filterStatus);
-      if (filterForm !== 'all' && filterForm !== '') np.set('formId', filterForm);
-      router.push(`?${np}`, { scroll: false });
     } catch (e) { setError(e instanceof Error ? e.message : 'An error occurred'); }
     finally { setLoading(false); }
-  }, [currentPage, limit, filterStatus, filterForm, router]);
+  }, [limit, filterStatus, filterForm]);
 
-  const fetchStats = useCallback(async () => {
+  // Refetch stats only
+  const refetchStats = useCallback(async () => {
     try {
       const params = new URLSearchParams();
       if (filterForm !== 'all' && filterForm !== '') params.set('formId', filterForm);
       const res = await fetch(`/api/submissions/stats?${params}`);
-      if (!res.ok) throw new Error('Failed to fetch stats');
-      const data = await res.json();
-      setStats(data.data);
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data.data);
+      }
     } catch { /* silent */ }
   }, [filterForm]);
 
-  useEffect(() => { fetchSubmissions(); fetchStats(); }, [fetchSubmissions, fetchStats]);
+  // Fetch submissions and stats on mount and when filters change
+  useEffect(() => {
+    let isMounted = true;
+    const fetchData = async () => {
+      try {
+        setLoading(true); setError(null);
+        const params = new URLSearchParams();
+        params.set('page', currentPage.toString()); params.set('limit', limit.toString());
+        if (filterStatus !== 'all') params.set('status', filterStatus);
+        if (filterForm !== 'all' && filterForm !== '') params.set('formId', filterForm);
+        const res = await fetch(`/api/submissions?${params}`);
+        if (!res.ok) throw new Error('Failed to fetch submissions');
+        const data: SubmissionsResponse = await res.json();
+        if (!isMounted) return;
+        setSubmissions(data.data); setPagination(data.pagination);
+        const np = new URLSearchParams();
+        np.set('page', currentPage.toString());
+        if (filterStatus !== 'all') np.set('status', filterStatus);
+        if (filterForm !== 'all' && filterForm !== '') np.set('formId', filterForm);
+        router.push(`?${np}`, { scroll: false });
+
+        // Fetch stats
+        const statsParams = new URLSearchParams();
+        if (filterForm !== 'all' && filterForm !== '') statsParams.set('formId', filterForm);
+        const statsRes = await fetch(`/api/submissions/stats?${statsParams}`);
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          if (isMounted) setStats(statsData.data);
+        }
+      } catch (e) { 
+        if (isMounted) setError(e instanceof Error ? e.message : 'An error occurred');
+      }
+      finally { 
+        if (isMounted) setLoading(false); 
+      }
+    };
+    fetchData();
+    return () => { isMounted = false; };
+  }, [currentPage, limit, filterStatus, filterForm, router]);
 
   const handleDelete = (id: string) => {
     setSubmissionToDelete(id);
@@ -141,7 +180,7 @@ export default function SubmissionsPage() {
       if (!res.ok) throw new Error('Failed to delete');
       setSubmissions(s => s.filter(x => x.id !== submissionToDelete));
       if (selected?.id === submissionToDelete) setSelected(null);
-      fetchStats();
+      refetchStats();
       showNotification('Submission deleted successfully', 'success');
     } catch (e) {
       showNotification(e instanceof Error ? e.message : 'Failed to delete', 'error');
@@ -176,7 +215,7 @@ export default function SubmissionsPage() {
       if (!res.ok) throw new Error('Failed to update status');
       setSubmissions(s => s.map(x => x.id === id ? { ...x, status } : x));
       if (selected?.id === id) setSelected({ ...selected, status });
-      fetchStats();
+      refetchStats();
     } catch (e) { showNotification(e instanceof Error ? e.message : 'Failed to update', 'error'); }
   };
 
@@ -281,7 +320,7 @@ export default function SubmissionsPage() {
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
             <Download className="w-4 h-4" /> Export
           </button>
-          <button onClick={fetchSubmissions} disabled={loading}
+          <button onClick={() => refetch(currentPage)} disabled={loading}
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
@@ -361,9 +400,23 @@ export default function SubmissionsPage() {
                         </td>
                         <td className="px-5 py-3.5">
                           <div className="flex items-center gap-1.5">
-                            {s.submittedBy
-                              ? <><Mail className="w-3.5 h-3.5 text-slate-400" /><span className="text-sm text-slate-600">{s.submittedBy}</span></>
-                              : <><User className="w-3.5 h-3.5 text-slate-300" /><span className="text-sm text-slate-400 italic">Anonymous</span></>
+                            {s.memberName
+                              ? (
+                                <button
+                                  onClick={() => router.push(`/admin/members/${s.memberComputerId}`)}
+                                  className="inline-flex items-center gap-1.5 text-sm text-[#038DCD] hover:text-[#0260a8] hover:underline transition-colors group"
+                                  title="View member profile"
+                                >
+                                  <User className="w-3.5 h-3.5 text-[#038DCD] group-hover:text-[#0260a8]" />
+                                  <span className="font-medium">{s.memberName}</span>
+                                </button>
+                              )
+                              : (
+                                <>
+                                  <Mail className="w-3.5 h-3.5 text-slate-400" />
+                                  <span className="text-sm text-slate-600">{s.submittedBy || 'Anonymous'}</span>
+                                </>
+                              )
                             }
                           </div>
                         </td>

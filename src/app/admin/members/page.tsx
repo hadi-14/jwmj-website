@@ -57,22 +57,6 @@ export default function AdminMembersPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
 
-  const fetchMembers = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch('/api/users?limit=1000');
-      const data = await response.json();
-      if (data.success) {
-        setMembers(data.data || []);
-      }
-    } catch (error) {
-      console.error('Error fetching members:', error);
-      showNotification('Failed to load members', 'error');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [showNotification]);
-
   const filterMembers = useCallback(() => {
     let filtered = [...members];
 
@@ -92,9 +76,49 @@ export default function AdminMembersPage() {
     setFilteredMembers(filtered);
   }, [members, searchQuery, statusFilter]);
 
+  // Fetch members function for refetch on actions
+  const refetchMembers = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/users?limit=1000');
+      const data = await response.json();
+      if (data.success) {
+        setMembers(data.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching members:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Fetch members on mount with cleanup to prevent double calls
   useEffect(() => {
+    let isMounted = true;
+    const fetchMembers = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/users?limit=1000');
+        const data = await response.json();
+        if (!isMounted) return;
+        if (data.success) {
+          setMembers(data.data || []);
+        }
+      } catch (error) {
+        if (!isMounted) return;
+        console.error('Error fetching members:', error);
+        showNotification('Failed to load members', 'error');
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
     fetchMembers();
-  }, [fetchMembers]);
+    return () => { isMounted = false; };
+  }, [showNotification]);
+
+  useEffect(() => {
+    filterMembers();
+  }, [searchQuery, statusFilter, members, filterMembers]);
 
   useEffect(() => {
     filterMembers();
@@ -111,7 +135,7 @@ export default function AdminMembersPage() {
       const response = await fetch(`/api/users/${memberToDelete}`, { method: 'DELETE' });
       if (response.ok) {
         showNotification('User deleted successfully', 'success');
-        fetchMembers();
+        refetchMembers();
       } else {
         showNotification('Failed to delete user', 'error');
       }
@@ -174,7 +198,7 @@ export default function AdminMembersPage() {
       setShowEditModal(false);
       setFormData({ name: '', email: '', password: '', role: 'MEMBER' });
       setSelectedMember(null);
-      fetchMembers();
+      refetchMembers();
     } catch (error: unknown) {
       if (error instanceof Error) {
         showNotification(error.message || 'Operation failed', 'error');

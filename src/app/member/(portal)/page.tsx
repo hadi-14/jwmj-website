@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useMemberAuth } from '@/contexts/MemberAuthContext';
-import { 
-  Users, 
-  Receipt, 
-  FileText, 
+import {
+  Users,
+  Receipt,
+  FileText,
   Calendar,
   Briefcase,
   ArrowRight,
@@ -15,88 +15,65 @@ import {
   Clock
 } from 'lucide-react';
 
-interface MemberInfo {
-  MemComputerID: string;
-  MemWehvariaNo?: string;
-  MemMembershipNo?: string;
-  MemName?: string;
-  MemFatherName?: string;
-  MemMotherName?: string;
-  MemCNIC?: string;
-  MemDOB?: string;
-  MemRegistrationDate?: string;
-  MemPostalAddress?: string;
-  email?: string;
-  cellNumbers: string[];
-  surname?: string;
-  gender?: string;
-  area?: string;
-  country?: string;
-  maritalStatus?: string;
-  occupation?: string;
-  qualification?: string;
-  memberStatus?: string;
-  isDeceased: boolean;
-  isDeActive: boolean;
-  profileImage?: string | null;
-  hasProfileImage?: boolean;
-}
-
-interface FeeData {
-  summary: {
-    totalDue: number;
-    totalPaid: number;
-    totalDiscount: number;
-    balance: number;
-    status: string;
+interface DashboardData {
+  member: {
+    MemComputerID: string;
+    MemMembershipNo?: string;
+    MemName?: string;
+    MemFatherName?: string;
+    MemCNIC?: string;
+    MemRegistrationDate?: string;
+    email?: string;
+    cellNumbers: string[];
+    surname?: string;
+    gender?: string;
+    area?: string;
+    profileImage?: string | null;
   };
-}
-
-interface FamilyTree {
-  spouse: unknown[];
-  children: unknown[];
-  parents: unknown[];
-}
-
-interface Application {
-  id: string;
-  status: string;
+  fees: {
+    summary: {
+      totalDue: number;
+      totalPaid: number;
+      totalDiscount: number;
+      balance: number;
+      status: string;
+    };
+  };
+  family: {
+    spouse: number;
+    children: number;
+    parents: number;
+    total: number;
+  };
+  applications: Array<{
+    id: string;
+    status: string;
+  }>;
 }
 
 export default function MemberDashboard() {
   const { isLoading: authLoading } = useMemberAuth();
-  const [member, setMember] = useState<MemberInfo | null>(null);
-  const [feeData, setFeeData] = useState<FeeData | null>(null);
-  const [familyTree, setFamilyTree] = useState<FamilyTree | null>(null);
-  const [applications, setApplications] = useState<Application[]>([]);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchAllData();
+    fetchDashboardData();
   }, []);
 
-  const fetchAllData = async () => {
+  const fetchDashboardData = async () => {
     try {
-      const [memberRes, feeRes, familyRes, appRes] = await Promise.all([
-        fetch('/api/member'),
-        fetch('/api/member/fees'),
-        fetch('/api/member/family-tree'),
-        fetch('/api/member/applications')
-      ]);
-
-      if (memberRes.ok) setMember(await memberRes.json());
-      if (feeRes.ok) setFeeData(await feeRes.json());
-      if (familyRes.ok) setFamilyTree(await familyRes.json());
-      if (appRes.ok) {
-        const data = await appRes.json();
-        setApplications(data.applications || []);
+      const res = await fetch('/api/member/dashboard');
+      if (res.ok) {
+        setDashboardData(await res.json());
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
     }
   };
+
+
 
   if (authLoading || loading) {
     return (
@@ -107,12 +84,12 @@ export default function MemberDashboard() {
     );
   }
 
-  if (!member) {
+  if (!dashboardData) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <p className="text-red-500 font-semibold">Failed to load member information</p>
+        <p className="text-red-500 font-semibold">Failed to load dashboard data</p>
         <button
-          onClick={fetchAllData}
+          onClick={fetchDashboardData}
           className="px-5 py-2.5 bg-primary-blue text-primary-white text-sm font-bold rounded-full hover:bg-primary-blue-600 transition-colors"
         >
           Retry
@@ -121,9 +98,12 @@ export default function MemberDashboard() {
     );
   }
 
-  const totalFamily = familyTree
-    ? (familyTree.spouse?.length || 0) + (familyTree.children?.length || 0) + (familyTree.parents?.length || 0)
-    : 0;
+  const member = dashboardData.member;
+  const feeData = dashboardData.fees;
+  const family = dashboardData.family;
+  const applications = dashboardData.applications;
+
+  const totalFamily = family.total;
   const paidPct = feeData ? Math.round((feeData.summary.totalPaid / feeData.summary.totalDue) * 100) || 0 : 0;
 
   const quickLinks = [
@@ -165,7 +145,7 @@ export default function MemberDashboard() {
         <div className="p-5 sm:p-6">
           <div className="flex flex-col sm:flex-row gap-5 items-start">
             {/* Avatar */}
-            <div className="flex flex-col items-center gap-2 shrink-0">
+            <div className="flex flex-col items-center gap-2 shrink-0 relative">
               {member?.profileImage ? (
                 <Image
                   src={member.profileImage}
@@ -224,7 +204,7 @@ export default function MemberDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Family Members */}
-        <Link 
+        <Link
           href="/member/family"
           className="bg-background rounded-xl border-2 border-primary-silver-400 p-4 sm:p-5 hover:border-primary-blue hover:shadow-md transition-all group"
         >
@@ -236,11 +216,16 @@ export default function MemberDashboard() {
           </div>
           <p className="text-xs font-bold text-foreground-200 uppercase tracking-widest mb-1">Family</p>
           <p className="text-2xl sm:text-3xl font-bold text-primary-blue">{totalFamily}</p>
-          <p className="text-xs text-foreground-300 mt-1">Registered members</p>
+          <p className="text-xs text-foreground-300 mt-2">
+            {family.spouse + family.children + family.parents === 0
+              ? 'No family members'
+              : `Spouse: ${family.spouse}, Children: ${family.children}, Parents: ${family.parents}`
+            }
+          </p>
         </Link>
 
         {/* Fee Balance */}
-        <Link 
+        <Link
           href="/member/fees"
           className="bg-background rounded-xl border-2 border-primary-silver-400 p-4 sm:p-5 hover:border-primary-yellow hover:shadow-md transition-all group"
         >
@@ -256,9 +241,9 @@ export default function MemberDashboard() {
           </p>
           <div className="mt-2">
             <div className="h-1.5 bg-primary-silver-300 rounded-full overflow-hidden">
-              <div 
-                className="h-full rounded-full bg-gradient-to-r from-primary-blue to-primary-yellow" 
-                style={{ width: `${paidPct}%` }} 
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-primary-blue to-primary-yellow"
+                style={{ width: `${paidPct}%` }}
               />
             </div>
             <p className="text-xs text-foreground-300 mt-1">{paidPct}% paid</p>
@@ -266,7 +251,7 @@ export default function MemberDashboard() {
         </Link>
 
         {/* Applications */}
-        <Link 
+        <Link
           href="/member/applications"
           className="bg-background rounded-xl border-2 border-primary-silver-400 p-4 sm:p-5 hover:border-primary-green hover:shadow-md transition-all group"
         >
@@ -293,13 +278,13 @@ export default function MemberDashboard() {
           </div>
           <p className="text-xs font-bold text-foreground-200 uppercase tracking-widest mb-1">Member Since</p>
           <p className="text-lg sm:text-xl font-bold text-accent-navy">
-            {member?.MemRegistrationDate 
+            {member?.MemRegistrationDate
               ? new Date(member.MemRegistrationDate).getFullYear()
               : 'N/A'
             }
           </p>
           <p className="text-xs text-foreground-300 mt-1">
-            {member?.MemRegistrationDate 
+            {member?.MemRegistrationDate
               ? `${Math.floor((Date.now() - new Date(member.MemRegistrationDate).getTime()) / (1000 * 60 * 60 * 24 * 365))} years`
               : ''
             }
@@ -344,6 +329,8 @@ export default function MemberDashboard() {
           <p className="text-sm text-foreground-300">Your recent actions will appear here</p>
         </div>
       </div>
+
+
     </div>
   );
 }

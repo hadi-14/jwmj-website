@@ -283,6 +283,7 @@ export function generateSecureToken(length: number = 32): string {
 /**
  * Log security event for audit trail
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function logSecurityEvent(
   _event: string,
   _userId: string | null,

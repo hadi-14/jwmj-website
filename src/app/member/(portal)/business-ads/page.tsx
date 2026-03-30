@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useNotification } from '@/components/Notification';
 import {
@@ -62,6 +62,7 @@ const categories = [
 
 export default function BusinessAdsPage() {
   const { showNotification } = useNotification();
+  const isMountedRef = useRef(true);
   const [activeTab, setActiveTab] = useState<'list' | 'new'>('list');
   const [requests, setRequests] = useState<BusinessAdRequest[]>([]);
   const [member, setMember] = useState<MemberInfo | null>(null);
@@ -90,16 +91,14 @@ export default function BusinessAdsPage() {
     requestedEndDate: ''
   });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
     try {
       const [adsRes, memberRes] = await Promise.all([
         fetch('/api/member/business-ads'),
         fetch('/api/member')
       ]);
+
+      if (!isMountedRef.current) return;
 
       if (adsRes.ok) {
         const data = await adsRes.json();
@@ -112,9 +111,19 @@ export default function BusinessAdsPage() {
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
   };
+
+  useEffect(() => {
+    fetchData();
+
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const uploadLogoFile = async (file: File) => {
     const uploadForm = new FormData();

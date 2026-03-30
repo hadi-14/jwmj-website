@@ -206,13 +206,42 @@ export async function GET(req: NextRequest) {
       prisma.formSubmission.count({ where }),
     ]);
 
+    // Fetch member info for submissions that have memberComputerId
+    const memberIds = submissions
+      .filter((s: { memberComputerId: unknown }) => s.memberComputerId)
+      .map((s: { memberComputerId: unknown }) => s.memberComputerId as Decimal);
+
+    const members = memberIds.length > 0
+      ? await prisma.member_Information.findMany({
+          where: { MemComputerID: { in: memberIds } },
+          select: {
+            MemComputerID: true,
+            MemName: true,
+            MemMembershipNo: true,
+            MemCNIC: true,
+            Mem_Pic: true,
+          },
+        })
+      : [];
+
+    const memberMap = new Map(members.map(m => [m.MemComputerID.toString(), m]));
+
     // Transform the data to handle JSON parsing and null fields
     const transformedSubmissions = submissions.map((submission: {
       fieldValues: Array<{ field: { validationRule: string | object | null; options: string | object | null } | null }>;
+      memberComputerId: Decimal | null;
       [key: string]: unknown;
-    }) => ({
-      ...submission,
-      fieldValues: submission.fieldValues
+    }) => {
+      const memberData = submission.memberComputerId
+        ? memberMap.get(submission.memberComputerId.toString())
+        : null;
+
+      return {
+        ...submission,
+        memberName: memberData?.MemName,
+        memberMembershipNo: memberData?.MemMembershipNo,
+        memberProfileImage: memberData?.Mem_Pic,
+        fieldValues: submission.fieldValues
         .filter((fv: { field: unknown }) => fv.field !== null) // Filter out orphaned field values
         .map((fv: { field: { validationRule: string | object | null; options: string | object | null } | null;[key: string]: unknown }) => ({
           ...fv,
@@ -238,7 +267,8 @@ export async function GET(req: NextRequest) {
               : fv.field.options,
           } : undefined
         }))
-    }));
+      };
+    });
 
     // Return without Zod validation on the response to avoid schema mismatches
     return NextResponse.json({

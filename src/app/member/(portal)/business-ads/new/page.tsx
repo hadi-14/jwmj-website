@@ -12,7 +12,8 @@ import {
   X,
   Plus,
   Loader2,
-  Building2
+  Building2,
+  Check
 } from 'lucide-react';
 
 interface MemberInfo {
@@ -30,6 +31,8 @@ export default function NewBusinessAdPage() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [uploadedLogoUrl, setUploadedLogoUrl] = useState<string | null>(null);
+  const [isDragActive, setIsDragActive] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const [formData, setFormData] = useState({
     businessName: '',
@@ -68,25 +71,62 @@ export default function NewBusinessAdPage() {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!file.type.startsWith('image/')) {
-        showNotification('Please select a valid image file.', 'error');
-        return;
-      }
-      if (file.size > 2 * 1024 * 1024) {
-        showNotification('File size must be less than 2MB.', 'error');
-        return;
-      }
+      await processFile(file);
+    }
+  };
 
-      setLogoFile(file);
-      const reader = new FileReader();
-      reader.onload = (event) => setLogoPreview(event.target?.result as string);
-      reader.readAsDataURL(file);
-
-      const uploadedPath = await uploadLogoFile(file);
-      if (uploadedPath) {
-        setUploadedLogoUrl(uploadedPath);
-        showNotification('Logo uploaded successfully', 'success');
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setIsDragActive(true);
+      return;
+    }
+    if (e.type === 'dragleave') {
+      // Only deactivate if leaving the drop zone entirely
+      const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+      const x = e.clientX;
+      const y = e.clientY;
+      if (x <= rect.left || x >= rect.right || y <= rect.top || y >= rect.bottom) {
+        setIsDragActive(false);
       }
+    }
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      await processFile(file);
+    }
+  };
+
+  const processFile = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      showNotification('Please select a valid image file.', 'error');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      showNotification('File size must be less than 2MB.', 'error');
+      return;
+    }
+
+    setLogoFile(file);
+    const reader = new FileReader();
+    reader.onload = (event) => setLogoPreview(event.target?.result as string);
+    reader.readAsDataURL(file);
+
+    setUploadProgress(10);
+    const uploadedPath = await uploadLogoFile(file);
+    if (uploadedPath) {
+      setUploadedLogoUrl(uploadedPath);
+      setUploadProgress(100);
+      showNotification('Logo uploaded successfully', 'success');
+      setTimeout(() => setUploadProgress(0), 2000);
     }
   };
 
@@ -318,41 +358,91 @@ export default function NewBusinessAdPage() {
         {/* Logo Upload */}
         <div className="bg-background rounded-2xl border-2 border-primary-silver-400 p-5 sm:p-6">
           <label className={labelClass}>Business Logo (Optional)</label>
-          <div className="mt-2 flex justify-center px-6 py-8 border-2 border-dashed border-primary-silver-400 rounded-xl hover:border-primary-blue transition-colors">
+          <div
+            className={`mt-2 flex justify-center px-6 py-8 border-2 transition-all duration-300 rounded-xl cursor-pointer ${isDragActive
+                ? 'border-primary-blue bg-primary-blue/5 border-solid'
+                : 'border-dashed border-primary-silver-400 hover:border-primary-blue'
+              }`}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+          >
             {logoPreview ? (
-              <div className="relative">
-                <Image
-                  src={logoPreview}
-                  alt="Logo preview"
-                  width={128}
-                  height={128}
-                  className="h-32 w-32 object-contain rounded-xl"
-                />
-                <button
-                  type="button"
-                  onClick={removeLogo}
-                  className="absolute -top-2 -right-2 bg-red-500 text-primary-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-red-600 transition-colors"
-                  aria-label="Remove logo"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+              <div className="w-full">
+                <div className="relative inline-block w-full">
+                  <div className="flex justify-center">
+                    <div className="relative">
+                      <Image
+                        src={logoPreview}
+                        alt="Logo preview"
+                        width={128}
+                        height={128}
+                        className="h-32 w-32 object-contain rounded-xl border-2 border-primary-silver-300"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeLogo}
+                        className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg"
+                        aria-label="Remove logo"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                  {uploadProgress > 0 && uploadProgress < 100 && (
+                    <div className="mt-4 w-full">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-foreground-300">Uploading...</span>
+                        <span className="text-sm text-foreground-300">{uploadProgress}%</span>
+                      </div>
+                      <div className="w-full bg-primary-silver-300 rounded-full h-2">
+                        <div
+                          className="bg-primary-blue h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${uploadProgress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
+                  {uploadProgress === 100 && (
+                    <div className="mt-4 flex justify-center">
+                      <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg">
+                        <Check className="w-4 h-4" />
+                        <span className="text-sm font-medium">Uploaded</span>
+                      </div>
+                    </div>
+                  )}
+                  <div className="mt-3 text-center">
+                    <label className="text-sm font-semibold text-primary-blue hover:text-primary-blue-600 cursor-pointer">
+                      <span>Change logo</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="sr-only"
+                      />
+                    </label>
+                  </div>
+                </div>
               </div>
             ) : (
-              <div className="text-center">
+              <div className="text-center w-full">
                 <Upload className="mx-auto h-12 w-12 text-foreground-300" />
-                <div className="mt-4 flex text-sm text-foreground-300">
-                  <label className="relative cursor-pointer rounded-md font-semibold text-primary-blue hover:text-primary-blue-600">
-                    <span>Upload a logo</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="sr-only"
-                    />
-                  </label>
-                  <p className="pl-1">or drag and drop</p>
+                <div className="mt-4 flex flex-col gap-1 text-sm">
+                  <div className="flex justify-center gap-1 text-foreground-300">
+                    <label className="cursor-pointer rounded-md font-semibold text-primary-blue hover:text-primary-blue-600">
+                      <span>Upload a logo</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="sr-only"
+                      />
+                    </label>
+                    <span className="text-foreground-300">or drag and drop</span>
+                  </div>
                 </div>
-                <p className="text-xs text-foreground-300 mt-2">PNG, JPG up to 2MB</p>
+                <p className="text-xs text-foreground-300 mt-2">PNG, JPG, GIF up to 2MB</p>
               </div>
             )}
           </div>

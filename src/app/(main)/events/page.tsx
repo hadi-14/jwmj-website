@@ -85,12 +85,12 @@ export default function EventsPage() {
       </Head>
       <main className="w-full min-h-screen pb-20 bg-linear-to-b from-gray-50 to-white">
         {/* Hero Section */}
-        <section className="relative flex justify-center items-center mt-10 mb-12">
+        <section className="relative flex justify-center items-center mt-6 md:mt-10 mb-8 md:mb-12 px-4">
           {/* Main box: smaller width, more height */}
-          <div className="relative z-10 md:w-4xl w-lg h-24 md:h-30 bg-jwmj rounded-3xl shadow-lg border border-slate-300 flex items-center justify-center mx-auto" />
+          <div className="relative z-10 w-full md:w-4xl h-16 md:h-24 md:h-30 bg-jwmj rounded-2xl md:rounded-3xl shadow-lg border border-slate-300 flex items-center justify-center mx-auto" />
           {/* Translucent blue pill overlay */}
-          <div className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-6xl h-16 md:h-20 bg-sky-400/70 rounded-[30px] flex items-center justify-center shadow-md border border-blue-200">
-            <h1 className="text-2xl md:text-5xl font-bold text-white text-center tracking-wide">Community Events</h1>
+          <div className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-6xl h-14 md:h-16 md:h-20 bg-sky-400/70 rounded-xl md:rounded-[30px] flex items-center justify-center shadow-md border border-blue-200 px-4">
+            <h1 className="text-xl md:text-3xl lg:text-5xl font-bold text-white text-center tracking-wide">Community Events</h1>
           </div>
         </section>
 
@@ -98,15 +98,15 @@ export default function EventsPage() {
 
         {/* Timeline Section */}
         <section className="max-w-6xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <div className="w-1 h-8 bg-linear-to-b from-sky-400 to-blue-500 rounded-full"></div>
-              <h2 className="text-3xl font-bold text-gray-800">Events</h2>
-              <div className="flex-1 h-px bg-linear-to-r from-gray-300 to-transparent ml-4"></div>
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 md:mb-8 gap-4">
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <div className="w-1 h-6 md:h-8 bg-linear-to-b from-sky-400 to-blue-500 rounded-full"></div>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Events</h2>
+              <div className="hidden md:flex flex-1 h-px bg-linear-to-r from-gray-300 to-transparent ml-4"></div>
             </div>
 
             <select
-              className="border-2 border-gray-200 rounded-xl px-4 py-2 text-sm text-gray-700 bg-white hover:border-sky-300 focus:border-sky-400 outline-none transition-colors shadow-sm"
+              className="w-full md:w-auto border-2 border-gray-200 rounded-xl px-3 md:px-4 py-2 text-sm text-gray-700 bg-white hover:border-sky-300 focus:border-sky-400 outline-none transition-colors shadow-sm"
               value={sortOrder}
               onChange={e => setSortOrder(e.target.value as 'new' | 'old')}
             >
@@ -116,11 +116,11 @@ export default function EventsPage() {
           </div>
 
           {/* Category tabs */}
-          <div className="flex gap-3 mb-12 flex-wrap justify-center">
+          <div className="flex gap-2 md:gap-3 mb-8 md:mb-12 flex-wrap justify-start md:justify-center overflow-x-auto pb-2">
             {categories.map((cat, index) => (
               <button
                 key={cat}
-                className={`px-6 py-3 rounded-full border-2 text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${activeTab === cat
+                className={`px-4 md:px-6 py-2 md:py-3 rounded-full border-2 text-xs md:text-sm font-semibold transition-all duration-300 transform hover:scale-105 whitespace-nowrap ${activeTab === cat
                   ? 'bg-linear-to-r from-sky-400 to-blue-500 text-white border-sky-300 shadow-lg'
                   : 'bg-white text-gray-700 border-gray-200 hover:border-sky-300 hover:text-sky-600 shadow-sm'
                   }`}
@@ -143,8 +143,11 @@ export default function EventsPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Timeline line */}
-                <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-linear-to-b from-sky-300 via-blue-400 to-sky-300 rounded-full transform -translate-x-1/2 shadow-sm"></div>
+                {/* Timeline line - hidden on mobile */}
+                <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-linear-to-b from-sky-300 via-blue-400 to-sky-300 rounded-full transform -translate-x-1/2 shadow-sm"></div>
+                {/* Mobile timeline line - left side only */}
+                <div className="md:hidden absolute left-3 top-0 bottom-0 w-1 bg-linear-to-b from-sky-300 via-blue-400 to-sky-300 rounded-full shadow-sm"></div>
+
                 {filteredCategoryEvents.map((event, index) => {
                   const isEven = index % 2 === 0;
                   const isVisible = visibleCards.has(event.id.toString());
@@ -153,30 +156,35 @@ export default function EventsPage() {
                     <div
                       key={event.id}
                       onClick={() => event.fb && window.open(event.fb, '_blank')}
-                      className={`timeline-card relative flex items-center ${isEven ? 'flex-row' : 'flex-row-reverse'
+                      className={`timeline-card relative flex flex-col md:flex-row items-stretch md:items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'
                         } group ${index > 0 ? '-mt-8' : ''}`}
                       data-id={event.id.toString()}
                       style={{
                         zIndex: filteredCategoryEvents.length - index,
                       }}
                     >
-                      {/* Timeline dot */}
-                      <div className={`absolute left-1/2 transform -translate-x-1/2 z-20 transition-all duration-700 ${isVisible ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
+                      {/* Timeline dot - positioned differently for mobile */}
+                      <div className={`absolute transform transition-all duration-700 ${isVisible ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
+                        } hidden md:flex md:left-1/2 md:-translate-x-1/2 md:z-20`}>
+                        <div className="w-6 h-6 bg-linear-to-br from-sky-400 to-blue-500 rounded-full border-4 border-white shadow-lg animate-pulse"></div>
+                        <div className="absolute inset-0 w-6 h-6 bg-sky-300 rounded-full animate-ping opacity-30"></div>
+                      </div>
+
+                      {/* Mobile timeline dot */}
+                      <div className={`md:hidden absolute left-0 transform -translate-x-1/2 transition-all duration-700 ${isVisible ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
                         }`}>
                         <div className="w-6 h-6 bg-linear-to-br from-sky-400 to-blue-500 rounded-full border-4 border-white shadow-lg animate-pulse"></div>
                         <div className="absolute inset-0 w-6 h-6 bg-sky-300 rounded-full animate-ping opacity-30"></div>
                       </div>
 
                       {/* Event card */}
-                      <div className={`w-5/12 ${isEven ? 'pr-8' : 'pl-8'}`}>
+                      <div className={`w-full md:w-5/12 md:${isEven ? 'pr-8' : 'pl-8'} pl-12 md:pl-0`}>
                         <div className={`bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-500 transform ${isVisible
                           ? `translate-x-0 opacity-100`
-                          : isEven
-                            ? `-translate-x-16 opacity-0`
-                            : `translate-x-16 opacity-0`
+                          : 'md:' + (isEven ? `-translate-x-16` : `translate-x-16`) + ' opacity-0'
                           } hover:scale-105 hover:z-50 relative`}
                           style={{ transitionDelay: `${index * 150}ms` }}>
-                          <div className="relative h-40 overflow-hidden">
+                          <div className="relative h-32 md:h-40 overflow-hidden">
                             <Image
                               src={event.img}
                               alt={event.title}
@@ -196,9 +204,9 @@ export default function EventsPage() {
                             </div>
                           </div>
 
-                          <div className="p-5">
+                          <div className="p-4 md:p-5">
                             <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 flex-wrap">
                                 <span className="inline-block px-2 py-1 bg-linear-to-r from-sky-100 to-blue-100 text-sky-800 text-xs font-semibold rounded-full">
                                   {event.category}
                                 </span>
@@ -211,7 +219,7 @@ export default function EventsPage() {
                             </div>
 
                             {event.time && (
-                              <div className="flex items-center gap-2 mb-2 text-sm text-gray-700">
+                              <div className="flex items-center gap-2 mb-2 text-xs md:text-sm text-gray-700 flex-wrap">
                                 <span>⏰ {event.time}</span>
                                 {event.venue && <span>📍 {event.venue}</span>}
                               </div>
@@ -220,19 +228,19 @@ export default function EventsPage() {
                               <div className="text-xs text-gray-500 mb-2">☪️ {event.islamicDate}</div>
                             )}
 
-                            <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-sky-600 transition-colors line-clamp-2">
+                            <h3 className="text-base md:text-lg font-bold text-gray-800 mb-2 group-hover:text-sky-600 transition-colors line-clamp-2">
                               {event.title}
                             </h3>
 
-                            <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
+                            <p className="text-gray-600 text-xs md:text-sm leading-relaxed line-clamp-2">
                               {event.desc}
                             </p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Empty space for alternating layout */}
-                      <div className="w-5/12"></div>
+                      {/* Empty space for alternating layout - hidden on mobile */}
+                      <div className="hidden md:block w-5/12"></div>
                     </div>
                   );
                 })}

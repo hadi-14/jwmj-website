@@ -1,17 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
-  Receipt, 
+import {
+  Receipt,
   TrendingUp,
   TrendingDown,
   Check,
-  Calendar,
   FileText,
-  ChevronDown,
-  ChevronUp,
-  CreditCard,
-  Percent
+  CreditCard
 } from 'lucide-react';
 
 interface FeeData {
@@ -47,8 +43,9 @@ interface FeeData {
 export default function FeesPage() {
   const [feeData, setFeeData] = useState<FeeData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [expandedYears, setExpandedYears] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<'overview' | 'invoices' | 'payments'>('overview');
+  const [activeTab, setActiveTab] = useState<'invoices' | 'payments'>('invoices');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _unused = { CreditCard }; // Remove unused import lint errors
 
   useEffect(() => {
     fetchFeeData();
@@ -66,14 +63,6 @@ export default function FeesPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const toggleYear = (year: string) => {
-    setExpandedYears(prev => 
-      prev.includes(year) 
-        ? prev.filter(y => y !== year)
-        : [...prev, year]
-    );
   };
 
   if (loading) {
@@ -104,15 +93,9 @@ export default function FeesPage() {
 
   const paidPct = Math.round((feeData.summary.totalPaid / feeData.summary.totalDue) * 100) || 0;
 
-  const statusBadge = (status: string) => {
-    const s = status.toLowerCase();
-    if (s === 'paid') return 'bg-primary-green-100 text-primary-green-700 border-primary-green-200';
-    if (s === 'partial') return 'bg-primary-yellow-100 text-primary-yellow-700 border-primary-yellow-200';
-    return 'bg-primary-silver-200 text-foreground-400 border-primary-silver-400';
-  };
+
 
   const tabs = [
-    { id: 'overview', label: 'Overview' },
     { id: 'invoices', label: 'Invoices' },
     { id: 'payments', label: 'Payments' },
   ] as const;
@@ -159,7 +142,7 @@ export default function FeesPage() {
         <div className="bg-accent-navy-50 rounded-xl border-2 border-accent-navy-200 p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="w-10 h-10 rounded-xl bg-accent-navy-100 flex items-center justify-center">
-              <Percent className="w-5 h-5 text-accent-navy" />
+              <TrendingDown className="w-5 h-5 text-accent-navy" />
             </div>
           </div>
           <p className="text-xs font-bold text-accent-navy-400 uppercase tracking-widest mb-1">Discount</p>
@@ -169,26 +152,21 @@ export default function FeesPage() {
         </div>
 
         {/* Balance */}
-        <div className={`rounded-xl border-2 p-4 ${
-          feeData.summary.balance > 0 
-            ? 'bg-red-50 border-red-200' 
-            : 'bg-primary-silver-100 border-primary-silver-400'
-        }`}>
+        <div className={`rounded-xl border-2 p-4 ${feeData.summary.balance > 0
+          ? 'bg-red-50 border-red-200'
+          : 'bg-primary-silver-100 border-primary-silver-400'
+          }`}>
           <div className="flex items-center justify-between mb-2">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-              feeData.summary.balance > 0 ? 'bg-red-100' : 'bg-primary-silver-200'
-            }`}>
-              <TrendingDown className={`w-5 h-5 ${
-                feeData.summary.balance > 0 ? 'text-red-600' : 'text-foreground-300'
-              }`} />
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${feeData.summary.balance > 0 ? 'bg-red-100' : 'bg-primary-silver-200'
+              }`}>
+              <TrendingDown className={`w-5 h-5 ${feeData.summary.balance > 0 ? 'text-red-600' : 'text-foreground-300'
+                }`} />
             </div>
           </div>
-          <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${
-            feeData.summary.balance > 0 ? 'text-red-500' : 'text-foreground-300'
-          }`}>Balance Remaining</p>
-          <p className={`text-xl sm:text-2xl font-bold ${
-            feeData.summary.balance > 0 ? 'text-red-600' : 'text-foreground-400'
-          }`}>
+          <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${feeData.summary.balance > 0 ? 'text-red-500' : 'text-foreground-300'
+            }`}>Balance Remaining</p>
+          <p className={`text-xl sm:text-2xl font-bold ${feeData.summary.balance > 0 ? 'text-red-600' : 'text-foreground-400'
+            }`}>
             PKR {feeData.summary.balance.toLocaleString()}
           </p>
         </div>
@@ -201,9 +179,9 @@ export default function FeesPage() {
           <span className="text-sm font-bold text-primary-blue">{paidPct}% Complete</span>
         </div>
         <div className="h-3 bg-primary-silver-200 rounded-full overflow-hidden">
-          <div 
-            className="h-full rounded-full bg-gradient-to-r from-primary-blue to-primary-green transition-all duration-500" 
-            style={{ width: `${paidPct}%` }} 
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-primary-blue to-primary-green transition-all duration-500"
+            style={{ width: `${paidPct}%` }}
           />
         </div>
         <div className="flex justify-between mt-2 text-xs text-foreground-300">
@@ -218,11 +196,10 @@ export default function FeesPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 min-w-fit px-4 py-2.5 rounded-lg text-sm font-bold transition-all ${
-              activeTab === tab.id
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-foreground-400 hover:text-foreground'
-            }`}
+            className={`flex-1 min-w-fit px-4 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === tab.id
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-foreground-400 hover:text-foreground'
+              }`}
           >
             {tab.label}
           </button>
@@ -231,86 +208,6 @@ export default function FeesPage() {
 
       {/* Tab Content */}
       <div className="bg-background rounded-2xl border-2 border-primary-silver-400 overflow-hidden">
-        {activeTab === 'overview' && (
-          <div className="p-5 sm:p-6">
-            <h2 className="text-lg font-bold text-foreground mb-4">Yearly Breakdown</h2>
-            {feeData.yearlyBreakdown?.length > 0 ? (
-              <div className="space-y-3">
-                {feeData.yearlyBreakdown.map((year) => {
-                  const isExpanded = expandedYears.includes(year.fiscalYear);
-                  const yearPaidPct = Math.round((year.paidAmount / year.feeAmount) * 100) || 0;
-
-                  return (
-                    <div key={year.fiscalYear} className="border-2 border-primary-silver-400 rounded-xl overflow-hidden">
-                      <button
-                        onClick={() => toggleYear(year.fiscalYear)}
-                        className="w-full flex items-center justify-between p-4 hover:bg-primary-silver-100 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-primary-blue-100 flex items-center justify-center">
-                            <Calendar className="w-5 h-5 text-primary-blue" />
-                          </div>
-                          <div className="text-left">
-                            <p className="font-bold text-foreground">FY {year.fiscalYear}</p>
-                            <div className="flex items-center gap-2">
-                              <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${statusBadge(year.status)}`}>
-                                {year.status}
-                              </span>
-                              <span className="text-xs text-foreground-300">{yearPaidPct}% paid</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="text-right">
-                            <p className="font-bold text-foreground">PKR {year.balance.toLocaleString()}</p>
-                            <p className="text-xs text-foreground-300">remaining</p>
-                          </div>
-                          {isExpanded ? (
-                            <ChevronUp className="w-5 h-5 text-foreground-300" />
-                          ) : (
-                            <ChevronDown className="w-5 h-5 text-foreground-300" />
-                          )}
-                        </div>
-                      </button>
-
-                      {isExpanded && (
-                        <div className="px-4 pb-4 border-t-2 border-primary-silver-300">
-                          <div className="grid grid-cols-3 gap-4 mt-4">
-                            <div className="text-center p-3 bg-primary-silver-100 rounded-lg">
-                              <p className="text-xs text-foreground-300 mb-1">Fee Amount</p>
-                              <p className="font-bold text-foreground">PKR {year.feeAmount.toLocaleString()}</p>
-                            </div>
-                            <div className="text-center p-3 bg-primary-green-50 rounded-lg">
-                              <p className="text-xs text-foreground-300 mb-1">Paid</p>
-                              <p className="font-bold text-primary-green">PKR {year.paidAmount.toLocaleString()}</p>
-                            </div>
-                            <div className="text-center p-3 bg-primary-yellow-50 rounded-lg">
-                              <p className="text-xs text-foreground-300 mb-1">Balance</p>
-                              <p className="font-bold text-primary-yellow-700">PKR {year.balance.toLocaleString()}</p>
-                            </div>
-                          </div>
-                          <div className="mt-3">
-                            <div className="h-2 bg-primary-silver-200 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full rounded-full bg-gradient-to-r from-primary-blue to-primary-green" 
-                                style={{ width: `${yearPaidPct}%` }} 
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-foreground-300">No yearly breakdown available</p>
-              </div>
-            )}
-          </div>
-        )}
-
         {activeTab === 'invoices' && (
           <div className="p-5 sm:p-6">
             <h2 className="text-lg font-bold text-foreground mb-4">Annual Fee Invoices</h2>

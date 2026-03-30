@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { Trash2, Edit, X, Upload, Eye } from 'lucide-react';
+import { Trash2, Edit, X, Upload, Eye, CheckSquare, Square, Plus } from 'lucide-react';
 import { useNotification, ConfirmationModal } from '@/components/Notification';
 
 interface Event {
@@ -53,6 +53,8 @@ export default function EventManagement() {
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [selectedGroupIds, setSelectedGroupIds] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState<'approve' | 'reject' | null>(null);
 
   // Confirmation modal states
   const [showDeleteEventConfirm, setShowDeleteEventConfirm] = useState(false);
@@ -63,6 +65,7 @@ export default function EventManagement() {
   const [registrationToReject, setRegistrationToReject] = useState<string | null>(null);
   const [showResendConfirm, setShowResendConfirm] = useState(false);
   const [registrationToResend, setRegistrationToResend] = useState<string | null>(null);
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -383,6 +386,65 @@ export default function EventManagement() {
     }
   };
 
+  // Bulk action handlers
+  const toggleSelectGroup = (groupId: string) => {
+    const newSelected = new Set(selectedGroupIds);
+    if (newSelected.has(groupId)) {
+      newSelected.delete(groupId);
+    } else {
+      newSelected.add(groupId);
+    }
+    setSelectedGroupIds(newSelected);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedGroupIds.size === registrations.length) {
+      setSelectedGroupIds(new Set());
+    } else {
+      setSelectedGroupIds(new Set(registrations.map(r => r.groupId)));
+    }
+  };
+
+  const handleBulkAction = (action: 'approve' | 'reject') => {
+    if (selectedGroupIds.size === 0) {
+      showNotification('Please select at least one registration', 'warning');
+      return;
+    }
+    setBulkAction(action);
+    setShowBulkConfirm(true);
+  };
+
+  const confirmBulkAction = async () => {
+    if (!bulkAction || selectedGroupIds.size === 0) return;
+
+    try {
+      const response = await fetch('/api/admin/events/registrations', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          groupIds: Array.from(selectedGroupIds),
+          action: bulkAction
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        fetchRegistrations();
+        setSelectedGroupIds(new Set());
+        showNotification(`Successfully ${bulkAction}ed ${data.processed} registration(s)!`, 'success');
+      } else {
+        const error = await response.json();
+        showNotification(`Error: ${error.error}`, 'error');
+      }
+    } catch (error) {
+      console.error('Bulk action error:', error);
+      showNotification(`Failed to ${bulkAction} registrations`, 'error');
+    } finally {
+      setShowBulkConfirm(false);
+      setBulkAction(null);
+    }
+  };
+
   if (loading && ((activeTab === 'events' && events.length === 0) || (activeTab === 'registrations' && registrations.length === 0))) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -392,29 +454,29 @@ export default function EventManagement() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       {/* Header with Tabs */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Event Management</h1>
-          <p className="text-slate-600 mt-1">Manage events and registrations</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Event Management</h1>
+          <p className="text-sm sm:text-base text-slate-600 mt-1">Manage events and registrations</p>
         </div>
         {activeTab === 'registrations' && (
           <button
             onClick={generateReport}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base"
           >
-            <Eye className="w-5 h-5" />
-            Generate Eid Milan Report
+            <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span>Generate Report</span>
           </button>
         )}
       </div>
 
-      {/* Tabs */}
-      <div className="flex space-x-1 bg-slate-100 p-1 rounded-lg w-fit">
+      {/* Tabs - Mobile Optimized */}
+      <div className="flex space-x-1 bg-slate-100 p-1 rounded-lg w-fit text-sm sm:text-base">
         <button
           onClick={() => setActiveTab('events')}
-          className={`px-6 py-2 rounded-md font-semibold transition-colors ${activeTab === 'events'
+          className={`px-3 sm:px-6 py-2 rounded-md font-semibold transition-colors ${activeTab === 'events'
             ? 'bg-white text-slate-900 shadow-sm'
             : 'text-slate-600 hover:text-slate-900'
             }`}
@@ -423,7 +485,7 @@ export default function EventManagement() {
         </button>
         <button
           onClick={() => setActiveTab('registrations')}
-          className={`px-6 py-2 rounded-md font-semibold transition-colors ${activeTab === 'registrations'
+          className={`px-3 sm:px-6 py-2 rounded-md font-semibold transition-colors ${activeTab === 'registrations'
             ? 'bg-white text-slate-900 shadow-sm'
             : 'text-slate-600 hover:text-slate-900'
             }`}
@@ -432,26 +494,39 @@ export default function EventManagement() {
         </button>
       </div>
 
+      {/* Add Event Button */}
+      <button
+        onClick={() => {
+          setShowModal(true);
+          resetForm();
+        }}
+        className="flex items-center gap-2 bg-[#038DCD] hover:bg-[#0278c1] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base w-fit"
+      >
+        <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+        Add Event
+      </button>
+
       {/* Content based on active tab */}
       {activeTab === 'events' ? (
         <>
-          {/* Events Table */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
+          {/* Events Table/Card Layout */}
+          <div className="bg-white rounded-lg sm:rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            {/* Desktop: Table Layout */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200">
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Image</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Title</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Category</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
+                    <th className="px-3 sm:px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Image</th>
+                    <th className="px-3 sm:px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Title</th>
+                    <th className="px-3 sm:px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Category</th>
+                    <th className="px-3 sm:px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Date</th>
+                    <th className="px-3 sm:px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {events.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                      <td colSpan={5} className="px-6 py-8 text-center text-slate-500 text-sm">
                         No events yet. Create your first event!
                       </td>
                     </tr>
@@ -459,7 +534,7 @@ export default function EventManagement() {
                     events.map((event) => (
                       <tr key={event.id} className="hover:bg-slate-50 transition-colors">
                         <td className="px-6 py-4">
-                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-slate-100">
+                          <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-slate-100">
                             <Image
                               src={event.img}
                               alt={event.title}
@@ -469,26 +544,17 @@ export default function EventManagement() {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <p className="font-medium text-slate-900 line-clamp-1">{event.title}</p>
+                          <p className="font-medium text-slate-900 line-clamp-1 text-sm">{event.title}</p>
                         </td>
                         <td className="px-6 py-4">
-                          <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                          <span className="inline-block px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
                             {event.category}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-slate-600 text-sm">
-                          <div className="flex items-center gap-2">
-                            <div>
-                              <div>{new Date(event.date).toLocaleDateString()}</div>
-                              {event.time && <div className="text-xs text-slate-500">{event.time}</div>}
-                              {event.islamicDate && <div className="text-xs text-slate-500 italic">{event.islamicDate}</div>}
-                              {event.venue && <div className="text-xs text-slate-500">📍 {event.venue}</div>}
-                            </div>
-                            {isUpcomingEvent(event.date) && (
-                              <span className="inline-block px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full whitespace-nowrap">
-                                Upcoming
-                              </span>
-                            )}
+                          <div>
+                            <div>{new Date(event.date).toLocaleDateString()}</div>
+                            {event.time && <div className="text-xs text-slate-500">{event.time}</div>}
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -515,16 +581,110 @@ export default function EventManagement() {
                 </tbody>
               </table>
             </div>
+
+            {/* Mobile: Card Layout */}
+            <div className="md:hidden p-3 sm:p-4 space-y-3 sm:space-y-4">
+              {events.length === 0 ? (
+                <div className="text-center py-6 text-slate-500 text-sm">
+                  No events yet. Create your first event!
+                </div>
+              ) : (
+                events.map((event) => (
+                  <div key={event.id} className="p-3 sm:p-4 border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+                    <div className="flex gap-3 mb-3">
+                      <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden bg-slate-200 flex-shrink-0">
+                        <Image
+                          src={event.img}
+                          alt={event.title}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-slate-900 text-sm sm:text-base truncate">{event.title}</h3>
+                        <div className="flex gap-2 flex-wrap mt-1">
+                          <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                            {event.category}
+                          </span>
+                          {isUpcomingEvent(event.date) && (
+                            <span className="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
+                              Upcoming
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-xs sm:text-sm text-slate-600 mb-3 space-y-1">
+                      <div>📅 {new Date(event.date).toLocaleDateString()}</div>
+                      {event.time && <div>🕐 {event.time}</div>}
+                      {event.venue && <div>📍 {event.venue}</div>}
+                      {event.islamicDate && <div className="italic">🌙 {event.islamicDate}</div>}
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(event)}
+                        className="flex-1 px-2 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                      >
+                        <Edit className="w-4 h-4 inline mr-1" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(event.id)}
+                        className="flex-1 px-2 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4 inline mr-1" />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </>
       ) : (
         <>
+          {/* Registrations Bulk Actions Toolbar */}
+          {selectedGroupIds.size > 0 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <span className="text-xs sm:text-sm font-medium text-blue-900">
+                {selectedGroupIds.size} registration(s) selected
+              </span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleBulkAction('approve')}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  Bulk Approve
+                </button>
+                <button
+                  onClick={() => handleBulkAction('reject')}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  Bulk Reject
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Registrations Table */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200">
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                      <button
+                        onClick={toggleSelectAll}
+                        className="p-1 hover:bg-slate-200 rounded transition-colors"
+                      >
+                        {selectedGroupIds.size === registrations.length && registrations.length > 0 ? (
+                          <CheckSquare className="w-5 h-5 text-blue-600" />
+                        ) : (
+                          <Square className="w-5 h-5 text-slate-600" />
+                        )}
+                      </button>
+                    </th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Event</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Head of Family</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Family Members</th>
@@ -537,13 +697,29 @@ export default function EventManagement() {
                 <tbody className="divide-y divide-slate-200">
                   {registrations.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-8 text-center text-slate-500">
+                      <td colSpan={8} className="px-6 py-8 text-center text-slate-500">
                         No registrations yet.
                       </td>
                     </tr>
                   ) : (
                     registrations.map((group: RegistrationGroup) => (
-                      <tr key={group.groupId} className="hover:bg-slate-50 transition-colors">
+                      <tr
+                        key={group.groupId}
+                        className={`${selectedGroupIds.has(group.groupId) ? 'bg-blue-50' : 'hover:bg-slate-50'
+                          } transition-colors`}
+                      >
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={() => toggleSelectGroup(group.groupId)}
+                            className="p-1 hover:bg-slate-200 rounded transition-colors"
+                          >
+                            {selectedGroupIds.has(group.groupId) ? (
+                              <CheckSquare className="w-5 h-5 text-blue-600" />
+                            ) : (
+                              <Square className="w-5 h-5 text-slate-600" />
+                            )}
+                          </button>
+                        </td>
                         <td className="px-6 py-4">
                           <div>
                             <p className="font-medium text-slate-900 line-clamp-1">{group.event.title}</p>
@@ -628,11 +804,11 @@ export default function EventManagement() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-lg sm:rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-slate-200 sticky top-0 bg-white">
-              <h2 className="text-2xl font-bold text-slate-900">
+            <div className="flex items-center justify-between p-3 sm:p-6 border-b border-slate-200 sticky top-0 bg-white gap-2">
+              <h2 className="text-lg sm:text-2xl font-bold text-slate-900">
                 {editingId ? 'Edit Event' : 'Add New Event'}
               </h2>
               <button
@@ -640,22 +816,22 @@ export default function EventManagement() {
                   setShowModal(false);
                   resetForm();
                 }}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0"
               >
-                <X className="w-5 h-5 text-slate-600" />
+                <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
               </button>
             </div>
 
             {/* Modal Body */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            <form onSubmit={handleSubmit} className="p-3 sm:p-6 space-y-4 sm:space-y-6">
               {/* Image Upload */}
               <div>
-                <label className="block text-sm font-semibold text-slate-900 mb-3">
+                <label className="block text-sm font-semibold text-slate-900 mb-2 sm:mb-3">
                   Event Image
                 </label>
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {previewImage && (
-                    <div className="relative w-full h-48 rounded-lg overflow-hidden bg-slate-100">
+                    <div className="relative w-full h-32 sm:h-48 rounded-lg overflow-hidden bg-slate-100">
                       <Image
                         src={previewImage}
                         alt="Preview"
@@ -664,9 +840,9 @@ export default function EventManagement() {
                       />
                     </div>
                   )}
-                  <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-blue-300 rounded-lg cursor-pointer hover:border-blue-400 transition-colors bg-blue-50">
-                    <div className="flex items-center gap-2 text-blue-600">
-                      <Upload className="w-5 h-5" />
+                  <label className="flex items-center justify-center w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-dashed border-blue-300 rounded-lg cursor-pointer hover:border-blue-400 transition-colors bg-blue-50">
+                    <div className="flex items-center gap-2 text-blue-600 text-sm sm:text-base">
+                      <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
                       <span className="font-medium">
                         {uploading ? 'Uploading...' : 'Click to upload image'}
                       </span>
@@ -689,7 +865,7 @@ export default function EventManagement() {
 
               {/* Title */}
               <div>
-                <label className="block text-sm font-semibold text-slate-900 mb-2">
+                <label className="block text-sm font-semibold text-slate-900 mb-1.5 sm:mb-2">
                   Title *
                 </label>
                 <input
@@ -698,14 +874,14 @@ export default function EventManagement() {
                   value={formData.title}
                   onChange={handleInputChange}
                   placeholder="Event title"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-semibold text-slate-900 mb-2">
+                <label className="block text-sm font-semibold text-slate-900 mb-1.5 sm:mb-2">
                   Description *
                 </label>
                 <textarea
@@ -713,16 +889,16 @@ export default function EventManagement() {
                   value={formData.desc}
                   onChange={handleInputChange}
                   placeholder="Event description"
-                  rows={5}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={4}
+                  className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
 
-              {/* Date and Category Row */}
-              <div className="grid grid-cols-2 gap-4">
+              {/* Date and Time Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-900 mb-2">
+                  <label className="block text-sm font-semibold text-slate-900 mb-1.5 sm:mb-2">
                     Date *
                   </label>
                   <input
@@ -730,12 +906,12 @@ export default function EventManagement() {
                     name="date"
                     value={formData.date}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-900 mb-2">
+                  <label className="block text-sm font-semibold text-slate-900 mb-1.5 sm:mb-2">
                     Time
                   </label>
                   <input
@@ -743,22 +919,22 @@ export default function EventManagement() {
                     name="time"
                     value={formData.time}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
 
               {/* Category and Venue Row */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-900 mb-2">
+                  <label className="block text-sm font-semibold text-slate-900 mb-1.5 sm:mb-2">
                     Category *
                   </label>
                   <select
                     name="category"
                     value={formData.category}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   >
                     <option value="">Select category</option>
@@ -770,7 +946,7 @@ export default function EventManagement() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-900 mb-2">
+                  <label className="block text-sm font-semibold text-slate-900 mb-1.5 sm:mb-2">
                     Venue
                   </label>
                   <input
@@ -779,14 +955,14 @@ export default function EventManagement() {
                     value={formData.venue}
                     onChange={handleInputChange}
                     placeholder="Event venue/location"
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
 
               {/* Islamic Date */}
               <div>
-                <label className="block text-sm font-semibold text-slate-900 mb-2">
+                <label className="block text-sm font-semibold text-slate-900 mb-1.5 sm:mb-2">
                   Islamic Date (Optional)
                 </label>
                 <input
@@ -795,13 +971,13 @@ export default function EventManagement() {
                   value={formData.islamicDate}
                   onChange={handleInputChange}
                   placeholder="e.g., 15 Rajab 1445"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               {/* Facebook Link */}
               <div>
-                <label className="block text-sm font-semibold text-slate-900 mb-2">
+                <label className="block text-sm font-semibold text-slate-900 mb-1.5 sm:mb-2">
                   Facebook Link
                 </label>
                 <input
@@ -810,26 +986,26 @@ export default function EventManagement() {
                   value={formData.fb}
                   onChange={handleInputChange}
                   placeholder="https://facebook.com/..."
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 justify-end pt-4 border-t border-slate-200">
+              <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 justify-end pt-4 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={() => {
                     setShowModal(false);
                     resetForm();
                   }}
-                  className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-50 transition-colors"
+                  className="px-4 sm:px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-50 transition-colors text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
+                  className="px-4 sm:px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 text-sm"
                 >
                   {submitting ? 'Saving...' : editingId ? 'Update Event' : 'Create Event'}
                 </button>
@@ -894,6 +1070,21 @@ export default function EventManagement() {
           setRegistrationToResend(null);
         }}
         type="warning"
+      />
+
+      <ConfirmationModal
+        isOpen={showBulkConfirm}
+        title={`Bulk ${bulkAction === 'approve' ? 'Approve' : 'Reject'} Registrations`}
+        message={`Are you sure you want to ${bulkAction} ${selectedGroupIds.size} registration(s)? ${bulkAction === 'approve' ? 'Invitation emails will be sent.' : ''
+          }`}
+        confirmText={bulkAction === 'approve' ? 'Approve All' : 'Reject All'}
+        cancelText="Cancel"
+        onConfirm={confirmBulkAction}
+        onCancel={() => {
+          setShowBulkConfirm(false);
+          setBulkAction(null);
+        }}
+        type={bulkAction === 'approve' ? 'info' : 'danger'}
       />
     </div>
   );

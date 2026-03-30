@@ -137,15 +137,18 @@ export async function GET() {
   }
 }
 
-// PUT update registration status
+// PUT update registration status (supports single or bulk)
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { groupId, action, notes } = body;
+    const { groupId, groupIds, action, notes } = body;
     let status = body.status;
 
-    if (!groupId) {
-      return NextResponse.json({ error: 'Group ID is required' }, { status: 400 });
+    // Handle bulk operations (groupIds array) or single operation (groupId)
+    const idsToUpdate = groupIds || (groupId ? [groupId] : null);
+
+    if (!idsToUpdate || idsToUpdate.length === 0) {
+      return NextResponse.json({ error: 'Group ID(s) required' }, { status: 400 });
     }
 
     // Convert action to status if action is provided
@@ -168,34 +171,36 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
     }
 
-    // Update all registrations in the group
+    // Update all registrations in the groups
     const updateResult = await prisma.eventRegistration.updateMany({
-      where: { groupId },
+      where: { groupId: { in: idsToUpdate } },
       data: {
         status,
         notes: notes || null
       }
     });
 
-    // If approved (or resend), send email invitation
-    if (status === 'approved') {
-      const registrations = await prisma.eventRegistration.findMany({
-        where: { groupId },
-        include: {
-          event: true
-        }
-      });
+    // If approved (or resend), send email invitations for each group
+    if (status === 'approved' && updateResult.count > 0) {
+      for (const id of idsToUpdate) {
+        const registrations = await prisma.eventRegistration.findMany({
+          where: { groupId: id },
+          include: {
+            event: true
+          }
+        });
 
-      if (registrations.length > 0) {
-        const headRegistration = registrations.find(r => r.isHead);
-        if (headRegistration) {
-          // @ts-expect-error - registrations from Prisma have all needed properties for email template
-          await sendEventInvitationEmail(headRegistration, registrations);
+        if (registrations.length > 0) {
+          const headRegistration = registrations.find(r => r.isHead);
+          if (headRegistration) {
+            // @ts-expect-error - registrations from Prisma have all needed properties for email template
+            await sendEventInvitationEmail(headRegistration, registrations);
+          }
         }
       }
     }
 
-    return NextResponse.json({ success: true, updated: updateResult.count });
+    return NextResponse.json({ success: true, updated: updateResult.count, processed: idsToUpdate.length });
   } catch (error) {
     console.error('Failed to update registration status:', error);
     return NextResponse.json({ error: 'Failed to update registration status' }, { status: 500 });

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Save, Send, CheckCircle2, AlertCircle, Info, Check, X } from 'lucide-react';
 import { IFormField, IForm } from '@/types/forms';
 
@@ -233,6 +234,7 @@ const FormField = ({ field, value, error, onChange }: {
 
 // Main DynamicForm Component
 export default function DynamicForm({ formId, formType }: { formId?: string; formType?: string }) {
+  const router = useRouter();
   const [form, setForm] = useState<IForm | null>(null);
   const [formData, setFormData] = useState<Record<string, FormValue>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -337,17 +339,28 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
     setSubmitMessage('');
 
     try {
+      // Try to fetch member info for authenticated users
+      let memberComputerId = null;
+      try {
+        const memberRes = await fetch('/api/member');
+        if (memberRes.ok) {
+          const memberData = await memberRes.json();
+          memberComputerId = memberData.MemComputerID;
+        }
+      } catch {
+        // Not authenticated - continue with anonymous submission
+      }
+
       const res = await fetch('/api/submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           formId: form?.id,
           fieldValues: formData,
-          status: 'submitted'
+          status: 'submitted',
+          ...(memberComputerId && { memberComputerId })
         })
       });
-
-      if (!res.ok) throw new Error('Failed to submit form');
 
       if (!res.ok) throw new Error('Failed to submit form');
 
@@ -355,7 +368,13 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
       setSubmitMessage('فارم کامیابی سے جمع ہو گیا! / Form submitted successfully!');
 
       setTimeout(() => {
-        window.location.href = '/forms';
+        // Redirect to member portal if authenticated, otherwise back to forms page
+        // Use router.push() to preserve session and client state
+        if (memberComputerId) {
+          router.push('/member');
+        } else {
+          router.push('/forms');
+        }
       }, 2000);
     } catch {
       setSubmitError('Failed to submit form. Please try again.');
@@ -371,13 +390,26 @@ export default function DynamicForm({ formId, formType }: { formId?: string; for
     setSubmitMessage('');
 
     try {
+      // Try to fetch member info for authenticated users
+      let memberComputerId = null;
+      try {
+        const memberRes = await fetch('/api/member');
+        if (memberRes.ok) {
+          const memberData = await memberRes.json();
+          memberComputerId = memberData.MemComputerID;
+        }
+      } catch {
+        // Not authenticated - continue with anonymous draft
+      }
+
       const res = await fetch('/api/submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           formId: form?.id,
           fieldValues: formData,
-          status: 'draft'
+          status: 'draft',
+          ...(memberComputerId && { memberComputerId })
         })
       });
 

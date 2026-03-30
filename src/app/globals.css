@@ -208,3 +208,45 @@ body {
 .bg-jwmj-950 {
   background: radial-gradient(circle at 21% 70%, rgba(249, 217, 143, 0.95) 0%, rgba(113, 189, 224, 0.95) 100%);
 }
+
+/* Mobile-Friendly Admin Utilities */
+/* Ensure minimum touch target size of 44px for mobile buttons and interactive elements */
+@media (max-width: 768px) {
+  button, a[role="button"], input[type="button"], input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Improve spacing on mobile forms */
+  input, select, textarea {
+    font-size: 16px;
+    /* Prevents auto-zoom on iOS when focusing on inputs */
+  }
+
+  /* Better spacing for mobile cards and containers */
+  .admin-card {
+    padding: 0.75rem;
+  }
+
+  /* Responsive table to card conversion on mobile */
+  table {
+    display: block;
+    width: 100%;
+  }
+}
+
+/* Ensure better readability on small screens */
+@media (max-width: 640px) {
+  h1 {
+    @apply text-xl;
+  }
+
+  h2 {
+    @apply text-lg;
+  }
+
+  /* Reduce padding on mobile for better space utilization */
+  .container {
+    padding: 0 0.75rem;
+  }
+}

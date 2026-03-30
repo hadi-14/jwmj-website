@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AuthProvider, useAuth } from './AuthContext';
 import { NotificationProvider } from '@/components/Notification';
+import MobileNav from '@/components/MobileNav';
 import {
   LayoutDashboard,
   Users,
@@ -14,7 +15,8 @@ import {
   Database,
   ChevronRight,
   Settings,
-  Menu
+  Menu,
+  MoreHorizontal
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
@@ -60,6 +62,15 @@ const navigation = [
   { name: 'Events', href: '/admin/events', icon: FileText },
   { name: 'Business Ads', href: '/admin/business-ads', icon: Database },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
+];
+
+// Mobile nav items (limited to 5, rest go to More)
+const mobileNavItems = [
+  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { name: 'Members', href: '/admin/members', icon: Users },
+  { name: 'Submissions', href: '/admin/submissions', icon: Database },
+  { name: 'Events', href: '/admin/events', icon: FileText },
+  { name: 'More', href: '#more', icon: MoreHorizontal },
 ];
 
 // ==================== SIDEBAR ====================
@@ -116,31 +127,31 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
         }}
       >
         {/* Sidebar top bar — collapse toggle + mobile close */}
-        <div className={`h-12 flex items-center border-b border-slate-100 shrink-0 ${collapsed ? 'justify-center' : 'justify-between px-4'}`}>
+        <div className={`h-16 flex items-center border-b-2 border-slate-200 shrink-0 ${collapsed ? 'justify-center' : 'justify-between px-5 sm:px-6'}`}>
           {!collapsed && (
-            <span className="text-[11px] font-bold text-[#038DCD] uppercase tracking-widest">Admin Panel</span>
+            <span className="font-bold text-lg text-slate-900">Admin Panel</span>
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
             className={`
               hidden lg:flex items-center justify-center w-6 h-6 rounded-lg
-              text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all
+              text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all
               ${collapsed ? 'absolute -right-3 top-3 bg-white border border-slate-200 shadow-sm' : ''}
             `}
           >
             <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-300 ${collapsed ? '' : 'rotate-180'}`} />
           </button>
           {!collapsed && (
-            <button onClick={onClose} className="lg:hidden p-1.5 hover:bg-slate-100 rounded-lg text-slate-500">
-              <X className="w-4 h-4" />
+            <button onClick={onClose} className="lg:hidden p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors">
+              <X className="w-5 h-5" />
             </button>
           )}
         </div>
 
         {/* User card */}
         {!collapsed ? (
-          <div className="px-3 py-3 border-b border-slate-100 shrink-0">
-            <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer group">
+          <div className="p-4 border-b-2 border-slate-200 shrink-0">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-blue-50 to-amber-50 hover:from-blue-100 hover:to-amber-100 transition-colors cursor-pointer group">
               <div className="relative shrink-0">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#038DCD] to-[#0260a8] flex items-center justify-center text-white font-bold text-sm shadow">
                   {(user?.name?.[0] || 'A').toUpperCase()}
@@ -155,9 +166,9 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
             </div>
           </div>
         ) : (
-          <div className="py-3 border-b border-slate-100 shrink-0 flex justify-center">
+          <div className="py-3 border-b-2 border-slate-200 shrink-0 flex justify-center">
             <div className="relative">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#038DCD] to-[#0260a8] flex items-center justify-center text-white font-bold text-sm shadow">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#038DCD] to-[#0260a8] flex items-center justify-center text-white font-bold text-sm shadow">
                 {(user?.name?.[0] || 'A').toUpperCase()}
               </div>
               <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white" />
@@ -166,9 +177,9 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
         )}
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-3 px-2.5 space-y-0.5">
+        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
           {!collapsed && (
-            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-3 pb-2 pt-1">
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider px-4 pb-3 pt-2">
               Menu
             </p>
           )}
@@ -187,21 +198,16 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
                 onClick={() => onClose()}
                 title={collapsed ? item.name : undefined}
                 className={`
-                  relative flex items-center gap-3 rounded-xl text-[13.5px] font-medium
+                  relative flex items-center gap-3 rounded-xl text-sm font-semibold
                   transition-all duration-150 group
-                  ${collapsed ? 'justify-center px-0 py-3' : 'px-3 py-2.5'}
+                  ${collapsed ? 'justify-center px-0 py-3' : 'px-4 py-3'}
                   ${isActive
-                    ? 'bg-[#038DCD]/10 text-[#0278b0]'
+                    ? 'bg-gradient-to-r from-[#038DCD] to-[#0369A1] text-white shadow-lg'
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }
                 `}
               >
-                {/* Active left bar */}
-                {isActive && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#038DCD] rounded-r-full" />
-                )}
-
-                <Icon className={`shrink-0 w-[18px] h-[18px] transition-colors ${isActive ? 'text-[#038DCD]' : 'text-slate-400 group-hover:text-slate-600'}`} />
+                <Icon className={`shrink-0 w-5 h-5 transition-colors ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-700'}`} />
 
                 {!collapsed && <span>{item.name}</span>}
 
@@ -221,18 +227,18 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
         </nav>
 
         {/* Logout - Sticky */}
-        <div className="sticky bottom-0 p-2.5 border-t border-slate-100 shrink-0 bg-white">
+        <div className="sticky bottom-0 p-4 border-t-2 border-slate-200 shrink-0 bg-white">
           <button
             onClick={logout}
             title={collapsed ? 'Logout' : undefined}
             className={`
-              w-full flex items-center gap-3 rounded-xl text-[13.5px] font-medium
-              text-slate-500 hover:bg-rose-50 hover:text-rose-600
+              w-full flex items-center gap-3 rounded-xl text-sm font-semibold
+              text-rose-700 hover:bg-rose-50
               transition-all duration-150 group relative
-              ${collapsed ? 'justify-center px-0 py-3' : 'px-3 py-2.5'}
+              ${collapsed ? 'justify-center px-0 py-3' : 'px-4 py-3'}
             `}
           >
-            <LogOut className="w-[18px] h-[18px] shrink-0" />
+            <LogOut className="w-5 h-5 shrink-0" />
             {!collapsed && <span>Logout</span>}
 
             {collapsed && (
@@ -254,11 +260,14 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
 // ==================== LAYOUT ====================
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const pathname = usePathname();
+  const { logout } = useAuth();
   useAuth();
 
   useEffect(() => {
     setSidebarOpen(false);
+    setMobileMoreOpen(false);
   }, [pathname]);
 
   if (pathname === '/admin/login') return <>{children}</>;
@@ -272,26 +281,75 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       <ProtectedRoute>
         <div className="min-h-screen bg-slate-50 flex flex-col">
           {/* Mobile Header */}
-          <header className="lg:hidden h-16 bg-white border-b border-slate-200 sticky top-0 z-30 flex items-center justify-between px-4">
+          <header className="lg:hidden h-16 bg-white border-b-2 border-slate-200 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
             >
               <Menu className="w-5 h-5 text-slate-600" />
             </button>
-            <span className="text-sm font-bold text-[#038DCD] uppercase tracking-wider">Admin Panel</span>
+            <span className="font-bold text-slate-900">Admin Panel</span>
             <div className="w-10" /> {/* Spacer for alignment */}
           </header>
 
-          <div className="flex-1 flex">
+          <div className="flex-1 flex flex-col">
             <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
             {/* Offset content by sidebar width on desktop */}
-            <div className="lg:pl-64 transition-all duration-300 flex-1">
-              <main className="p-4 sm:p-6 lg:p-8">
+            <div className="lg:pl-64 transition-all duration-300 flex-1 flex flex-col">
+              <main className="p-3 sm:p-4 lg:p-8 flex-1 pb-20 lg:pb-8">
                 {children}
               </main>
+              
+              {/* More Options Modal for Mobile */}
+              {mobileMoreOpen && (
+                <div className="fixed inset-0 bg-black/40 z-50 lg:hidden" onClick={() => setMobileMoreOpen(false)} />
+              )}
+              {mobileMoreOpen && (
+                <div className="fixed bottom-20 left-4 right-4 bg-white rounded-2xl border border-slate-200 shadow-xl z-50 lg:hidden max-w-xs">
+                  <div className="flex flex-col divide-y divide-slate-100">
+                    {navigation.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = pathname === item.href;
+                      return (
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          onClick={() => setMobileMoreOpen(false)}
+                          className={`flex items-center gap-3 px-4 py-3 transition-colors ${
+                            isActive
+                              ? 'bg-[#038DCD]/10 text-[#038DCD]'
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <Icon className="w-5 h-5" />
+                          <span className="font-medium">{item.name}</span>
+                        </Link>
+                      );
+                    })}
+                    <button
+                      onClick={() => {
+                        logout();
+                        setMobileMoreOpen(false);
+                      }}
+                      className="flex items-center gap-3 px-4 py-3 text-rose-700 hover:bg-rose-50 transition-colors w-full"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      <span className="font-medium">Logout</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
+
+          {/* Mobile Bottom Navigation */}
+          <MobileNav
+            items={mobileNavItems}
+            onMoreClick={() => setMobileMoreOpen(true)}
+            onLogout={logout}
+            theme="admin"
+            showLogout={false}
+          />
         </div>
       </ProtectedRoute>
     </>
