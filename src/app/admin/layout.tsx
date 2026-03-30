@@ -299,7 +299,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               <main className="p-3 sm:p-4 lg:p-8 flex-1 pb-20 lg:pb-8">
                 {children}
               </main>
-              
+
               {/* More Options Modal for Mobile */}
               {mobileMoreOpen && (
                 <div className="fixed inset-0 bg-black/40 z-50 lg:hidden" onClick={() => setMobileMoreOpen(false)} />
@@ -315,11 +315,10 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                           key={item.name}
                           href={item.href}
                           onClick={() => setMobileMoreOpen(false)}
-                          className={`flex items-center gap-3 px-4 py-3 transition-colors ${
-                            isActive
+                          className={`flex items-center gap-3 px-4 py-3 transition-colors ${isActive
                               ? 'bg-[#038DCD]/10 text-[#038DCD]'
                               : 'text-slate-600 hover:bg-slate-50'
-                          }`}
+                            }`}
                         >
                           <Icon className="w-5 h-5" />
                           <span className="font-medium">{item.name}</span>

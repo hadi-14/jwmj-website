@@ -360,8 +360,8 @@ export default function NewBusinessAdPage() {
           <label className={labelClass}>Business Logo (Optional)</label>
           <div
             className={`mt-2 flex justify-center px-6 py-8 border-2 transition-all duration-300 rounded-xl cursor-pointer ${isDragActive
-                ? 'border-primary-blue bg-primary-blue/5 border-solid'
-                : 'border-dashed border-primary-silver-400 hover:border-primary-blue'
+              ? 'border-primary-blue bg-primary-blue/5 border-solid'
+              : 'border-dashed border-primary-silver-400 hover:border-primary-blue'
               }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}

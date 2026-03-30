@@ -86,11 +86,10 @@ export default function MobileNav({
                         <li key={item.name} className="flex-1">
                             <Link
                                 href={item.href}
-                                className={`w-full flex flex-col items-center justify-center gap-1 px-3 py-2 transition-colors font-semibold ${
-                                    isActive
+                                className={`w-full flex flex-col items-center justify-center gap-1 px-3 py-2 transition-colors font-semibold ${isActive
                                         ? `${themeConfig.activeText}`
                                         : `${themeConfig.inactiveText} ${themeConfig.hoverText}`
-                                }`}
+                                    }`}
                             >
                                 <Icon className={`w-5 h-5 ${isActive ? themeConfig.activeIconStroke : ''}`} />
                                 <span className="text-xs">{item.name}</span>

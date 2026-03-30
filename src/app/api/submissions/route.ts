@@ -213,15 +213,15 @@ export async function GET(req: NextRequest) {
 
     const members = memberIds.length > 0
       ? await prisma.member_Information.findMany({
-          where: { MemComputerID: { in: memberIds } },
-          select: {
-            MemComputerID: true,
-            MemName: true,
-            MemMembershipNo: true,
-            MemCNIC: true,
-            Mem_Pic: true,
-          },
-        })
+        where: { MemComputerID: { in: memberIds } },
+        select: {
+          MemComputerID: true,
+          MemName: true,
+          MemMembershipNo: true,
+          MemCNIC: true,
+          Mem_Pic: true,
+        },
+      })
       : [];
 
     const memberMap = new Map(members.map(m => [m.MemComputerID.toString(), m]));
@@ -242,31 +242,31 @@ export async function GET(req: NextRequest) {
         memberMembershipNo: memberData?.MemMembershipNo,
         memberProfileImage: memberData?.Mem_Pic,
         fieldValues: submission.fieldValues
-        .filter((fv: { field: unknown }) => fv.field !== null) // Filter out orphaned field values
-        .map((fv: { field: { validationRule: string | object | null; options: string | object | null } | null;[key: string]: unknown }) => ({
-          ...fv,
-          field: fv.field ? {
-            ...fv.field,
-            validationRule: typeof fv.field.validationRule === 'string' && fv.field.validationRule
-              ? (() => {
-                try {
-                  return JSON.parse(fv.field.validationRule);
-                } catch {
-                  return null;
-                }
-              })()
-              : fv.field.validationRule,
-            options: typeof fv.field.options === 'string' && fv.field.options
-              ? (() => {
-                try {
-                  return JSON.parse(fv.field.options);
-                } catch {
-                  return [];
-                }
-              })()
-              : fv.field.options,
-          } : undefined
-        }))
+          .filter((fv: { field: unknown }) => fv.field !== null) // Filter out orphaned field values
+          .map((fv: { field: { validationRule: string | object | null; options: string | object | null } | null;[key: string]: unknown }) => ({
+            ...fv,
+            field: fv.field ? {
+              ...fv.field,
+              validationRule: typeof fv.field.validationRule === 'string' && fv.field.validationRule
+                ? (() => {
+                  try {
+                    return JSON.parse(fv.field.validationRule);
+                  } catch {
+                    return null;
+                  }
+                })()
+                : fv.field.validationRule,
+              options: typeof fv.field.options === 'string' && fv.field.options
+                ? (() => {
+                  try {
+                    return JSON.parse(fv.field.options);
+                  } catch {
+                    return [];
+                  }
+                })()
+                : fv.field.options,
+            } : undefined
+          }))
       };
     });
 

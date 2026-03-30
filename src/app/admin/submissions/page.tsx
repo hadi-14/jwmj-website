@@ -157,11 +157,11 @@ export default function SubmissionsPage() {
           const statsData = await statsRes.json();
           if (isMounted) setStats(statsData.data);
         }
-      } catch (e) { 
+      } catch (e) {
         if (isMounted) setError(e instanceof Error ? e.message : 'An error occurred');
       }
-      finally { 
-        if (isMounted) setLoading(false); 
+      finally {
+        if (isMounted) setLoading(false);
       }
     };
     fetchData();

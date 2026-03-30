@@ -101,8 +101,8 @@ export default function AdminDashboard() {
       if (response.ok) {
         showNotification('Registration updated successfully', 'success');
         // Update local state instead of re-fetching all registrations
-        setEventRegistrations(prev => 
-          prev.map(reg => 
+        setEventRegistrations(prev =>
+          prev.map(reg =>
             reg.id === id ? { ...reg, status: status as 'pending' | 'approved' | 'rejected' | 'cancelled' } : reg
           )
         );
