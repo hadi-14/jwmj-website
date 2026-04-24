@@ -573,7 +573,7 @@ Event Management Committee — Jamnagar Wehvaria Memon Jamat
 }
 
 export async function sendPasswordResetEmail(email: string, resetToken: string, userName: string) {
-  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/member/reset-password?token=${resetToken}`;
+  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://jwmj.org'}/member/reset-password?token=${resetToken}`;
 
   const mailOptions = {
     from: `"${process.env.APP_NAME || 'JWMJ Member Portal'}" <${process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@jwmj.org'}>`,
