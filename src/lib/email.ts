@@ -62,7 +62,7 @@ export async function sendVerificationEmail(email: string, code: string) {
               <p style="margin: 10px 0 0 0; opacity: 0.9;">JWMJ Member Portal</p>
             </div>
             <div class="content">
-              <p>Hello,</p>
+              <p>Assalamu Alaikum,</p>
               <p>Thank you for registering with JWMJ Member Portal. To complete your registration, please use the verification code below:</p>
               
               <div class="code-box">
@@ -602,7 +602,7 @@ export async function sendPasswordResetEmail(email: string, resetToken: string, 
               <p>Password Reset Request</p>
             </div>
             <div class="content">
-              <h2>Hello ${userName},</h2>
+              <h2>Assalamu Alaikum ${userName},</h2>
 
               <p>You have requested to reset your password for your JWMJ Member Portal account.</p>
 
@@ -641,7 +641,7 @@ export async function sendPasswordResetEmail(email: string, resetToken: string, 
     text: `
 JWMJ Member Portal - Password Reset
 
-Hello ${userName},
+Assalamu Alaikum ${userName},
 
 You have requested to reset your password for your JWMJ Member Portal account.
 

@@ -100,9 +100,9 @@ export default function HomeClient() {
                             >
                                 Jamnagar Wehvaria Memon Jamat
                             </p>
-                            <button className="bg-white/80 text-[#038DCD] font-bold px-4 py-2 rounded-full shadow-md transition text-sm hover:bg-[#038DCD]/90 hover:text-white hover:scale-105 duration-200">
+                            {/* <button className="bg-white/80 text-[#038DCD] font-bold px-4 py-2 rounded-full shadow-md transition text-sm hover:bg-[#038DCD]/90 hover:text-white hover:scale-105 duration-200">
                                 BECOME A MEMBER
-                            </button>
+                            </button> */}
                         </div>
                     </div>
 
@@ -170,12 +170,12 @@ export default function HomeClient() {
                             >
                                 Jamnagar Wehvaria Memon Jamat
                             </p>
-                            <button
+                            {/* <button
                                 className="bg-white/80 text-[#038DCD] font-bold px-5 py-3 rounded-full shadow-md transition mb-2 text-lg hover:bg-[#038DCD]/90 hover:text-white hover:scale-105 duration-200"
                                 style={{ boxShadow: "0 2px 8px rgba(3,141,205,0.12)" }}
                             >
                                 BECOME A MEMBER
-                            </button>
+                            </button> */}
                         </div>
 
                         {/* Right: Services Card */}
