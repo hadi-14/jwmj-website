@@ -9,6 +9,7 @@ interface Registration {
   memberName?: string;
   memberEmail?: string;
   wehvariaNo?: string;
+  membershipId?: string;
   relation?: string;
   groupId?: string;
 }
@@ -72,7 +73,7 @@ export async function GET() {
       ]
     });
 
-    // Fetch wehvaria numbers for all members
+    // Fetch membership identifiers for all members
     const memberIds = new Set<number>();
     registrations.forEach(reg => memberIds.add(parseInt(reg.memberId)));
 
@@ -82,13 +83,18 @@ export async function GET() {
       },
       select: {
         MemComputerID: true,
+        MemMembershipNo: true,
         MemWehvariaNo: true
       }
     });
 
-    const wehvariaMap: Record<string, string> = {};
+    const memberIdentifierMap: Record<string, { id: string; wehvariaNo: string }> = {};
     members.forEach(m => {
-      wehvariaMap[m.MemComputerID.toString()] = m.MemWehvariaNo?.toString() || 'N/A';
+      const id = m.MemMembershipNo?.trim() || m.MemWehvariaNo?.toString() || 'N/A';
+      memberIdentifierMap[m.MemComputerID.toString()] = {
+        id,
+        wehvariaNo: m.MemWehvariaNo?.toString() || 'N/A'
+      };
     });
 
     // Group registrations by groupId
@@ -109,11 +115,13 @@ export async function GET() {
         };
       }
       if (reg.isHead) {
-        const regWithWehvaria: Registration = { ...reg, wehvariaNo: wehvariaMap[reg.memberId] } as Registration;
-        acc[reg.groupId].head = regWithWehvaria;
+        const memberInfo = memberIdentifierMap[reg.memberId] || { id: 'N/A', wehvariaNo: 'N/A' };
+        const regWithMembershipId: Registration = { ...reg, membershipId: memberInfo.id, wehvariaNo: memberInfo.wehvariaNo } as Registration;
+        acc[reg.groupId].head = regWithMembershipId;
         acc[reg.groupId].status = reg.status;
       } else {
-        const familyMember: Registration = { ...reg, wehvariaNo: wehvariaMap[reg.memberId] } as Registration;
+        const memberInfo = memberIdentifierMap[reg.memberId] || { id: 'N/A', wehvariaNo: 'N/A' };
+        const familyMember: Registration = { ...reg, membershipId: memberInfo.id, wehvariaNo: memberInfo.wehvariaNo } as Registration;
         acc[reg.groupId].family.push(familyMember);
       }
       return acc;

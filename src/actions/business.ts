@@ -124,6 +124,7 @@ export async function getBusinessAdRequests(status?: string) {
           select: {
             MemName: true,
             MemMembershipNo: true,
+            MemWehvariaNo: true,
             MemFatherName: true
           }
         },
@@ -134,10 +135,16 @@ export async function getBusinessAdRequests(status?: string) {
       }
     });
 
-    // Transform to convert Decimal to number
+    // Transform to convert Decimal to number/string where needed
     return requests.map(request => ({
       ...request,
-      memberId: Number(request.memberId)
+      memberId: Number(request.memberId),
+      member: {
+        MemName: request.member?.MemName ?? null,
+        MemMembershipNo: request.member?.MemMembershipNo ?? null,
+        MemWehvariaNo: request.member?.MemWehvariaNo ? request.member.MemWehvariaNo.toString() : null,
+        MemFatherName: request.member?.MemFatherName ?? null,
+      }
     }));
   } catch (error) {
     console.error('Error fetching business ad requests:', error);

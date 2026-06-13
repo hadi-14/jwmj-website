@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getBusinessAdRequests, approveBusinessAdRequest, rejectBusinessAdRequest } from '@/actions/business';
 import { useNotification } from '@/components/Notification';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
+import { Trash2, Edit, Download } from 'lucide-react';
 
 interface BusinessAdApproval {
   id: number;
@@ -36,6 +37,7 @@ interface BusinessAdRequest {
   member: {
     MemName: string | null;
     MemMembershipNo: string | null;
+    MemWehvariaNo?: string | null;
     MemFatherName: string | null;
   };
   approvals: BusinessAdApproval[];
@@ -133,6 +135,87 @@ export default function BusinessAdsManagement() {
     }
   };
 
+  const escapeCsvCell = (value: unknown) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+
+  const exportRequests = () => {
+    if (requests.length === 0) {
+      showNotification('No requests available to export.', 'warning');
+      return;
+    }
+
+    const headers = [
+      'Srno',
+      'ID',
+      'Business Name',
+      'Category',
+      'Owner',
+      'Phone',
+      'Email',
+      'Website',
+      'Address',
+      'Established',
+      'Status',
+      'Requested Start Date',
+      'Requested End Date',
+      'Submitted At',
+      'Approved Start Date',
+      'Approved End Date',
+      'Admin Notes',
+      'Member Name',
+      'Membership No',
+      'Services',
+      'Special Offers',
+      'Description'
+    ];
+
+    const rows = requests.map((request, index) => {
+      const services = (() => {
+        try {
+          return JSON.parse(request.services) as string[];
+        } catch {
+          return [];
+        }
+      })();
+
+      const approval = request.approvals[0];
+
+      const memberId = request.member.MemMembershipNo?.trim() || request.member.MemWehvariaNo?.toString() || '';
+      return [
+        index + 1,
+        memberId,
+        request.businessName,
+        request.category,
+        request.owner,
+        request.phone,
+        request.email,
+        request.website || '',
+        request.address,
+        request.established,
+        request.status,
+        formatDate(request.requestedStartDate),
+        formatDate(request.requestedEndDate),
+        formatDate(request.submittedAt),
+        approval?.approvedStartDate ? formatDate(approval.approvedStartDate) : '',
+        approval?.approvedEndDate ? formatDate(approval.approvedEndDate) : '',
+        approval?.adminNotes || '',
+        request.member.MemName || '',
+        request.member.MemMembershipNo || '',
+        services.join('; '),
+        request.specialOffers || '',
+        request.description
+      ];
+    });
+
+    const csv = [headers.map(escapeCsvCell).join(','), ...rows.map(row => row.map(escapeCsvCell).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `business_ads_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString();
   };
@@ -147,9 +230,18 @@ export default function BusinessAdsManagement() {
 
   return (
     <div className="p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Business Ad Requests Management</h1>
-        <p className="text-gray-600">Review and manage business advertisement requests from community members.</p>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Business Ad Requests Management</h1>
+          <p className="text-gray-600">Review and manage business advertisement requests from community members.</p>
+        </div>
+        <button
+          onClick={exportRequests}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
+        >
+          <Download className="w-4 h-4" />
+          Export Requests
+        </button>
       </div>
 
       {/* Filter Tabs */}

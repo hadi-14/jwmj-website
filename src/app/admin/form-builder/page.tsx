@@ -294,6 +294,38 @@ export default function FormBuilder() {
     showNotification('Form exported', 'success');
   };
 
+  const exportFormDefinitions = () => {
+    if (forms.length === 0) {
+      showNotification('No forms available to export.', 'warning');
+      return;
+    }
+
+    const escapeCsvCell = (value: unknown) => `"${String(value).replace(/"/g, '""')}"`;
+    const headers = ['Srno', 'ID', 'Name', 'Type', 'Fields', 'Created At', 'Updated At'];
+    const rows = forms.map((form, index) => [
+      index + 1,
+      form.id,
+      form.name,
+      form.formType,
+      form.fields.length,
+      form.createdAt ? new Date(form.createdAt).toLocaleDateString() : '',
+      form.updatedAt ? new Date(form.updatedAt).toLocaleDateString() : ''
+    ]);
+
+    const csv = [headers.map(escapeCsvCell).join(','), ...rows.map((row) => row.map(escapeCsvCell).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `forms_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showNotification('Forms exported', 'success');
+  };
+
   const formTypes = ['all', ...new Set(forms.map(f => f.formType))];
 
   // ─── Loading ────────────────────────────────────────────────────────────────
@@ -590,14 +622,22 @@ export default function FormBuilder() {
           <div className="space-y-8">
 
             {/* Stats row */}
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-2 gap-3 flex-wrap">
               <h2 className="text-lg font-bold text-slate-900">Overview</h2>
-              <button
-                onClick={() => setShowTemplateSelection(true)}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#038DCD] hover:bg-[#0278b0] text-white rounded-xl font-semibold text-sm transition-colors shadow-sm shadow-[#038DCD]/20"
-              >
-                <Plus className="w-4 h-4" /> New Form
-              </button>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={exportFormDefinitions}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm transition-colors hover:bg-slate-50"
+                >
+                  <Download className="w-4 h-4" /> Export Forms
+                </button>
+                <button
+                  onClick={() => setShowTemplateSelection(true)}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#038DCD] hover:bg-[#0278b0] text-white rounded-xl font-semibold text-sm transition-colors shadow-sm shadow-[#038DCD]/20"
+                >
+                  <Plus className="w-4 h-4" /> New Form
+                </button>
+              </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <StatCard icon={FileText} label="Total Forms" value={forms.length} accent />

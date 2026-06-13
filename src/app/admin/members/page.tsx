@@ -33,6 +33,7 @@ interface Member {
   managerPages?: string[] | null;
   createdAt: string;
   updatedAt: string;
+  domainMemberId?: string | null;
 }
 
 interface FormData {
@@ -67,7 +68,8 @@ export default function AdminMembersPage() {
         (m) =>
           m.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           m.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          m.id.toLowerCase().includes(searchQuery.toLowerCase())
+          m.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          m.domainMemberId?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -229,17 +231,20 @@ export default function AdminMembersPage() {
   };
 
   const exportMembers = () => {
+    const escapeCsvCell = (value: unknown) => `"${String(value).replace(/"/g, '""')}"`;
+
     const csv = [
-      ['ID', 'Name', 'Email', 'Role', 'Created Date'],
-      ...filteredMembers.map((m) => [
-        m.id,
+      ['Srno', 'ID', 'Name', 'Email', 'Role', 'Created Date'],
+      ...filteredMembers.map((m, index) => [
+        index + 1,
+        m.domainMemberId || '',
         m.name || '',
         m.email,
         m.role,
         new Date(m.createdAt).toLocaleDateString()
       ]),
     ]
-      .map((row) => row.join(','))
+      .map((row) => row.map(escapeCsvCell).join(','))
       .join('\n');
 
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -641,7 +646,7 @@ export default function AdminMembersPage() {
                   onClick={() => {
                     setShowAddModal(false);
                     setShowEditModal(false);
-                    setFormData({ name: '', email: '', password: '', role: 'MEMBER' });
+                    setFormData({ name: '', email: '', password: '', role: 'MEMBER', managerPages: [] });
                     setSelectedMember(null);
                   }}
                   disabled={isSaving}

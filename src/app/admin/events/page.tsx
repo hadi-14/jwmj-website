@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { Trash2, Edit, X, Upload, Eye, CheckSquare, Square, Plus } from 'lucide-react';
+import { Trash2, Edit, X, Upload, Eye, CheckSquare, Square, Plus, Download } from 'lucide-react';
 import { useNotification, ConfirmationModal } from '@/components/Notification';
 
 interface Event {
@@ -26,6 +26,7 @@ interface Registration {
   relation?: string;
   memberEmail?: string;
   wehvariaNo?: string;
+  membershipId?: string;
 }
 
 interface RegistrationGroup {
@@ -55,6 +56,10 @@ export default function EventManagement() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [selectedGroupIds, setSelectedGroupIds] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState<'approve' | 'reject' | null>(null);
+  const [eventSortBy, setEventSortBy] = useState<'date' | 'title' | 'category' | 'updatedAt'>('date');
+  const [eventSortDir, setEventSortDir] = useState<'asc' | 'desc'>('asc');
+  const [registrationSortBy, setRegistrationSortBy] = useState<'event' | 'status' | 'date'>('event');
+  const [registrationSortDir, setRegistrationSortDir] = useState<'asc' | 'desc'>('asc');
 
   // Confirmation modal states
   const [showDeleteEventConfirm, setShowDeleteEventConfirm] = useState(false);
@@ -249,6 +254,88 @@ export default function EventManagement() {
     }
   };
 
+  const exportEvents = () => {
+    if (events.length === 0) {
+      showNotification('No events available to export.', 'warning');
+      return;
+    }
+
+    const escapeCsvCell = (value: unknown) => `"${String(value).replace(/"/g, '""')}"`;
+    const headers = ['Srno', 'ID', 'Title', 'Category', 'Date', 'Time', 'Venue', 'Created At', 'Updated At'];
+    const rows = events.map((event, index) => [
+      index + 1,
+      event.id,
+      event.title,
+      event.category,
+      new Date(event.date).toLocaleDateString(),
+      event.time || '',
+      event.venue || '',
+      new Date(event.createdAt).toLocaleDateString(),
+      event.updatedAt ? new Date(event.updatedAt).toLocaleDateString() : ''
+    ]);
+
+    const csv = [headers.map(escapeCsvCell).join(','), ...rows.map((row) => row.map(escapeCsvCell).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `events_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const exportRegistrations = () => {
+    if (registrations.length === 0) {
+      showNotification('No registrations available to export.', 'warning');
+      return;
+    }
+
+    const escapeCsvCell = (value: unknown) => `"${String(value).replace(/"/g, '""')}"`;
+    const headers = [
+      'Srno',
+      'ID',
+      'Registration Group ID',
+      'Event Title',
+      'Head of Family',
+      'Head Membership No',
+      'Family Members',
+      'Total Attendees',
+      'Status',
+      'Registration Date'
+    ];
+
+    const rows = registrations.map((group, index) => {
+      const familyText = group.family.map((member) => `${member.memberName}${member.relation ? ` (${member.relation})` : ''}`).join('; ');
+      return [
+        index + 1,
+        group.head?.membershipId || '',
+        group.groupId,
+        group.event.title,
+        group.head?.memberName || 'Unknown',
+        group.head?.membershipId || '',
+        familyText,
+        group.family.length + 1,
+        group.status,
+        new Date(group.createdAt).toLocaleDateString()
+      ];
+    });
+
+    const csv = [headers.map(escapeCsvCell).join(','), ...rows.map((row) => row.map(escapeCsvCell).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `event_registrations_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const isUpcomingEvent = (date: string) => {
     const eventDate = new Date(date);
     const today = new Date();
@@ -271,18 +358,21 @@ export default function EventManagement() {
       return;
     }
 
+    const escapeCsvCell = (value: unknown) => `"${String(value).replace(/"/g, '""')}"`;
+
     // Create CSV content
-    const headers = ['Registration ID', 'Head of Family', 'Family Members', 'Total Attendees', 'Status', 'Registration Date'];
+    const headers = ['Srno', 'Registration ID', 'Head of Family', 'Family Members', 'Total Attendees', 'Status', 'Registration Date'];
     const csvContent = [
-      headers.join(','),
-      ...eidMilanRegistrations.map((group: RegistrationGroup) => [
+      headers.map(escapeCsvCell).join(','),
+      ...eidMilanRegistrations.map((group: RegistrationGroup, index: number) => [
+        index + 1,
         group.groupId,
-        `"${group.head?.memberName || 'Unknown'}"`,
-        `"${group.family.map((m: Registration) => m.memberName).join('; ')}"`,
+        group.head?.memberName || 'Unknown',
+        group.family.map((m: Registration) => m.memberName).join('; '),
         group.family.length + 1,
         group.status,
         new Date(group.createdAt).toLocaleDateString()
-      ].join(','))
+      ].map(escapeCsvCell).join(','))
     ].join('\n');
 
     // Create and download CSV file
@@ -354,6 +444,53 @@ export default function EventManagement() {
     } finally {
       setShowRejectConfirm(false);
       setRegistrationToReject(null);
+    }
+  };
+
+  const sortedEvents = [...events].sort((a, b) => {
+    const compareString = (left: string, right: string) => left.localeCompare(right, undefined, { sensitivity: 'base' });
+    switch (eventSortBy) {
+      case 'title': return eventSortDir === 'asc' ? compareString(a.title, b.title) : compareString(b.title, a.title);
+      case 'category': return eventSortDir === 'asc' ? compareString(a.category, b.category) : compareString(b.category, a.category);
+      case 'updatedAt': return eventSortDir === 'asc'
+        ? new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+        : new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      default:
+        return eventSortDir === 'asc'
+          ? new Date(a.date).getTime() - new Date(b.date).getTime()
+          : new Date(b.date).getTime() - new Date(a.date).getTime();
+    }
+  });
+
+  const sortedRegistrations = [...registrations].sort((a, b) => {
+    const compareString = (left: string, right: string) => left.localeCompare(right, undefined, { sensitivity: 'base' });
+    switch (registrationSortBy) {
+      case 'status': return registrationSortDir === 'asc'
+        ? compareString(a.status, b.status)
+        : compareString(b.status, a.status);
+      case 'date': return registrationSortDir === 'asc'
+        ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      default:
+        return registrationSortDir === 'asc'
+          ? compareString(a.event.title, b.event.title)
+          : compareString(b.event.title, a.event.title);
+    }
+  });
+
+  const handleToggleSortDirection = () => {
+    if (activeTab === 'events') {
+      setEventSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setRegistrationSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    }
+  };
+
+  const handleSortByChange = (value: string) => {
+    if (activeTab === 'events') {
+      setEventSortBy(value as typeof eventSortBy);
+    } else {
+      setRegistrationSortBy(value as typeof registrationSortBy);
     }
   };
 
@@ -461,15 +598,64 @@ export default function EventManagement() {
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Event Management</h1>
           <p className="text-sm sm:text-base text-slate-600 mt-1">Manage events and registrations</p>
         </div>
-        {activeTab === 'registrations' && (
-          <button
-            onClick={generateReport}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base"
-          >
-            <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span>Generate Report</span>
-          </button>
-        )}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="text-sm font-medium text-slate-700">Sort by</label>
+            <select
+              value={activeTab === 'events' ? eventSortBy : registrationSortBy}
+              onChange={(e) => handleSortByChange(e.target.value)}
+              className="px-3 py-2 border border-slate-200 rounded-lg bg-white text-sm text-slate-900 focus:outline-none"
+            >
+              {activeTab === 'events' ? (
+                <>
+                  <option value="date">Event Date</option>
+                  <option value="title">Event Title</option>
+                  <option value="category">Category</option>
+                  <option value="updatedAt">Updated At</option>
+                </>
+              ) : (
+                <>
+                  <option value="event">Event</option>
+                  <option value="status">Status</option>
+                  <option value="date">Registration Date</option>
+                </>
+              )}
+            </select>
+            <button
+              onClick={handleToggleSortDirection}
+              className="px-3 py-2 border border-slate-200 rounded-lg bg-white text-sm text-slate-900 hover:bg-slate-50 transition-colors"
+            >
+              {activeTab === 'events' ? (eventSortDir === 'asc' ? 'Asc' : 'Desc') : (registrationSortDir === 'asc' ? 'Asc' : 'Desc')}
+            </button>
+          </div>
+
+          {activeTab === 'events' ? (
+            <button
+              onClick={exportEvents}
+              className="flex items-center gap-2 bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base"
+            >
+              <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>Export Events</span>
+            </button>
+          ) : (
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <button
+                onClick={exportRegistrations}
+                className="flex items-center gap-2 bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base"
+              >
+                <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Export Registrations</span>
+              </button>
+              <button
+                onClick={generateReport}
+                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base"
+              >
+                <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Generate Report</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Tabs - Mobile Optimized */}
@@ -531,7 +717,7 @@ export default function EventManagement() {
                       </td>
                     </tr>
                   ) : (
-                    events.map((event) => (
+                    sortedEvents.map((event) => (
                       <tr key={event.id} className="hover:bg-slate-50 transition-colors">
                         <td className="px-6 py-4">
                           <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-slate-100">
@@ -589,10 +775,10 @@ export default function EventManagement() {
                   No events yet. Create your first event!
                 </div>
               ) : (
-                events.map((event) => (
+                sortedEvents.map((event) => (
                   <div key={event.id} className="p-3 sm:p-4 border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
                     <div className="flex gap-3 mb-3">
-                      <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden bg-slate-200 flex-shrink-0">
+                      <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden bg-slate-200 shrink-0">
                         <Image
                           src={event.img}
                           alt={event.title}
@@ -650,7 +836,7 @@ export default function EventManagement() {
               <span className="text-xs sm:text-sm font-medium text-blue-900">
                 {selectedGroupIds.size} registration(s) selected
               </span>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => handleBulkAction('approve')}
                   className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
@@ -702,7 +888,7 @@ export default function EventManagement() {
                       </td>
                     </tr>
                   ) : (
-                    registrations.map((group: RegistrationGroup) => (
+                    sortedRegistrations.map((group: RegistrationGroup) => (
                       <tr
                         key={group.groupId}
                         className={`${selectedGroupIds.has(group.groupId) ? 'bg-blue-50' : 'hover:bg-slate-50'
@@ -729,7 +915,7 @@ export default function EventManagement() {
                         <td className="px-6 py-4">
                           <div>
                             <p className="font-medium text-slate-900">{group.head?.memberName || 'Unknown'}</p>
-                            <p className="text-sm text-slate-500">Membership No: {group.head?.wehvariaNo || 'N/A'}</p>
+                            <p className="text-sm text-slate-500">ID: {group.head?.membershipId || 'N/A'}</p>
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -739,7 +925,7 @@ export default function EventManagement() {
                                 {group.family.map((member: Registration, index: number) => (
                                   <div key={index} className="mb-1">
                                     • {member.memberName}{member.relation && member.relation !== 'Family Member' ? ` (${member.relation})` : ''}<br />
-                                    <span className="text-xs text-slate-500">Membership No: {member.wehvariaNo || 'N/A'}</span>
+                                    <span className="text-xs text-slate-500">ID: {member.membershipId || 'N/A'}</span>
                                   </div>
                                 ))}
                               </div>
@@ -816,7 +1002,7 @@ export default function EventManagement() {
                   setShowModal(false);
                   resetForm();
                 }}
-                className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0"
+                className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-lg transition-colors shrink-0"
               >
                 <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
               </button>

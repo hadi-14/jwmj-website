@@ -66,9 +66,44 @@ export async function GET(request: NextRequest) {
       take: limit,
     });
 
+    const emailToMemberId: Record<string, string> = {};
+    const userEmails = users
+      .map((user) => user.email?.trim().toLowerCase())
+      .filter(Boolean) as string[];
+
+    if (userEmails.length > 0) {
+      const mappedMembers = await prisma.member_Emailid.findMany({
+        where: {
+          MEM_Emailid: { in: userEmails }
+        },
+        select: {
+          MEM_Emailid: true,
+          member: {
+            select: {
+              MemMembershipNo: true,
+              MemWehvariaNo: true
+            }
+          }
+        }
+      });
+
+      mappedMembers.forEach((entry) => {
+        const emailKey = entry.MEM_Emailid.trim().toLowerCase();
+        const identifier = entry.member.MemMembershipNo?.trim() || entry.member.MemWehvariaNo?.toString() || '';
+        if (identifier) {
+          emailToMemberId[emailKey] = identifier;
+        }
+      });
+    }
+
+    const usersWithMemberIds = users.map((user) => ({
+      ...user,
+      domainMemberId: emailToMemberId[user.email.trim().toLowerCase()] || null,
+    }));
+
     return NextResponse.json({
       success: true,
-      data: users,
+      data: usersWithMemberIds,
       pagination: {
         total,
         page,
