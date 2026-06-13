@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { AuthProvider, useAuth } from './AuthContext';
 import { NotificationProvider } from '@/components/Notification';
 import MobileNav from '@/components/MobileNav';
+import { PAGE_ACCESS } from '@/lib/roles';
 import {
   LayoutDashboard,
   Users,
@@ -78,11 +79,20 @@ const mobileNavItems = [
 // Height of the public site header (ticker + navbar). Adjust if yours differs.
 const SITE_HEADER_HEIGHT = 104;
 
-function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function Sidebar({ isOpen, onClose, userRole }: { isOpen: boolean; onClose: () => void; userRole?: string }) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
+
+  // Filter navigation based on user role
+  const filteredNavigation = navigation.filter((item) => {
+    if (!userRole) return false;
+    const allowedPages = PAGE_ACCESS[userRole as keyof typeof PAGE_ACCESS] || [];
+    return allowedPages.some(page =>
+      item.href === page || item.href.startsWith(page)
+    );
+  });
 
   useEffect(() => {
     const update = () => {
@@ -184,7 +194,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
             </p>
           )}
 
-          {navigation.map((item) => {
+          {filteredNavigation.map((item) => {
             const Icon = item.icon;
             // Dashboard should only be active on exact /admin path, not /admin/form-builder etc
             const isActive = item.href === '/admin'
@@ -262,8 +272,17 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const pathname = usePathname();
-  const { logout } = useAuth();
-  useAuth();
+  const { logout, user } = useAuth();
+
+  // Filter navigation based on user role
+  const filteredNavigation = user?.role
+    ? navigation.filter((item) => {
+      const allowedPages = PAGE_ACCESS[user.role as keyof typeof PAGE_ACCESS] || [];
+      return allowedPages.some(page =>
+        item.href === page || item.href.startsWith(page)
+      );
+    })
+    : [];
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -293,7 +312,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           </header>
 
           <div className="flex-1 flex flex-col">
-            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} userRole={user?.role} />
             {/* Offset content by sidebar width on desktop */}
             <div className="lg:pl-64 transition-all duration-300 flex-1 flex flex-col">
               <main className="p-3 sm:p-4 lg:p-8 flex-1 pb-20 lg:pb-8">
@@ -307,7 +326,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               {mobileMoreOpen && (
                 <div className="fixed bottom-20 left-4 right-4 bg-white rounded-2xl border border-slate-200 shadow-xl z-50 lg:hidden max-w-xs">
                   <div className="flex flex-col divide-y divide-slate-100">
-                    {navigation.map((item) => {
+                    {filteredNavigation.map((item) => {
                       const Icon = item.icon;
                       const isActive = pathname === item.href;
                       return (
@@ -316,8 +335,8 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                           href={item.href}
                           onClick={() => setMobileMoreOpen(false)}
                           className={`flex items-center gap-3 px-4 py-3 transition-colors ${isActive
-                              ? 'bg-[#038DCD]/10 text-[#038DCD]'
-                              : 'text-slate-600 hover:bg-slate-50'
+                            ? 'bg-[#038DCD]/10 text-[#038DCD]'
+                            : 'text-slate-600 hover:bg-slate-50'
                             }`}
                         >
                           <Icon className="w-5 h-5" />

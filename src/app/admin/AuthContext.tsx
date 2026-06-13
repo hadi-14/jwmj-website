@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (response.ok) {
                 const data = await response.json();
-                if (data.user && data.user.role === 'ADMIN') {
+                if (data.user && (data.user.role === 'ADMIN' || data.user.role === 'MANAGER')) {
                     setUser(data.user);
                 } else {
                     setUser(null);
@@ -79,13 +79,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             const data = await response.json();
 
-            // Strict Role Check on Login
-            if (data.user.role !== 'ADMIN') {
-                throw new Error('Access Denied: Admin privileges required.');
+            // Allow both ADMIN and MANAGER roles
+            if (data.user.role !== 'ADMIN' && data.user.role !== 'MANAGER') {
+                throw new Error('Access Denied: Admin or Manager privileges required.');
             }
 
             setUser(data.user);
-            router.push('/admin');
+
+            // Redirect to appropriate dashboard based on role
+            const redirectPath = data.user.role === 'ADMIN' ? '/admin' : '/admin/events';
+            router.push(redirectPath);
         } catch (error: unknown) {
             if (error instanceof Error) {
                 throw error;

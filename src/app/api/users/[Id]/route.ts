@@ -6,7 +6,8 @@ import { requireAdmin, sanitizeInput, sanitizeEmail, logSecurityEvent } from '@/
 // Validate UUID format to prevent injection
 function isValidUUID(id: string): boolean {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(id);
+  const cuidRegex = /^c[a-z0-9]{24,}$/i;
+  return uuidRegex.test(id) || cuidRegex.test(id);
 }
 
 export async function GET(
@@ -84,7 +85,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { email, name, password, role } = body;
+    const { email, name, password, role, managerPages } = body;
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
@@ -107,7 +108,7 @@ export async function PUT(
           { status: 400 }
         );
       }
-      
+
       if (sanitizedEmail !== existingUser.email) {
         const emailTaken = await prisma.user.findUnique({
           where: { email: sanitizedEmail },
@@ -122,7 +123,7 @@ export async function PUT(
     }
 
     // Validate role if provided
-    if (role && !['ADMIN', 'USER', 'MEMBER'].includes(role)) {
+    if (role && !['ADMIN', 'MANAGER', 'USER', 'MEMBER'].includes(role)) {
       return NextResponse.json(
         { success: false, error: 'Invalid role' },
         { status: 400 }
@@ -135,11 +136,17 @@ export async function PUT(
       name?: string;
       role?: string;
       password?: string;
+      managerPages?: unknown;
     } = {};
-    
+
     if (email) updateData.email = sanitizeEmail(email) || undefined;
     if (name !== undefined) updateData.name = name ? sanitizeInput(name) : null;
     if (role) updateData.role = role;
+    if (role === 'MANAGER' && managerPages && Array.isArray(managerPages)) {
+      updateData.managerPages = managerPages;
+    } else if (role !== 'MANAGER') {
+      updateData.managerPages = null;
+    }
     if (password) {
       if (password.length < 8) {
         return NextResponse.json(

@@ -57,14 +57,14 @@ export async function POST(request: NextRequest) {
         result = await prisma.user.deleteMany({
           where: { id: { in: userIds } },
         });
-        await logSecurityEvent('BULK_DELETE_USERS', authResult.user.userId, { 
+        await logSecurityEvent('BULK_DELETE_USERS', authResult.user.userId, {
           count: userIds.length,
-          userIds 
+          userIds
         }, request);
         break;
 
       case 'update-role':
-        if (!data?.role || !['ADMIN', 'USER', 'MEMBER'].includes(data.role)) {
+        if (!data?.role || !['ADMIN', 'MANAGER', 'USER', 'MEMBER'].includes(data.role)) {
           return NextResponse.json(
             { success: false, error: 'Valid role is required for bulk update' },
             { status: 400 }
@@ -74,9 +74,9 @@ export async function POST(request: NextRequest) {
           where: { id: { in: userIds } },
           data: { role: data.role },
         });
-        await logSecurityEvent('BULK_UPDATE_ROLE', authResult.user.userId, { 
+        await logSecurityEvent('BULK_UPDATE_ROLE', authResult.user.userId, {
           count: userIds.length,
-          newRole: data.role 
+          newRole: data.role
         }, request);
         break;
 

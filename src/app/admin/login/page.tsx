@@ -38,8 +38,8 @@ export default function AdminLogin() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-[#038DCD] to-[#0369A1] rounded-2xl mb-4 shadow-lg">
             <Shield className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Admin Login</h1>
-          <p className="text-slate-600">Sign in to access the admin panel</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Admin & Manager Login</h1>
+          <p className="text-slate-600">Sign in to access the management panel</p>
         </div>
 
         {/* Login Form */}

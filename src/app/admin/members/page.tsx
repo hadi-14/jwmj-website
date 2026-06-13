@@ -12,17 +12,17 @@ import {
   Eye,
   Mail,
   Calendar,
-  XCircle,
   X,
   Save,
   Loader,
   UserCheck,
-  AlertCircle,
   Shield,
   UserPlus,
-  Lock
+  Lock,
+  Crown
 } from 'lucide-react';
 import { useNotification, ConfirmationModal } from '@/components/Notification';
+import { getRoleDisplayName, type Role } from '@/lib/roles';
 
 
 interface Member {
@@ -30,6 +30,7 @@ interface Member {
   name: string | null;
   email: string;
   role: string;
+  managerPages?: string[] | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -39,6 +40,7 @@ interface FormData {
   email: string;
   password: string;
   role: string;
+  managerPages: string[];
 }
 
 export default function AdminMembersPage() {
@@ -52,7 +54,7 @@ export default function AdminMembersPage() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-  const [formData, setFormData] = useState<FormData>({ name: '', email: '', password: '', role: 'MEMBER' });
+  const [formData, setFormData] = useState<FormData>({ name: '', email: '', password: '', role: 'MEMBER', managerPages: [] });
   const [isSaving, setIsSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
@@ -177,6 +179,10 @@ export default function AdminMembersPage() {
         role: formData.role,
       };
 
+      if (formData.role === 'MANAGER') {
+        payload.managerPages = formData.managerPages;
+      }
+
       if (formData.password) {
         payload.password = formData.password;
       }
@@ -196,7 +202,7 @@ export default function AdminMembersPage() {
       showNotification(showEditModal ? 'User updated successfully' : 'User created successfully', 'success');
       setShowAddModal(false);
       setShowEditModal(false);
-      setFormData({ name: '', email: '', password: '', role: 'MEMBER' });
+      setFormData({ name: '', email: '', password: '', role: 'MEMBER', managerPages: [] });
       setSelectedMember(null);
       refetchMembers();
     } catch (error: unknown) {
@@ -217,6 +223,7 @@ export default function AdminMembersPage() {
       email: member.email,
       password: '',
       role: member.role,
+      managerPages: member.managerPages || [],
     });
     setShowEditModal(true);
   };
@@ -246,9 +253,10 @@ export default function AdminMembersPage() {
 
   const stats = {
     total: members.length,
-    active: members.filter((m) => m.role === 'MEMBER').length,
-    pending: members.filter((m) => m.role === 'USER').length,
-    inactive: members.filter((m) => m.role === 'ADMIN').length,
+    admins: members.filter((m) => m.role === 'ADMIN').length,
+    managers: members.filter((m) => m.role === 'MANAGER').length,
+    members: members.filter((m) => m.role === 'MEMBER').length,
+    users: members.filter((m) => m.role === 'USER').length,
   };
 
   if (isLoading) {
@@ -291,11 +299,23 @@ export default function AdminMembersPage() {
         <div className="bg-white rounded-xl shadow-sm border-2 border-slate-200 p-6">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-slate-600 font-medium mb-2">Total Users</p>
-              <p className="text-3xl font-bold text-slate-900">{stats.total}</p>
+              <p className="text-slate-600 font-medium mb-2">Admins</p>
+              <p className="text-3xl font-bold text-red-600">{stats.admins}</p>
             </div>
-            <div className="p-3 bg-blue-50 rounded-xl">
-              <Users className="w-6 h-6 text-[#038DCD]" />
+            <div className="p-3 bg-red-50 rounded-xl">
+              <Crown className="w-6 h-6 text-red-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border-2 border-slate-200 p-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-slate-600 font-medium mb-2">Managers</p>
+              <p className="text-3xl font-bold text-purple-600">{stats.managers}</p>
+            </div>
+            <div className="p-3 bg-purple-50 rounded-xl">
+              <Shield className="w-6 h-6 text-purple-600" />
             </div>
           </div>
         </div>
@@ -304,7 +324,7 @@ export default function AdminMembersPage() {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-slate-600 font-medium mb-2">Members</p>
-              <p className="text-3xl font-bold text-emerald-600">{stats.active}</p>
+              <p className="text-3xl font-bold text-emerald-600">{stats.members}</p>
             </div>
             <div className="p-3 bg-emerald-50 rounded-xl">
               <UserCheck className="w-6 h-6 text-emerald-600" />
@@ -315,23 +335,11 @@ export default function AdminMembersPage() {
         <div className="bg-white rounded-xl shadow-sm border-2 border-slate-200 p-6">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-slate-600 font-medium mb-2">Users</p>
-              <p className="text-3xl font-bold text-amber-600">{stats.pending}</p>
+              <p className="text-slate-600 font-medium mb-2">Regular Users</p>
+              <p className="text-3xl font-bold text-blue-600">{stats.users}</p>
             </div>
-            <div className="p-3 bg-amber-50 rounded-xl">
-              <AlertCircle className="w-6 h-6 text-amber-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border-2 border-slate-200 p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-slate-600 font-medium mb-2">Admins</p>
-              <p className="text-3xl font-bold text-slate-600">{stats.inactive}</p>
-            </div>
-            <div className="p-3 bg-slate-50 rounded-xl">
-              <XCircle className="w-6 h-6 text-slate-600" />
+            <div className="p-3 bg-blue-50 rounded-xl">
+              <Users className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
@@ -358,6 +366,7 @@ export default function AdminMembersPage() {
             >
               <option value="all">All Roles</option>
               <option value="ADMIN">Admin</option>
+              <option value="MANAGER">Manager</option>
               <option value="MEMBER">Member</option>
               <option value="USER">User</option>
             </select>
@@ -428,15 +437,19 @@ export default function AdminMembersPage() {
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${member.role === 'ADMIN'
-                          ? 'bg-purple-100 text-purple-700'
-                          : member.role === 'MEMBER'
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-blue-100 text-blue-700'
+                            ? 'bg-red-100 text-red-700'
+                            : member.role === 'MANAGER'
+                              ? 'bg-purple-100 text-purple-700'
+                              : member.role === 'MEMBER'
+                                ? 'bg-emerald-100 text-emerald-700'
+                                : 'bg-blue-100 text-blue-700'
                           }`}
                       >
-                        {member.role === 'ADMIN' && <Shield className="w-3.5 h-3.5" />}
+                        {member.role === 'ADMIN' && <Crown className="w-3.5 h-3.5" />}
+                        {member.role === 'MANAGER' && <Shield className="w-3.5 h-3.5" />}
                         {member.role === 'MEMBER' && <UserCheck className="w-3.5 h-3.5" />}
-                        {member.role}
+                        {member.role === 'USER' && <Users className="w-3.5 h-3.5" />}
+                        {getRoleDisplayName(member.role as Role)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -493,7 +506,7 @@ export default function AdminMembersPage() {
                 onClick={() => {
                   setShowAddModal(false);
                   setShowEditModal(false);
-                  setFormData({ name: '', email: '', password: '', role: 'MEMBER' });
+                  setFormData({ name: '', email: '', password: '', role: 'MEMBER', managerPages: [] });
                   setSelectedMember(null);
                 }}
                 className="p-2 hover:bg-white/10 rounded-lg transition-colors"
@@ -567,9 +580,10 @@ export default function AdminMembersPage() {
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                     className="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-xl focus:border-[#038DCD] focus:ring-4 focus:ring-[#038DCD]/10 outline-none cursor-pointer transition-all appearance-none bg-white"
                   >
-                    <option value="USER">User - Basic access</option>
-                    <option value="MEMBER">Member - Standard privileges</option>
-                    <option value="ADMIN">Admin - Full access</option>
+                    <option value="USER">User - Basic access only</option>
+                    <option value="MEMBER">Member - View and submit forms</option>
+                    <option value="MANAGER">Manager - Manage events, forms & members</option>
+                    <option value="ADMIN">Admin - Full system access</option>
                   </select>
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                     <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -580,12 +594,47 @@ export default function AdminMembersPage() {
                 <div className="mt-3 p-3 bg-blue-50 border-2 border-blue-200 rounded-xl">
                   <p className="text-xs text-blue-800">
                     <strong>Role Permissions:</strong>
-                    {formData.role === 'ADMIN' && ' Full system access including user management'}
-                    {formData.role === 'MEMBER' && ' Standard access to member features'}
+                    {formData.role === 'ADMIN' && ' Full system access including user & admin management'}
+                    {formData.role === 'MANAGER' && ' Manage events, forms, business ads & members'}
+                    {formData.role === 'MEMBER' && ' View events, submit forms & manage profile'}
                     {formData.role === 'USER' && ' Basic read-only access'}
                   </p>
                 </div>
               </div>
+
+              {formData.role === 'MANAGER' && (
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">
+                    Assigned Pages <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="space-y-2">
+                    {['/admin/events', '/admin/business-ads', '/admin/form-builder', '/admin/submissions', '/admin/members'].map((page) => (
+                      <label key={page} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.managerPages.includes(page)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData({ ...formData, managerPages: [...formData.managerPages, page] });
+                            } else {
+                              setFormData({ ...formData, managerPages: formData.managerPages.filter(p => p !== page) });
+                            }
+                          }}
+                          className="w-4 h-4 rounded cursor-pointer"
+                        />
+                        <span className="text-sm text-slate-700">
+                          {page === '/admin/events' && '📅 Events'}
+                          {page === '/admin/business-ads' && '🏢 Business Ads'}
+                          {page === '/admin/form-builder' && '📝 Forms'}
+                          {page === '/admin/submissions' && '📊 Submissions'}
+                          {page === '/admin/members' && '👥 Members'}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-xs text-slate-500">Select which pages this manager can access</p>
+                </div>
+              )}
 
               <div className="flex gap-3 pt-4 border-t-2 border-slate-200">
                 <button
@@ -653,15 +702,37 @@ export default function AdminMembersPage() {
                   </div>
                   <span
                     className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold ${selectedMember.role === 'ADMIN'
-                      ? 'bg-purple-100 text-purple-700'
-                      : selectedMember.role === 'MEMBER'
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-blue-100 text-blue-700'
+                        ? 'bg-red-100 text-red-700'
+                        : selectedMember.role === 'MANAGER'
+                          ? 'bg-purple-100 text-purple-700'
+                          : selectedMember.role === 'MEMBER'
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-blue-100 text-blue-700'
                       }`}
                   >
-                    {selectedMember.role}
+                    {getRoleDisplayName(selectedMember.role as Role)}
                   </span>
                 </div>
+
+                {selectedMember.role === 'MANAGER' && selectedMember.managerPages && selectedMember.managerPages.length > 0 && (
+                  <div className="p-4 bg-slate-50 rounded-xl md:col-span-2">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Shield className="w-4 h-4 text-slate-500" />
+                      <p className="text-sm font-semibold text-slate-500">Assigned Pages</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedMember.managerPages.map((page) => (
+                        <span key={page} className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
+                          {page === '/admin/events' && '📅 Events'}
+                          {page === '/admin/business-ads' && '🏢 Business Ads'}
+                          {page === '/admin/form-builder' && '📝 Forms'}
+                          {page === '/admin/submissions' && '📊 Submissions'}
+                          {page === '/admin/members' && '👥 Members'}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className="p-4 bg-slate-50 rounded-xl">
                   <div className="flex items-center gap-2 mb-2">

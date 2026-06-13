@@ -48,6 +48,13 @@ export default function AdminDashboard() {
     approvedToday: 0,
   });
   const [recentApplications, setRecentApplications] = useState<Record<string, unknown>[]>([]);
+
+  // Redirect managers to their dashboard
+  useEffect(() => {
+    if (user?.role === 'MANAGER') {
+      router.push('/admin/events');
+    }
+  }, [user?.role, router]);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [eventRegistrations, setEventRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
@@ -128,7 +135,7 @@ export default function AdminDashboard() {
       <div className="flex flex-col gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900">Dashboard Overview</h1>
-          <p className="text-sm sm:text-base text-slate-600">Welcome back, {user?.name || 'Admin'}! Here&apos;s what&apos;s happening today.</p>
+          <p className="text-sm sm:text-base text-slate-600">Welcome back, {user?.name || 'Admin'}! {user?.role === 'MANAGER' ? "Here's your manager dashboard." : "Here's what's happening today."}</p>
         </div>
       </div>
 

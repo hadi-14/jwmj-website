@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { requireAdmin, sanitizeInput, sanitizeEmail, applyRateLimit } from '@/lib/auth';
+import { VALID_ROLES, type Role } from '@/lib/roles';
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,8 +22,8 @@ export async function GET(request: NextRequest) {
     // Filters with sanitization
     const role = searchParams.get('role');
     const search = searchParams.get('search');
-    const sortBy = ['createdAt', 'email', 'name', 'role'].includes(searchParams.get('sortBy') || '') 
-      ? searchParams.get('sortBy') 
+    const sortBy = ['createdAt', 'email', 'name', 'role'].includes(searchParams.get('sortBy') || '')
+      ? searchParams.get('sortBy')
       : 'createdAt';
     const sortOrder = searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc';
 
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
       OR?: Array<{ name?: { contains: string }; email?: { contains: string } }>;
     } = {};
 
-    if (role && ['ADMIN', 'USER', 'MEMBER'].includes(role)) {
+    if (role && VALID_ROLES.includes(role as Role)) {
       where.role = role;
     }
 
@@ -55,6 +56,7 @@ export async function GET(request: NextRequest) {
         email: true,
         name: true,
         role: true,
+        managerPages: true,
         createdAt: true,
         updatedAt: true,
         // Explicitly exclude password
@@ -96,7 +98,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { email, name, password, role = 'USER' } = body;
+    const { email, name, password, role = 'USER', managerPages } = body;
 
     // Validation
     if (!email || !password) {
@@ -124,11 +126,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate role
-    if (!['ADMIN', 'USER', 'MEMBER'].includes(role)) {
+    if (!VALID_ROLES.includes(role as Role)) {
       return NextResponse.json(
-        { success: false, error: 'Invalid role' },
+        { success: false, error: 'Invalid role. Must be one of: ADMIN, MANAGER, MEMBER, USER' },
         { status: 400 }
       );
+    }
+
+    // Validate managerPages for MANAGER role
+    if (role === 'MANAGER') {
+      if (!Array.isArray(managerPages) || managerPages.length === 0) {
+        return NextResponse.json(
+          { success: false, error: 'At least one page must be assigned to a Manager' },
+          { status: 400 }
+        );
+      }
     }
 
     // Check if user already exists
@@ -153,12 +165,14 @@ export async function POST(request: NextRequest) {
         name: name ? sanitizeInput(name) : null,
         password: hashedPassword,
         role,
+        ...(role === 'MANAGER' && { managerPages }),
       },
       select: {
         id: true,
         email: true,
         name: true,
         role: true,
+        managerPages: true,
         createdAt: true,
         updatedAt: true,
       },

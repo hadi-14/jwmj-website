@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
-import { 
-  createToken, 
-  setAuthCookie, 
-  applyRateLimit, 
+import {
+  createToken,
+  setAuthCookie,
+  applyRateLimit,
   sanitizeEmail,
-  logSecurityEvent 
+  logSecurityEvent
 } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
         name: true,
         password: true,
         role: true,
+        managerPages: true,
       },
     });
 

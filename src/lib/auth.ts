@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Role, VALID_ROLES, hasPermission, PERMISSIONS } from '@/lib/roles';
 
 // SECURITY: Never use fallback secrets in production
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -13,7 +14,7 @@ if (!JWT_SECRET) {
 export interface AuthUser {
   userId: string;
   email: string;
-  role: 'ADMIN' | 'MEMBER' | 'USER';
+  role: Role;
   name?: string;
 }
 
@@ -52,12 +53,17 @@ export async function verifyAuth(): Promise<AuthResult> {
       return { success: false, error: 'User not found' };
     }
 
+    // Validate role is one of the valid roles
+    if (!VALID_ROLES.includes(user.role as Role)) {
+      return { success: false, error: 'Invalid user role' };
+    }
+
     return {
       success: true,
       user: {
         userId: user.id,
         email: user.email,
-        role: user.role as 'ADMIN' | 'MEMBER' | 'USER',
+        role: user.role as Role,
         name: user.name || undefined,
       },
     };
@@ -91,10 +97,10 @@ export async function requireAuth(): Promise<{ user: AuthUser } | NextResponse> 
 }
 
 /**
- * Require admin role for a route
- * Returns 401 if not authenticated, 403 if not admin
+ * Require Admin role for a route
+ * Returns 401 if not authenticated, 403 if not Admin
  */
-export async function requireAdmin(): Promise<{ user: AuthUser } | NextResponse> {
+export async function requireAdminRole(): Promise<{ user: AuthUser } | NextResponse> {
   const auth = await verifyAuth();
 
   if (!auth.success || !auth.user) {
@@ -115,6 +121,61 @@ export async function requireAdmin(): Promise<{ user: AuthUser } | NextResponse>
 }
 
 /**
+ * Require admin role for a route (kept for backward compatibility)
+ * Returns 401 if not authenticated, 403 if not admin
+ */
+export async function requireAdmin(): Promise<{ user: AuthUser } | NextResponse> {
+  return requireAdminRole();
+}
+
+/**
+ * Require Admin or Manager role for a route
+ * Returns 401 if not authenticated, 403 if not Admin/Manager
+ */
+export async function requireAdminOrManager(): Promise<{ user: AuthUser } | NextResponse> {
+  const auth = await verifyAuth();
+
+  if (!auth.success || !auth.user) {
+    return NextResponse.json(
+      { success: false, error: auth.error || 'Not authenticated' },
+      { status: 401 }
+    );
+  }
+
+  if (auth.user.role !== 'ADMIN' && auth.user.role !== 'MANAGER') {
+    return NextResponse.json(
+      { success: false, error: 'Admin or Manager access required' },
+      { status: 403 }
+    );
+  }
+
+  return { user: auth.user };
+}
+
+/**
+ * Require a specific permission for a route
+ */
+export async function requirePermission(permission: typeof PERMISSIONS[keyof typeof PERMISSIONS]): Promise<{ user: AuthUser } | NextResponse> {
+  const auth = await verifyAuth();
+
+  if (!auth.success || !auth.user) {
+    return NextResponse.json(
+      { success: false, error: auth.error || 'Not authenticated' },
+      { status: 401 }
+    );
+  }
+
+  if (!hasPermission(auth.user.role, permission)) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions' },
+      { status: 403 }
+    );
+  }
+
+  return { user: auth.user };
+}
+
+/**
  * Require member or admin role for a route
  */
 export async function requireMember(): Promise<{ user: AuthUser } | NextResponse> {
@@ -127,7 +188,7 @@ export async function requireMember(): Promise<{ user: AuthUser } | NextResponse
     );
   }
 
-  if (auth.user.role !== 'MEMBER' && auth.user.role !== 'ADMIN') {
+  if (auth.user.role !== 'MEMBER' && auth.user.role !== 'ADMIN' && auth.user.role !== 'MANAGER') {
     return NextResponse.json(
       { success: false, error: 'Member access required' },
       { status: 403 }
@@ -230,13 +291,23 @@ export function sanitizeEmail(email: string): string | null {
 /**
  * Create JWT token for user
  */
-export function createToken(user: { id: string; email: string; role: string }): string {
+export function createToken(user: { id: string; email: string; role: string; managerPages?: unknown }): string {
   if (!JWT_SECRET) {
     throw new Error('JWT_SECRET not configured');
   }
 
+  const payload: { userId: string; email: string; role: string; managerPages?: unknown } = {
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+  };
+
+  if (user.role === 'MANAGER' && user.managerPages) {
+    payload.managerPages = user.managerPages;
+  }
+
   return jwt.sign(
-    { userId: user.id, email: user.email, role: user.role },
+    payload,
     JWT_SECRET,
     { expiresIn: '7d' }
   );
